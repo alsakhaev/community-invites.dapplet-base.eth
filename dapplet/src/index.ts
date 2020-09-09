@@ -24,7 +24,13 @@ export default class Feature {
                     initial: "DEFAULT",
                     "DEFAULT": {
                         text: 'Devcon 2020 (+1)',
-                        exec: () => console.log('Label clicked'),
+                        exec: async (ctx) => {
+                            const contractAddress = await Core.storage.get('contractAddress');
+                            const oracleAddress = await Core.storage.get('oracleAddress');
+                            this._overlay.sendAndListen('profile_select', { ...ctx, contractAddress, oracleAddress }, { 
+
+                            });
+                        },
                         img: ICON
                     }
                 })
