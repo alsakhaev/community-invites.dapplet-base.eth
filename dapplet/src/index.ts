@@ -13,7 +13,7 @@ export default class Feature {
         public viewportAdapter: any
     ) {
         const wallet = Core.wallet();
-        Core.storage.get('overlayUrl').then(url => this._overlay = Core.overlay({ url, title: 'Identity Management' }));
+        Core.storage.get('overlayUrl').then(url => this._overlay = Core.overlay({ url, title: 'Community Invite' }));
 
         const { statusLine } = viewportAdapter.exports;
         const { label, button } = this.identityAdapter.exports;
