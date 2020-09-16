@@ -11,7 +11,9 @@ export default class Feature {
 
         @Inject("common-adapter.dapplet-base.eth")
         public viewportAdapter: any
-    ) {
+    ) {        
+        Core.onAction(() => this._openPostOverlay({}));
+
         const wallet = Core.wallet();
         Core.storage.get('overlayUrl').then(url => this._overlay = Core.overlay({ url, title: 'Community Invite' }));
 
@@ -24,17 +26,20 @@ export default class Feature {
                     initial: "DEFAULT",
                     "DEFAULT": {
                         text: 'Devcon 2020 (+1)',
-                        exec: async (ctx) => {
-                            const contractAddress = await Core.storage.get('contractAddress');
-                            const oracleAddress = await Core.storage.get('oracleAddress');
-                            this._overlay.sendAndListen('profile_select', { ...ctx, contractAddress, oracleAddress }, { 
-
-                            });
-                        },
+                        exec: (ctx) => this._openPostOverlay(ctx),
                         img: ICON
                     }
                 })
             ]
         })
+    }
+
+    private async _openPostOverlay(post) {
+        console.log(JSON.stringify(post))
+        const contractAddress = await Core.storage.get('contractAddress');
+        const oracleAddress = await Core.storage.get('oracleAddress');
+        this._overlay.sendAndListen('profile_select', { ...post, contractAddress, oracleAddress }, { 
+
+        });
     }
 }
