@@ -10,7 +10,7 @@ interface IProps {
 
 interface IState { }
 
-export class TweetCard extends React.Component<IProps, IState> {
+export class PostCard extends React.Component<IProps, IState> {
     render() {
         const p = this.props.post;
         if (this.props.card) return (<Card fluid>
@@ -23,7 +23,7 @@ export class TweetCard extends React.Component<IProps, IState> {
                 />
                 <Card.Header>{p.authorFullname}</Card.Header>
                 <Card.Meta>@{p.authorUsername}</Card.Meta>
-                <Card.Description>
+                <Card.Description style={{ wordBreak: 'break-all'}}>
                     {p.text}
                 </Card.Description>
             </Card.Content>

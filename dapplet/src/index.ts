@@ -11,11 +11,16 @@ export default class Feature {
 
         @Inject("common-adapter.dapplet-base.eth")
         public viewportAdapter: any
-    ) {        
-        Core.onAction(() => this._openPostOverlay({}));
+    ) {
+        const profile = {
+            username: 'alsakhaev',
+            fullname: 'Alexander Sakhaev',
+            img: 'https://abs.twimg.com/sticky/default_profile_images/default_profile_200x200.png'
+        };
+
+        Core.onAction(() => this._openOverlay(profile));
 
         const wallet = Core.wallet();
-        Core.storage.get('overlayUrl').then(url => this._overlay = Core.overlay({ url, title: 'Community Invite' }));
 
         const { statusLine } = viewportAdapter.exports;
         const { label, button } = this.identityAdapter.exports;
@@ -26,7 +31,7 @@ export default class Feature {
                     initial: "DEFAULT",
                     "DEFAULT": {
                         text: 'Devcon 2020 (+1)',
-                        exec: (ctx) => this._openPostOverlay(ctx),
+                        exec: (post) => this._openOverlay(profile, post),
                         img: ICON
                     }
                 })
@@ -34,11 +39,15 @@ export default class Feature {
         })
     }
 
-    private async _openPostOverlay(post) {
-        console.log(JSON.stringify(post))
+    private async _openOverlay(profile: any, post?: any) {
+        if (!this._overlay) {
+            const url = await Core.storage.get('overlayUrl');
+            this._overlay = Core.overlay({ url, title: 'Community Invite' });
+        }
+
         const contractAddress = await Core.storage.get('contractAddress');
         const oracleAddress = await Core.storage.get('oracleAddress');
-        this._overlay.sendAndListen('profile_select', { ...post, contractAddress, oracleAddress }, { 
+        this._overlay.sendAndListen('data', { profile, post, settings: { contractAddress, oracleAddress } }, {
 
         });
     }

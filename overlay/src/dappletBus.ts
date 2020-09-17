@@ -5,12 +5,24 @@ export type Post = {
     authorUsername: string;
     authorImg: string;
     id: string;
-    text: string;
-}
+    text: string;    
+};
+
+export type Profile = {
+    username: string;
+    fullname: string;    
+    img: string;
+};
 
 export type Settings = {
     contractAddress: string;
-    oracleAddress: string;
+    oracleAddress: string;    
+};
+
+export type Data = {
+    post?: Post;
+    profile?: Profile;
+    settings?: Settings;
 }
 
 export type UnsignedProve = string;
@@ -19,9 +31,9 @@ export type SignedProve = string;
 class DappletBus extends Bus {
     _subId: number = 0;
 
-    onProfileSelect(callback: (profile: Post & Settings) => void) {
-        this.subscribe('profile_select', (profile: Post & Settings) => {
-            callback(profile);
+    onData(callback: (data: Data) => void) {
+        this.subscribe('data', (data: Data) => {
+            callback(data);
             return (++this._subId).toString();
         });
     }
