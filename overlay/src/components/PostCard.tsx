@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from "react-router-dom";
-import { Button, Divider, Card, Accordion, Icon, Segment, Image, Comment } from 'semantic-ui-react';
+import { Button, Divider, Card, Accordion, Icon, Segment, Image, Comment, Label } from 'semantic-ui-react';
 import { Post } from '../dappletBus';
 
 interface IProps {

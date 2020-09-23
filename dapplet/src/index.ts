@@ -12,13 +12,7 @@ export default class Feature {
         @Inject("common-adapter.dapplet-base.eth")
         public viewportAdapter: any
     ) {
-        const profile = {
-            username: 'alsakhaev',
-            fullname: 'Alexander Sakhaev',
-            img: 'https://abs.twimg.com/sticky/default_profile_images/default_profile_200x200.png'
-        };
-
-        Core.onAction(() => this._openOverlay(profile));
+        Core.onAction(() => this._openOverlay(this.identityAdapter.getCurrentUser()));
 
         const wallet = Core.wallet();
 
@@ -31,12 +25,21 @@ export default class Feature {
                     initial: "DEFAULT",
                     "DEFAULT": {
                         text: 'Devcon 2020 (+1)',
-                        exec: (post) => this._openOverlay(profile, post),
+                        exec: (post) => this._openOverlay(this.identityAdapter.getCurrentUser(), post),
                         img: ICON
                     }
                 })
+            ],
+            POST_SOUTH: [
+                button({
+                    initial: "DEFAULT",
+                    "DEFAULT": {
+                        img: ICON,
+                        exec: (post) => this._openOverlay(this.identityAdapter.getCurrentUser(), post)
+                    }
+                })
             ]
-        })
+        });
     }
 
     private async _openOverlay(profile: any, post?: any) {

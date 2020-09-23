@@ -1,10 +1,11 @@
 import React from 'react';
 import { Link } from "react-router-dom";
-import { Button, Divider, Card, Accordion, Icon, Segment, Container } from 'semantic-ui-react';
+import { Button, Divider, Card, Accordion, Icon, Segment, Container, Checkbox } from 'semantic-ui-react';
 import { Post, Profile } from '../dappletBus';
 import { PostCard } from '../components/PostCard';
 import { Conference, getConferences } from '../api';
-import { ProfileCard } from '../components/ProfileCard'
+import { ProfileCard } from '../components/ProfileCard';
+import { Participants } from '../components/Participants';
 
 interface IProps {
   post: Post;
@@ -43,6 +44,10 @@ export class MyMeetups extends React.Component<IProps, IState> {
     this.setState({ activeIndex: newIndex })
   }
 
+  markBadge = () => {
+
+  }
+
   renderAccordion = (conferences: Conference[]) => {
     const { activeIndex } = this.state;
 
@@ -61,6 +66,7 @@ export class MyMeetups extends React.Component<IProps, IState> {
             {c.startDate.toLocaleDateString() + ' - ' + c.finishDate.toLocaleDateString()}<br />
             <a href={c.website}>{c.website}</a>
           </p>
+          <Participants/>
         </Accordion.Content>
       </React.Fragment>)}
     </Accordion>);
@@ -72,7 +78,7 @@ export class MyMeetups extends React.Component<IProps, IState> {
         <Container text style={{ textAlign: 'center' }}>
           ???
         </Container>
-        <ProfileCard card profile={this.props.profile as any}/>
+        <ProfileCard card profile={this.props.profile as any} badge={'Devcon 6'}/>
         {this.renderAccordion(this.state.conferences)}
       </div>
     );

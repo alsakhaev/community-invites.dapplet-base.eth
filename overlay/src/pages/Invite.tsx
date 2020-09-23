@@ -3,10 +3,11 @@ import { Link } from "react-router-dom";
 import { Button, Divider, Card, Accordion, Icon, Segment, Container } from 'semantic-ui-react';
 import { Post, Profile } from '../dappletBus';
 import { PostCard } from '../components/PostCard';
+import { HoverButton } from '../components/HoverButton';
 import { Conference, getConferences } from '../api';
 
 interface IProps {
-  post: Post;
+  post?: Post;
   profile?: Profile;
 }
 
@@ -69,7 +70,8 @@ export class Invite extends React.Component<IProps, IState> {
     return (<Accordion fluid styled>
       {conferences.map(c => <React.Fragment key={c.id}>
         <Accordion.Title active={activeIndex === c.id} index={c.id} onClick={this.handleClick} style={{ lineHeight: '29px' }}>
-          <Icon name='dropdown' />{c.name} <Button index={c.id} color={isInvited(c) ? 'green' : 'blue'} floated='right' size='mini' onClick={this.buttonClick}>{isInvited(c) ? 'Invited' : 'Invite'}</Button>
+          <Icon name='dropdown' />{c.name}
+          <HoverButton color={isInvited(c) ? 'green' : 'blue'} hoverColor={isInvited(c) ? 'red' : 'blue'} hoverText={isInvited(c) ? 'Withdraw' : 'Invite'} index={c.id} floated='right' size='mini' onClick={this.buttonClick}>{isInvited(c) ? 'Invited' : 'Invite'}</HoverButton>
         </Accordion.Title>
         <Accordion.Content active={activeIndex === c.id}>
           <p>
@@ -84,6 +86,12 @@ export class Invite extends React.Component<IProps, IState> {
 
   render() {
     const { activeIndex } = this.state;
+
+    if (!this.props.post) return (
+      <Container text style={{ textAlign: 'center' }}>
+        Select a post to invite an author for discussion
+      </Container>
+    );
 
     return (
       <div>
