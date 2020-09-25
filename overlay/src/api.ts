@@ -108,7 +108,7 @@ export class Api {
 
     async getConferencesWithInvitations(profile: Profile): Promise<{ conference: Conference, invitations: { from: Profile, to: Profile, post_id: string }[], attendance: boolean }[]> {
 
-        const resp = await fetch(this._url + '/conferences/invitations?namespace=twitter&username=' + profile.username, { mode: 'no-cors' });
+        const resp = await fetch(this._url + '/conferences/invitations?namespace=twitter&username=' + profile.username);
         const json = await resp.json();
         if (!json.success) throw Error(json.message);
 
