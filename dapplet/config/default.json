@@ -1,17 +1,14 @@
 {
     "main": {
         "overlayUrl": "https://swarm-gateways.net/bzz:/4c6869f3c8c0202b1d5bfdb7c71d5b79ba0f3066a6a5017ce98810dd469e1e9c",
-        "contractAddress": "0xf6b3a0B20281796D465bB8613e233BE30be07084",
-        "oracleAddress": "0x692a4d7B7BE2dc1623155E90B197a82D114a74f3"
+        "serverUrl": "https://community-invite.herokuapp.com"
     },
     "test": {
         "overlayUrl": "https://swarm-gateways.net/bzz:/4c6869f3c8c0202b1d5bfdb7c71d5b79ba0f3066a6a5017ce98810dd469e1e9c",
-        "contractAddress": "0xf6b3a0B20281796D465bB8613e233BE30be07084",
-        "oracleAddress": "0x692a4d7B7BE2dc1623155E90B197a82D114a74f3"
+        "serverUrl": "https://community-invite.herokuapp.com"
     },
     "dev": {
         "overlayUrl": "https://localhost:3000",
-        "contractAddress": "0xf6b3a0B20281796D465bB8613e233BE30be07084",
-        "oracleAddress": "0x692a4d7B7BE2dc1623155E90B197a82D114a74f3"
+        "serverUrl": "http://localhost:3001"
     }
 }

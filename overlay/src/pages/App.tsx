@@ -33,7 +33,7 @@ export class App extends React.Component<IProps, IState> {
     document.getElementsByClassName('loader-container')?.[0]?.remove();
   }
 
-  postsClickHandler = (conferenceId: string, username: string) => {
+  postsClickHandler = (conferenceId: number, username: string) => {
     this.setState({ activeIndex: 1, postsDefaultSearch: `conferenceId:${conferenceId} username:${username}` });
   }
 
@@ -62,10 +62,10 @@ export class App extends React.Component<IProps, IState> {
       // }, 
       {
         menuItem: "Conferences",
-        render: () => <Tab.Pane as={() => <Merged profile={this.state.profile} post={this.state.post as Post} onPostsClick={this.postsClickHandler} />} />,
+        render: () => <Tab.Pane as={() => <Merged profile={this.state.profile} post={this.state.post} onPostsClick={this.postsClickHandler} settings={this.state.settings!} />} />,
       }, {
         menuItem: "Posts",
-        render: () => <Tab.Pane as={() => <Posts defaultSearch={this.state.postsDefaultSearch}/>} />,
+        render: () => <Tab.Pane as={() => <Posts defaultSearch={this.state.postsDefaultSearch} settings={this.state.settings!} /> } />,
       }
     ];
 

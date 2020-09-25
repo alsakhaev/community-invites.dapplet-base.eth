@@ -9,7 +9,7 @@ const router = Router();
 router.get('/', home.index);
 
 router.get('/conferences', conference.get);
-router.get('/conferences/participants', conference.getWithParticipants);
+router.get('/conferences/invitations', conference.getWithInvitations);
 router.get('/conferences/:id', conference.getById);
 router.post('/conferences', conference.post);
 router.post('/conferences/invite', conference.invite);

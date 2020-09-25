@@ -2,11 +2,12 @@ import React from 'react';
 import { Link } from "react-router-dom";
 import { Button, Divider, Card, Accordion, Icon, Segment, Image, Comment, Grid, Checkbox, Input, InputOnChangeData } from 'semantic-ui-react';
 import { getPosts } from '../api';
-import { Post, Profile } from '../dappletBus';
+import { Post, Profile, Settings } from '../dappletBus';
 import { PostCard } from '../components/PostCard';
 
 interface IProps {
     defaultSearch: string;
+    settings: Settings;
 }
 
 interface IState {

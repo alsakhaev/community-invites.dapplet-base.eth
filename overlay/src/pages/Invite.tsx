@@ -13,8 +13,8 @@ interface IProps {
 
 interface IState {
   conferences: Conference[];
-  activeIndex: string | null;
-  invited: string[];
+  activeIndex: number | null;
+  invited: number[];
 }
 
 export class Invite extends React.Component<IProps, IState> {
@@ -76,7 +76,7 @@ export class Invite extends React.Component<IProps, IState> {
         <Accordion.Content active={activeIndex === c.id}>
           <p>
             {c.location}<br />
-            {c.startDate.toLocaleDateString() + ' - ' + c.finishDate.toLocaleDateString()}<br />
+            {c.date_from.toLocaleDateString() + ' - ' + c.date_to.toLocaleDateString()}<br />
             <a href={c.website}>{c.website}</a>
           </p>
         </Accordion.Content>
@@ -102,13 +102,13 @@ export class Invite extends React.Component<IProps, IState> {
         <PostCard post={this.props.post} card />
 
         <Container text style={{ textAlign: 'center', marginBottom: 5 }}>at conferences HE/SHE visits</Container>
-        {this.renderAccordion(this.state.conferences.filter(c => parseInt(c.id) < 2))}
+        {this.renderAccordion(this.state.conferences.filter(c => c.id < 2))}
 
         <Container text style={{ textAlign: 'center', marginTop: 10, marginBottom: 5 }}>at conferences YOU visit</Container>
-        {this.renderAccordion(this.state.conferences.filter(c => parseInt(c.id) >= 2 && parseInt(c.id) < 4))}
+        {this.renderAccordion(this.state.conferences.filter(c => c.id >= 2 && c.id < 4))}
 
         <Container text style={{ textAlign: 'center', marginTop: 10, marginBottom: 5 }}>or any other conferences</Container>
-        {this.renderAccordion(this.state.conferences.filter(c => parseInt(c.id) >= 4 && parseInt(c.id) < 7))}
+        {this.renderAccordion(this.state.conferences.filter(c => c.id >= 4 && c.id < 7))}
       </div>
     );
   }

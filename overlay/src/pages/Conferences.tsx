@@ -13,8 +13,8 @@ interface IProps {
 
 interface IState {
   conferences: Conference[];
-  activeIndex: string | null;
-  attended: string[];
+  activeIndex: number | null;
+  attended: number[];
 }
 
 export class Conferences extends React.Component<IProps, IState> {
@@ -22,7 +22,7 @@ export class Conferences extends React.Component<IProps, IState> {
     super(props);
     this.state = {
       conferences: [],
-      activeIndex: '6',
+      activeIndex: 6,
       attended: []
     }
   }
@@ -76,7 +76,7 @@ export class Conferences extends React.Component<IProps, IState> {
         <Accordion.Content active={activeIndex === c.id}>
           <p>
             {c.location}<br />
-            {c.startDate.toLocaleDateString() + ' - ' + c.finishDate.toLocaleDateString()}<br />
+            {c.date_from.toLocaleDateString() + ' - ' + c.date_to.toLocaleDateString()}<br />
             <a href={c.website}>{c.website}</a>
           </p>
           <Checkbox label='Make visible as a badge' />

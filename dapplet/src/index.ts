@@ -48,9 +48,8 @@ export default class Feature {
             this._overlay = Core.overlay({ url, title: 'Community Invite' });
         }
 
-        const contractAddress = await Core.storage.get('contractAddress');
-        const oracleAddress = await Core.storage.get('oracleAddress');
-        this._overlay.sendAndListen('data', { profile, post, settings: { contractAddress, oracleAddress } }, {
+        const serverUrl = await Core.storage.get('serverUrl');
+        this._overlay.sendAndListen('data', { profile, post, settings: { serverUrl } }, {
 
         });
     }

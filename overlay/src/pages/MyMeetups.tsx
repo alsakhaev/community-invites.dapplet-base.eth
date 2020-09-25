@@ -14,7 +14,7 @@ interface IProps {
 
 interface IState {
   conferences: Conference[];
-  activeIndex: string | null;
+  activeIndex: number | null;
 }
 
 export class MyMeetups extends React.Component<IProps, IState> {
@@ -22,7 +22,7 @@ export class MyMeetups extends React.Component<IProps, IState> {
     super(props);
     this.state = {
       conferences: [],
-      activeIndex: '6'
+      activeIndex: 6
     }
   }
 
@@ -63,7 +63,7 @@ export class MyMeetups extends React.Component<IProps, IState> {
         <Accordion.Content active={activeIndex === c.id}>
           <p>
             {c.location}<br />
-            {c.startDate.toLocaleDateString() + ' - ' + c.finishDate.toLocaleDateString()}<br />
+            {c.date_from.toLocaleDateString() + ' - ' + c.date_to.toLocaleDateString()}<br />
             <a href={c.website}>{c.website}</a>
           </p>
           <Participants/>

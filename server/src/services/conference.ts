@@ -31,7 +31,7 @@ export async function createConference(c: Conference): Promise<Conference> {
     });
 }
 
-export async function getConferencesWithParticipants(namespace: string, username: string): Promise<{ conference: Conference, invitations: { from: User, to: User, post_id: string }[], attendance: boolean }[]> {
+export async function getConferencesWithInvitations(namespace: string, username: string): Promise<{ conference: Conference, invitations: { from: User, to: User, post_id: string }[], attendance: boolean }[]> {
     return execute(async (client) => {
         const res = await client.query(`
             SELECT

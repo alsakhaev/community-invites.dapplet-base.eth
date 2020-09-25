@@ -15,8 +15,7 @@ export type Profile = {
 };
 
 export type Settings = {
-    contractAddress: string;
-    oracleAddress: string;    
+    serverUrl: string;
 };
 
 export type Data = {
