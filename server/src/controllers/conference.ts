@@ -19,9 +19,9 @@ export const post = asyncHandler(async function (req: any, res: any) {
 })
 
 export const getWithInvitations = asyncHandler(async function (req: any, res: any) {
-    const { namespace, username } = req.query;
-    if (!namespace || !username) throw new Error('namespace and username are required');
-    const data = await conferenceService.getConferencesWithInvitations(namespace, username);
+    const { namespace_from, username_from, namespace_to, username_to } = req.query;
+    if (!namespace_from || !username_from || !namespace_to || !username_to) throw new Error('namespace_from, username_from, namespace_to, username_to are required');
+    const data = await conferenceService.getConferencesWithInvitations(namespace_from, username_from, namespace_to, username_to);
     return res.json({ success: true, data });
 })
 

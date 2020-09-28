@@ -39,6 +39,8 @@ export class HoverButton extends React.Component<HoverButtonProps, HoverButtonSt
             color={color} 
             floated={p.floated}
             size={p.size}
+            loading={p.loading}
+            disabled={p.disabled}
             onClick={(e,d) => (this.mouseOutHandler(), p.onClick?.(e,d))}
             index={p.index}
         >{text}</Button>;

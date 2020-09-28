@@ -1,7 +1,8 @@
 import { execute } from '../connection';
-import { Conference, Post, User } from '../types';
+import { Conference, Post, Profile } from '../types';
 import * as userService from './user';
 import * as postService from './post';
+import bodyParser from 'body-parser';
 
 export async function getConferences(): Promise<Conference[]> {
     return execute(async (client) => {
@@ -31,7 +32,7 @@ export async function createConference(c: Conference): Promise<Conference> {
     });
 }
 
-export async function getConferencesWithInvitations(namespace: string, username: string): Promise<{ conference: Conference, invitations: { from: User, to: User, post_id: string }[], attendance: boolean }[]> {
+export async function getConferencesWithInvitations(namespace_from: string, username_from: string, namespace_to: string, username_to: string): Promise<{ conference: Conference, invitations: { from: Profile, to: Profile, post_id: string }[], attendance_from: boolean, attendance_to: boolean }[]> {
     return execute(async (client) => {
         const res = await client.query(`
             SELECT
@@ -41,21 +42,22 @@ export async function getConferencesWithInvitations(namespace: string, username:
                     'to', u_to.*,
                     'post_id', i.post_id
                 )) FILTER (WHERE i.post_id IS NOT NULL), '[]') as invitations,
-                (CASE WHEN (SELECT TRUE FROM attendance as a where c.id = a.conference_id and a.namespace = 'twitter' and a.username = 'alsakhaev') IS NULL THEN FALSE ELSE TRUE END) AS attendance
+                (CASE WHEN (SELECT TRUE FROM attendance as a where c.id = a.conference_id and a.namespace = $1 and a.username = $2 LIMIT 1) IS NULL THEN FALSE ELSE TRUE END) AS attendance_from,
+                (CASE WHEN (SELECT TRUE FROM attendance as a where c.id = a.conference_id and a.namespace = $3 and a.username = $4 LIMIT 1) IS NULL THEN FALSE ELSE TRUE END) AS attendance_to
             FROM conferences as c
             LEFT JOIN invitations as i on c.id = i.conference_id
             LEFT JOIN users as u_from on u_from.namespace = i.namespace_from and u_from.username = i.username_from
             LEFT JOIN users as u_to on u_to.namespace = i.namespace_to and u_to.username = i.username_to
             WHERE (i is NULL or (i.namespace_from = $1 OR i.namespace_to = $1)
                 AND (i.username_from = $2 OR i.username_to = $2))
-            GROUP BY c.id`, [namespace, username]);
+            GROUP BY c.id`, [namespace_from, username_from, namespace_to, username_to]);
 
         return res.rows;
     });
 }
 
 
-export async function invite(userFrom: User, userTo: User, conferenceId: number, post: Post): Promise<void> {
+export async function invite(userFrom: Profile, userTo: Profile, conferenceId: number, post: Post): Promise<void> {
     return execute(async (client) => {
         if (!await userService.getUser(userFrom.namespace, userFrom.username)) {
             await userService.createUser(userFrom);
@@ -78,7 +80,7 @@ export async function invite(userFrom: User, userTo: User, conferenceId: number,
     });
 }
 
-export async function withdraw(userFrom: User, userTo: User, conferenceId: number, post: Post): Promise<void> {
+export async function withdraw(userFrom: Profile, userTo: Profile, conferenceId: number, post: Post): Promise<void> {
     return execute(async (client) => {
         if (!await userService.getUser(userFrom.namespace, userFrom.username)) {
             await userService.createUser(userFrom);
@@ -106,7 +108,7 @@ export async function withdraw(userFrom: User, userTo: User, conferenceId: numbe
 }
 
 
-export async function attend(user: User, conferenceId: number): Promise<void> {
+export async function attend(user: Profile, conferenceId: number): Promise<void> {
     return execute(async (client) => {
         if (!await userService.getUser(user.namespace, user.username)) {
             await userService.createUser(user);
@@ -121,7 +123,7 @@ export async function attend(user: User, conferenceId: number): Promise<void> {
     });
 }
 
-export async function absend(user: User, conferenceId: number): Promise<void> {
+export async function absend(user: Profile, conferenceId: number): Promise<void> {
     return execute(async (client) => {
         if (!await userService.getUser(user.namespace, user.username)) {
             await userService.createUser(user);

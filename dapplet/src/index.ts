@@ -49,6 +49,7 @@ export default class Feature {
         }
 
         const serverUrl = await Core.storage.get('serverUrl');
+        profile.namespace = 'twitter.com';
         this._overlay.sendAndListen('data', { profile, post, settings: { serverUrl } }, {
 
         });

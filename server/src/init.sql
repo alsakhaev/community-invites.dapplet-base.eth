@@ -24,7 +24,7 @@ CREATE TABLE users (
   namespace varchar(15) NOT NULL,
   username varchar(50) NOT NULL,
   fullname varchar(255) NOT NULL,
-  avatar varchar(255) NOT NULL,
+  img varchar(255) NOT NULL,
   PRIMARY KEY(namespace, username)
 );
 

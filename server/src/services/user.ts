@@ -1,21 +1,21 @@
 import { execute } from '../connection';
-import { User } from '../types';
+import { Profile } from '../types';
 
-export async function getUsers(): Promise<User[]> {
+export async function getUsers(): Promise<Profile[]> {
     return execute(async (client) => {
         const res = await client.query('SELECT * FROM users;');
         return res.rows;
     });
 }
 
-export async function getUser(namespace: string, username: string): Promise<User[]> {
+export async function getUser(namespace: string, username: string): Promise<Profile[]> {
     return execute(async (client) => {
         const res = await client.query('SELECT * FROM users WHERE namespace = $1 and username = $2;', [namespace, username]);
         return res.rows[0];
     });
 }
 
-export async function createUser(u: User): Promise<User> {
+export async function createUser(u: Profile): Promise<Profile> {
     return execute(async (client) => {
         const entries = Object.entries(u);
         const values = entries.map(x => x[1]);

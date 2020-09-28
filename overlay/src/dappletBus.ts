@@ -5,12 +5,13 @@ export type Post = {
     authorUsername: string;
     authorImg: string;
     id: string;
-    text: string;    
+    text: string;
 };
 
 export type Profile = {
+    namespace: string;
     username: string;
-    fullname: string;    
+    fullname: string;
     img: string;
 };
 

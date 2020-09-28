@@ -13,11 +13,11 @@ export type Conference = {
     date_to: string;
 }
 
-export type User = {
+export type Profile = {
     namespace: string;
     username: string;
     fullname: string;
-    avatar: string;
+    img: string;
 }
 
 export type Invitation = {
