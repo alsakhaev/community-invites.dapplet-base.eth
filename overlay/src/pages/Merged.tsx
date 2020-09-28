@@ -44,7 +44,7 @@ export class Merged extends React.Component<IProps, IState> {
         'list': true
       },
       profileTo: this.props.post ? {
-        username: this.props.post!.authorUsername,
+        username: this.props.post!.authorUsername.toLowerCase(),
         fullname: this.props.post!.authorFullname,
         img: this.props.post!.authorImg,
         namespace: 'twitter.com'
