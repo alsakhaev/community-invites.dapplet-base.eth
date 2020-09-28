@@ -2,21 +2,16 @@
     "type": "object",
     "required": [
         "overlayUrl",
-        "contractAddress",
-        "oracleAddress"
+        "serverUrl"
     ],
     "properties": {
         "overlayUrl": {
             "type": "string",
             "title": "Overlay URL"
         },
-        "contractAddress": {
+        "serverUrl": {
             "type": "string",
-            "title": "Contract Address"
-        },
-        "oracleAddress": {
-            "type": "string",
-            "title": "Oracle Address"
+            "title": "Server URL"
         }
     }
 }
