@@ -25,6 +25,7 @@ CREATE TABLE users (
   username varchar(50) NOT NULL,
   fullname varchar(255) NOT NULL,
   img varchar(255) NOT NULL,
+  main_conference_id SERIAL NULL,
   PRIMARY KEY(namespace, username)
 );
 

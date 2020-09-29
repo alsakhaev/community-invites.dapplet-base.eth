@@ -7,6 +7,7 @@ import { Api, Conference, ConferenceWithInvitations, getConferences } from '../a
 import { ProfileCard } from '../components/ProfileCard'
 import { HoverButton } from '../components/HoverButton';
 import { Participants } from '../components/Participants';
+import { throws } from 'assert';
 
 interface IProps {
   post?: Post;
@@ -21,7 +22,7 @@ interface IState {
   attended: number[];
   invited: number[];
   badgeIndex: number | null;
-  detailsIndex: number | null;
+  //detailsIndex: number | null;
   loading: { [key: string]: boolean };
   profileTo: Profile | null;
 }
@@ -38,8 +39,8 @@ export class Merged extends React.Component<IProps, IState> {
       activeIndex: null,
       attended: [],
       invited: [],
-      badgeIndex: null,
-      detailsIndex: null,
+      badgeIndex: this.props.profile?.main_conference_id || null,
+      //detailsIndex: null,
       loading: {
         'list': true
       },
@@ -47,7 +48,8 @@ export class Merged extends React.Component<IProps, IState> {
         username: this.props.post!.authorUsername.toLowerCase(),
         fullname: this.props.post!.authorFullname,
         img: this.props.post!.authorImg,
-        namespace: 'twitter.com'
+        namespace: 'twitter.com',
+        main_conference_id: null
       } : null
     }
   }
@@ -78,6 +80,8 @@ export class Merged extends React.Component<IProps, IState> {
     this._setLoading('attend-' + index, true);
     try {
       if (this.state.data.find((d) => d.conference.id === index)!.attendance_from) {
+
+        // ToDo: move to backend?
         if (this.state.data.find((d) => d.conference.id === index)!.invitations.find(x => (
           x.from.username === this.props.profile?.username
           && x.from.namespace === this.props.profile?.namespace
@@ -86,6 +90,17 @@ export class Merged extends React.Component<IProps, IState> {
         ))) {
           await this._api.withdraw(this.props.profile!, this.state.profileTo!, index, this.props.post!);
         }
+
+        // ToDo: move to backend?
+        if (this.state.badgeIndex === index) {
+          const { profile } = this.props;
+          if (profile) {
+            profile.main_conference_id = null;
+            const newProfile = await this._api.updateUser(profile);
+            this.setState({ badgeIndex: newProfile.main_conference_id });
+          }
+        }
+
         await this._api.absend(this.props.profile!, index);
       } else {
         await this._api.attend(this.props.profile!, index);
@@ -105,6 +120,7 @@ export class Merged extends React.Component<IProps, IState> {
     const { index } = titleProps;
     this._setLoading('invite-' + index, true);
     try {
+      // ToDo: move to backend?
       if (this.state.data.find((d) => d.conference.id === index)!.invitations.find(x => (
         x.from.username === this.props.profile?.username
         && x.from.namespace === this.props.profile?.namespace
@@ -127,16 +143,36 @@ export class Merged extends React.Component<IProps, IState> {
     }
   }
 
-  badgeCheckboxClickHandler = (e: React.FormEvent<HTMLInputElement>, data: CheckboxProps & any) => {
+  badgeCheckboxClickHandler = async (_: any, data: CheckboxProps & any) => {
     const { index } = data;
     const oldValue = this.state.badgeIndex;
     const newValue = (oldValue === index) ? null : index;
-    this.setState({ badgeIndex: newValue });
+
+    const { profile } = this.props;
+    if (profile) {
+      this._setLoading('badge-' + index, true);
+      profile.main_conference_id = newValue;
+      const newProfile = await this._api.updateUser(profile);
+      this.setState({ badgeIndex: newProfile.main_conference_id });
+      this._setLoading('badge-' + index, false);
+    }
   }
 
-  detailsClickHandler = (conferenceId: number) => {
-    this.setState({ detailsIndex: conferenceId });
+  badgeClickHandler = () => {
+    const { badgeIndex } = this.state;
+    if (badgeIndex) {
+      this.setState({ activeIndex: badgeIndex });
+    } else {
+      const newIndex = this.state.data.find(x => x.attendance_from === true)?.conference.id;
+      if (newIndex) {
+        this.setState({ activeIndex: newIndex });
+      }
+    }
   }
+
+  // detailsClickHandler = (conferenceId: number) => {
+  //   this.setState({ detailsIndex: conferenceId });
+  // }
 
   _setLoading(key: string, value: boolean) {
     const loading = this.state.loading;
@@ -181,8 +217,16 @@ export class Merged extends React.Component<IProps, IState> {
               {c.date_from.toLocaleDateString() + ' - ' + c.date_to.toLocaleDateString()}<br />
               <a href={c.website}>{c.website}</a>
             </p>
-            {(isAttended(c)) ? <div style={{ marginBottom: '10px' }}><Checkbox checked={this.state.badgeIndex === c.id} index={c.id} onChange={this.badgeCheckboxClickHandler} label='Make visible as a badge' /></div> : null}
-            {this.state.detailsIndex === c.id ? this.renderParticipants(c.id) : <a onClick={() => this.detailsClickHandler(c.id)} style={{ cursor: 'pointer' }}>Show details...</a>}
+            {(isAttended(c)) ? <div style={{ marginBottom: '10px' }}>
+              <Checkbox
+                disabled={this._getLoading('badge-' + c.id)}
+                checked={this.state.badgeIndex === c.id}
+                index={c.id}
+                onChange={this.badgeCheckboxClickHandler}
+                label='Make visible as a badge'
+              />
+            </div> : null}
+            {this.renderParticipants(c.id)}
           </Accordion.Content>
         </React.Fragment>)}
       </Accordion>
@@ -191,9 +235,9 @@ export class Merged extends React.Component<IProps, IState> {
 
   getCurrentBadge() {
     const { data, badgeIndex } = this.state;
-    if (!badgeIndex) return undefined;
+    if (!badgeIndex) return null;
 
-    return data.find(x => x.conference.id === badgeIndex)?.conference.short_name;
+    return data.find(x => x.conference.id === badgeIndex)?.conference.short_name || undefined;
   }
 
   renderParticipants(conferenceId: number) {
@@ -255,7 +299,7 @@ export class Merged extends React.Component<IProps, IState> {
         {/* <Container text style={{ textAlign: 'center' }}>
           Your account is visible as
         </Container> */}
-        <ProfileCard card profile={this.props.profile} badge={this.getCurrentBadge()} />
+        <ProfileCard card profile={this.props.profile} badge={this.getCurrentBadge()} onBadgeClick={this.badgeClickHandler}/>
 
         {this.props.post ? <React.Fragment>
           <Divider horizontal>Invites for discussion</Divider>

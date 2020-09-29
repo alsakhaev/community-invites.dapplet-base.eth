@@ -114,6 +114,16 @@ export class Api {
         return data;
     }
 
+    async getConference(id: number): Promise<Conference> {
+
+        const conf = await this._sendRequest(`/conferences/${id}`);
+
+        conf.date_from = new Date(conf.date_from);
+        conf.date_to = new Date(conf.date_to);
+
+        return conf;
+    }
+
     async invite(userFrom: Profile, userTo: Profile, conferenceId: number, post: Post) {
         const postDto = {
             id: post.id,
@@ -136,7 +146,19 @@ export class Api {
         await this._sendRequest('/conferences/absend', 'POST', { user, conferenceId });
     }
 
-    private async _sendRequest(query: string, method: 'POST' | 'GET' = 'GET', body?: any): Promise<any> {
+    async getUser(namespace: string, username: string): Promise<Profile> {
+        return await this._sendRequest(`/users/${namespace}/${username}`);
+    }
+
+    async updateUser(user: Profile): Promise<Profile> {
+        return await this._sendRequest(`/users`, 'PUT', user);
+    }
+
+    async createUser(user: Profile): Promise<Profile> {
+        return await this._sendRequest(`/users`, 'POST', user);
+    }
+
+    private async _sendRequest(query: string, method: 'POST' | 'GET' | 'PUT' = 'GET', body?: any): Promise<any> {
         const init = body ? { body: JSON.stringify(body), headers: { 'Content-Type': 'application/json' }, method } : { method };
         const resp = await fetch(this._url + query, init);
         const json = await resp.json();

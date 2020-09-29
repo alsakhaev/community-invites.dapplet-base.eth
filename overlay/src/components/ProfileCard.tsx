@@ -6,7 +6,8 @@ import { Profile } from '../dappletBus';
 interface IProps {
     profile: Profile;
     card?: boolean;
-    badge?: string;
+    badge: string | null | undefined;
+    onBadgeClick?: Function;
 }
 
 interface IState { }
@@ -23,9 +24,9 @@ export class ProfileCard extends React.Component<IProps, IState> {
                     src={p.img}
                 />
                 <Card.Header>{p.fullname} 
-                    {(this.props.badge) ? 
-                        <Label style={{ position: 'relative', top: '-3px', marginLeft: '8px' }} color='blue' size='tiny'>{this.props.badge}</Label> : 
-                        <Label title='You can change this setting in conference details' style={{ position: 'relative', top: '-3px', borderStyle: 'dashed', marginLeft: '8px' }} basic color='grey' size='tiny'>No label</Label>}
+                    {(this.props.badge === undefined) ? null : (this.props.badge) ? 
+                        <Label title='You can change this setting in conference details' onClick={() => this.props.onBadgeClick?.()} style={{ cursor: 'pointer', position: 'relative', top: '-3px', marginLeft: '8px' }} color='blue' size='tiny'>{this.props.badge}</Label> : 
+                        <Label title='You can change this setting in conference details' onClick={() => this.props.onBadgeClick?.()} style={{ cursor: 'pointer', position: 'relative', top: '-3px', borderStyle: 'dashed', marginLeft: '8px' }} basic color='grey' size='tiny'>No label</Label>}
                 </Card.Header>
                 <Card.Meta>@{p.username}</Card.Meta>
             </Card.Content>

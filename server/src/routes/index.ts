@@ -1,9 +1,8 @@
 import { Router } from "express";
 import * as home from "../controllers/home";
 import * as conference from "../controllers/conference";
-//import multer from "multer";
+import * as user from "../controllers/user";
 
-//const upload = multer();
 const router = Router();
 
 router.get('/', home.index);
@@ -16,5 +15,9 @@ router.post('/conferences/invite', conference.invite);
 router.post('/conferences/withdraw', conference.withdraw);
 router.post('/conferences/attend', conference.attend);
 router.post('/conferences/absend', conference.absend);
+
+router.get('/users/:namespace/:username', user.getById);
+router.put('/users', user.put);
+router.post('/users', user.post);
 
 export default router;

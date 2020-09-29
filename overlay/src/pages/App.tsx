@@ -8,6 +8,7 @@ import { Conferences } from './Conferences';
 import { MyMeetups } from './MyMeetups';
 import { Merged } from './Merged';
 import { Posts } from './Posts';
+import { Api } from '../api';
 
 interface IProps {
   history?: any;
@@ -23,10 +24,26 @@ interface IState {
 
 export class App extends React.Component<IProps, IState> {
 
+  private _api?: Api;
+
   constructor(props: IProps) {
     super(props);
     this.state = { post: undefined, profile: undefined, settings: undefined, activeIndex: 0, postsDefaultSearch: '' };
-    dappletInstance.onData(({ post, profile, settings }) => this.setState({ post, profile, settings }));
+
+    dappletInstance.onData(async ({ post, profile, settings }) => {
+
+      this._api = new Api(settings.serverUrl);
+
+      if (profile) {
+        let user = await this._api.getUser(profile.namespace, profile.username);
+        if (!user) {
+          user = await this._api.createUser(profile);
+        }
+        this.setState({ profile: user });
+      }
+
+      this.setState({ post, settings });
+    });
   }
 
   componentDidMount() {
@@ -65,7 +82,7 @@ export class App extends React.Component<IProps, IState> {
         render: () => <Tab.Pane as={() => <Merged profile={this.state.profile} post={this.state.post} onPostsClick={this.postsClickHandler} settings={this.state.settings!} />} />,
       }, {
         menuItem: "Posts",
-        render: () => <Tab.Pane as={() => <Posts defaultSearch={this.state.postsDefaultSearch} settings={this.state.settings!} /> } />,
+        render: () => <Tab.Pane as={() => <Posts defaultSearch={this.state.postsDefaultSearch} settings={this.state.settings!} />} />,
       }
     ];
 
