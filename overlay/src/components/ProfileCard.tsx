@@ -22,7 +22,11 @@ export class ProfileCard extends React.Component<IProps, IState> {
                     style={{ borderRadius: 34, marginBottom: 0 }}
                     src={p.img}
                 />
-                <Card.Header>{p.fullname} {(this.props.badge) ? <Label style={{ position: 'relative', top: '-3px' }} color='blue' size='tiny'>{this.props.badge}</Label> : <Label title='You can change this setting in conference details' style={{ position: 'relative', top: '-3px' }} basic color='grey' size='tiny'>No label</Label>}</Card.Header>
+                <Card.Header>{p.fullname} 
+                    {(this.props.badge) ? 
+                        <Label style={{ position: 'relative', top: '-3px', marginLeft: '8px' }} color='blue' size='tiny'>{this.props.badge}</Label> : 
+                        <Label title='You can change this setting in conference details' style={{ position: 'relative', top: '-3px', borderStyle: 'dashed', marginLeft: '8px' }} basic color='grey' size='tiny'>No label</Label>}
+                </Card.Header>
                 <Card.Meta>@{p.username}</Card.Meta>
             </Card.Content>
         </Card>);
