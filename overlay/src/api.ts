@@ -158,6 +158,19 @@ export class Api {
         return await this._sendRequest(`/users`, 'POST', user);
     }
 
+    async getPosts(): Promise<Post[]> {
+        const data = await this._sendRequest(`/posts`);
+
+        return data.map((x: any) => ({
+            id: x.id,
+            text: x.text,
+            authorNamespace: x.namespace,
+            authorUsername: x.username,
+            authorFullname: x.fullname,
+            authorImg: x.img
+         }));
+    }
+
     private async _sendRequest(query: string, method: 'POST' | 'GET' | 'PUT' = 'GET', body?: any): Promise<any> {
         const init = body ? { body: JSON.stringify(body), headers: { 'Content-Type': 'application/json' }, method } : { method };
         const resp = await fetch(this._url + query, init);

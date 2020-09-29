@@ -3,7 +3,12 @@ import { Post } from '../types';
 
 export async function getPosts(): Promise<Post[]> {
     return execute(async (client) => {
-        const res = await client.query('SELECT * FROM posts;');
+        const res = await client.query(`
+            SELECT *
+            FROM posts as p 
+            JOIN users as u on u.namespace = p.namespace
+                AND u.username = p.username;
+        `);
         return res.rows;
     });
 }

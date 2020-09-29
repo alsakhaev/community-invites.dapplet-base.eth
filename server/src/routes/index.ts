@@ -2,6 +2,7 @@ import { Router } from "express";
 import * as home from "../controllers/home";
 import * as conference from "../controllers/conference";
 import * as user from "../controllers/user";
+import * as post from "../controllers/post";
 
 const router = Router();
 
@@ -19,5 +20,7 @@ router.post('/conferences/absend', conference.absend);
 router.get('/users/:namespace/:username', user.getById);
 router.put('/users', user.put);
 router.post('/users', user.post);
+
+router.get('/posts', post.get);
 
 export default router;

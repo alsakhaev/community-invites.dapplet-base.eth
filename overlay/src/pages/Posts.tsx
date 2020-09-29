@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from "react-router-dom";
-import { Button, Divider, Card, Accordion, Icon, Segment, Image, Comment, Grid, Checkbox, Input, InputOnChangeData } from 'semantic-ui-react';
-import { getPosts } from '../api';
+import { Button, Divider, Card, Accordion, Icon, Segment, Image, Comment, Grid, Checkbox, Input, InputOnChangeData, Loader } from 'semantic-ui-react';
+import { Api, getPosts } from '../api';
 import { Post, Profile, Settings } from '../dappletBus';
 import { PostCard } from '../components/PostCard';
 
@@ -13,19 +13,30 @@ interface IProps {
 interface IState {
     posts: Post[];
     search: string;
+    loading: { [key: string]: boolean };
 }
 
 export class Posts extends React.Component<IProps, IState> {
+
+    private _api: Api;
+
     constructor(props: any) {
         super(props);
-        this.state = { posts: [], search: this.props.defaultSearch };
+        this._api = new Api(this.props.settings.serverUrl);
+        this.state = {
+            posts: [],
+            search: this.props.defaultSearch,
+            loading: {
+                'list': true
+            }
+        };
     }
 
     async componentDidMount() {
-        const posts = await getPosts();
+        const posts = await this._api.getPosts();
         this.setState({ posts });
+        this._setLoading('list', false);
     }
-
 
     _parseSearch(str: string) {
         const regex = /([a-zA-Z]*):([^ ]*)/gm;
@@ -60,13 +71,23 @@ export class Posts extends React.Component<IProps, IState> {
         this.setState({ search: event.target.value });
     }
 
+    _setLoading(key: string, value: boolean) {
+        const loading = this.state.loading;
+        loading[key] = value;
+        this.setState({ loading });
+    }
+
+    _getLoading(key: string) {
+        return this.state.loading[key] || false;
+    }
+
     render() {
         return (<div>
             <Input fluid placeholder='Search...' value={this.state.search}
                 icon='search'
                 iconPosition='left'
                 onChange={this.inputChangeHandler} />
-            {this.state.posts.filter(this._postFilter).map((p, i) => <PostCard key={i} post={p} />)}
+            {this._getLoading('list') ? <Segment><Loader active inline='centered'>Loading</Loader></Segment> : this.state.posts.filter(this._postFilter).map((p, i) => <PostCard key={i} post={p} />)}
         </div>);
     }
 }
