@@ -45,12 +45,17 @@ export async function getConferencesWithInvitations(namespace_from: string, user
                 (CASE WHEN (SELECT TRUE FROM attendance as a where c.id = a.conference_id and a.namespace = $1 and a.username = $2 LIMIT 1) IS NULL THEN FALSE ELSE TRUE END) AS attendance_from,
                 (CASE WHEN (SELECT TRUE FROM attendance as a where c.id = a.conference_id and a.namespace = $3 and a.username = $4 LIMIT 1) IS NULL THEN FALSE ELSE TRUE END) AS attendance_to
             FROM conferences as c
-            LEFT JOIN invitations as i on c.id = i.conference_id
+            LEFT JOIN (
+                SELECT * 
+                FROM invitations
+                WHERE
+                    (namespace_from = $1 AND username_from = $2)
+                    OR (namespace_to = $1 AND username_to = $2)
+            ) as i on c.id = i.conference_id
             LEFT JOIN users as u_from on u_from.namespace = i.namespace_from and u_from.username = i.username_from
             LEFT JOIN users as u_to on u_to.namespace = i.namespace_to and u_to.username = i.username_to
-            WHERE (i is NULL or (i.namespace_from = $1 OR i.namespace_to = $1)
-                AND (i.username_from = $2 OR i.username_to = $2))
-            GROUP BY c.id`, [namespace_from, username_from, namespace_to, username_to]);
+            GROUP BY c.id
+        `, [namespace_from, username_from, namespace_to, username_to]);
 
         return res.rows;
     });
