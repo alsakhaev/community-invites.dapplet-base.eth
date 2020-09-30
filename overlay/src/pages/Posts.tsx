@@ -13,7 +13,11 @@ interface IProps {
 }
 
 interface IState {
-    posts: DetailedPost[];
+    posts: (DetailedPost & {
+        target_user_namespace: string;
+        target_user_username: string;
+        target_user_fullname: string;        
+    })[];
     search: string;
     loading: { [key: string]: boolean };
     active1: string | null;
@@ -39,9 +43,19 @@ export class Posts extends React.Component<IProps, IState> {
     }
 
     async componentDidMount() {
-        if (this.props.profile) {
-            const posts = await this._api.getMyDetailedPosts(this.props.profile.namespace, this.props.profile.username);
-            this.setState({ posts });
+        const { profile } = this.props;
+        if (profile) {
+            const posts = await this._api.getMyDetailedPosts(profile.namespace, profile.username);
+            const posts2 = posts.map(p => ({ ...p, ...((profile.namespace === p.user_from_namespace && profile.username === p.user_from_username) ? {
+                target_user_namespace: p.user_to_namespace,
+                target_user_username: p.user_to_username,
+                target_user_fullname: p.user_to_fullname
+            } : {
+                target_user_namespace: p.user_from_namespace,
+                target_user_username: p.user_from_username,
+                target_user_fullname: p.user_from_fullname
+            })}))
+            this.setState({ posts: posts2 });
         }
 
         this._setLoading('list', false);
@@ -109,11 +123,11 @@ export class Posts extends React.Component<IProps, IState> {
                                 <Accordion.Title active={active1 === conference_id} onClick={() => this.setState({ active1: conference_id, active2: null })}><Icon name='dropdown' />{conf.conference_name}</Accordion.Title>
                                 <Accordion.Content active={active1 === conference_id}>
                                     <Accordion.Accordion style={{ margin: 0}}>
-                                        {Object.entries(groupBy(conf_posts, 'authorUsername')).map(([username, user_posts]) => {
-                                            const user = conf_posts.find(x => x.authorUsername === username)!;
+                                        {Object.entries(groupBy(conf_posts, 'target_user_username')).map(([username, user_posts]) => {
+                                            const user = conf_posts.find(x => x.target_user_username === username)!;
 
                                             return (<React.Fragment key={username}>
-                                                <Accordion.Title active={active2 === username} onClick={() => this.setState({ active2: username })}><Icon name='dropdown' />{user.authorFullname} @{user.authorUsername}</Accordion.Title>
+                                                <Accordion.Title active={active2 === username} onClick={() => this.setState({ active2: username })}><Icon name='dropdown' />{user.target_user_fullname} @{user.target_user_username}</Accordion.Title>
                                                 <Accordion.Content active={active2 === username}>
                                                     <Comment.Group minimal>
                                                         {user_posts.map((p, i) =>
