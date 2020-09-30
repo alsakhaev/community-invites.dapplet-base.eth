@@ -22,5 +22,6 @@ router.put('/users', user.put);
 router.post('/users', user.post);
 
 router.get('/posts', post.get);
+router.get('/posts/details', post.getDetailed);
 
 export default router;

@@ -101,6 +101,17 @@ export async function getPosts(): Promise<Post[]> {
 
 export type ConferenceWithInvitations = { conference: Conference, invitations: { from: Profile, to: Profile, post_id: string }[], attendance_from: boolean, attendance_to: boolean };
 
+export type DetailedPost = Post & {
+    conference_id: number;
+    conference_name: string;
+    user_from_namespace: string;
+    user_from_username: string;
+    user_from_fullname: string;
+    user_to_namespace: string;
+    user_to_username: string;
+    user_to_fullname: string;
+}
+
 export class Api {
     constructor(private _url: string) { }
 
@@ -158,17 +169,30 @@ export class Api {
         return await this._sendRequest(`/users`, 'POST', user);
     }
 
-    async getPosts(namespace: string, username: string): Promise<Post[]> {
-        const data = await this._sendRequest(`/posts?namespace=${namespace}&username=${username}`);
+    // async getPosts(namespace: string, username: string): Promise<Post[]> {
+    //     const data = await this._sendRequest(`/posts?namespace=${namespace}&username=${username}`);
 
+    //     return data.map((x: any) => ({
+    //         id: x.id,
+    //         text: x.text,
+    //         authorNamespace: x.namespace,
+    //         authorUsername: x.username,
+    //         authorFullname: x.fullname,
+    //         authorImg: x.img
+    //      }));
+    // }
+
+    async getMyDetailedPosts(namespace: string, username: string): Promise<DetailedPost[]> {
+        const data = await this._sendRequest(`/posts/details?namespace=${namespace}&username=${username}`);
         return data.map((x: any) => ({
             id: x.id,
             text: x.text,
-            authorNamespace: x.namespace,
-            authorUsername: x.username,
-            authorFullname: x.fullname,
-            authorImg: x.img
-         }));
+            authorNamespace: x.author_namespace,
+            authorUsername: x.author_username,
+            authorFullname: x.author_fullname,
+            authorImg: x.author_img,
+            ...x
+        }));
     }
 
     private async _sendRequest(query: string, method: 'POST' | 'GET' | 'PUT' = 'GET', body?: any): Promise<any> {
