@@ -25,7 +25,7 @@ CREATE TABLE users (
   username varchar(50) NOT NULL,
   fullname varchar(255) NOT NULL,
   img varchar(255) NOT NULL,
-  main_conference_id SERIAL NULL,
+  main_conference_id INTEGER NULL,
   PRIMARY KEY(namespace, username)
 );
 
@@ -34,12 +34,12 @@ CREATE TABLE invitations (
   namespace_to varchar(15) NOT NULL,
   username_from varchar(50) NOT NULL,
   username_to varchar(50) NOT NULL,
-  conference_id SERIAL NOT NULL,
+  conference_id INTEGER NOT NULL,
   post_id varchar(31) NOT NULL
 );
 
 CREATE TABLE attendance (
-  conference_id SERIAL NOT NULL,
+  conference_id INTEGER NOT NULL,
   namespace varchar(15) NOT NULL,
   username varchar(50) NOT NULL
 );
