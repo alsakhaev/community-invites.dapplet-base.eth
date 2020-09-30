@@ -54,7 +54,18 @@ export class Posts extends React.Component<IProps, IState> {
                 target_user_namespace: p.user_from_namespace,
                 target_user_username: p.user_from_username,
                 target_user_fullname: p.user_from_fullname
-            })}))
+            })}));
+
+            // expand first item of accordion by default
+            const filteredPosts = posts2.filter(this._postFilter);
+            const conference_id = Object.keys(groupBy(filteredPosts, 'conference_id'))[0];
+            if (conference_id) {
+                const post = posts2.filter(p => p.conference_id === parseInt(conference_id))[0];
+                if (post) {
+                    this.setState({ active1: conference_id, active2: post.target_user_username });
+                }
+            }
+
             this.setState({ posts: posts2 });
         }
 
