@@ -247,18 +247,27 @@ export class Merged extends React.Component<IProps, IState> {
       username: x.from.username,
       fullname: x.from.fullname,
       isWant: false,
-      isMatch: false,
       isWantsMe: true
     }));
     const isWant = invitations.filter(x => x.from.username === this.props.profile?.username).map(x => ({
-      username: x.from.username,
-      fullname: x.from.fullname,
+      username: x.to.username,
+      fullname: x.to.fullname,
       isWant: true,
-      isMatch: false,
       isWantsMe: false
     }));
 
-    const data = [...wantsMe, ...isWant];
+    const data: any[] = [];
+
+    for (const row of [...wantsMe, ...isWant]) {
+      const found = data.find(x => x.username.toLowerCase() === row.username.toLowerCase());
+      if (found) {
+        found.count = found.count + 1;
+        found.isWant = found.isWant || row.isWant;
+        found.isWantsMe = found.isWantsMe || row.isWantsMe;
+      } else {
+        data.push({ ...row, count: 1 });
+      }
+    }
 
     return (<div>
       <br />
@@ -268,7 +277,7 @@ export class Merged extends React.Component<IProps, IState> {
             {this.getIcon(r)}
           </Grid.Column>
           <Grid.Column >
-            {r.fullname} @{r.username} <a style={{ cursor: 'pointer' }} onClick={() => this.props.onPostsClick?.(conferenceId, r.username)}>by 3 topics</a>
+            {r.fullname} @{r.username} <a style={{ cursor: 'pointer' }} onClick={() => this.props.onPostsClick?.(conferenceId, r.username)}>by {r.count} topic(s)</a>
           </Grid.Column>
         </Grid.Row>)}
       </Grid>
