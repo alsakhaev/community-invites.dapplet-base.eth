@@ -82,7 +82,7 @@ export class App extends React.Component<IProps, IState> {
         render: () => <Tab.Pane as={() => <Merged profile={this.state.profile} post={this.state.post} onPostsClick={this.postsClickHandler} settings={this.state.settings!} />} />,
       }, {
         menuItem: "Posts",
-        render: () => <Tab.Pane as={() => <Posts defaultSearch={this.state.postsDefaultSearch} settings={this.state.settings!} />} />,
+        render: () => <Tab.Pane as={() => <Posts profile={this.state.profile} defaultSearch={this.state.postsDefaultSearch} settings={this.state.settings!} />} />,
       }
     ];
 

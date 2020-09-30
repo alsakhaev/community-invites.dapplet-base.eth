@@ -2,6 +2,7 @@ import * as postService from "../services/post";
 import { asyncHandler } from "../common/helpers";
 
 export const get = asyncHandler(async function (req: any, res: any) {
-    const posts = await postService.getPosts();
+    const { namespace, username } = req.query;
+    const posts = await postService.getPosts(namespace, username);
     return res.json({ success: true, data: posts });
 })

@@ -8,6 +8,7 @@ import { PostCard } from '../components/PostCard';
 interface IProps {
     defaultSearch: string;
     settings: Settings;
+    profile?: Profile;
 }
 
 interface IState {
@@ -33,8 +34,11 @@ export class Posts extends React.Component<IProps, IState> {
     }
 
     async componentDidMount() {
-        const posts = await this._api.getPosts();
-        this.setState({ posts });
+        if (this.props.profile) {
+            const posts = await this._api.getPosts(this.props.profile.namespace, this.props.profile.username);
+            this.setState({ posts });
+        }
+
         this._setLoading('list', false);
     }
 

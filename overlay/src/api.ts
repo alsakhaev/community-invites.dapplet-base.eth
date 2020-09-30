@@ -158,8 +158,8 @@ export class Api {
         return await this._sendRequest(`/users`, 'POST', user);
     }
 
-    async getPosts(): Promise<Post[]> {
-        const data = await this._sendRequest(`/posts`);
+    async getPosts(namespace: string, username: string): Promise<Post[]> {
+        const data = await this._sendRequest(`/posts?namespace=${namespace}&username=${username}`);
 
         return data.map((x: any) => ({
             id: x.id,
