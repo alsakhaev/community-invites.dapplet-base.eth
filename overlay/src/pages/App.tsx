@@ -47,8 +47,8 @@ export class App extends React.Component<IProps, IState> {
     document.getElementsByClassName('loader-container')?.[0]?.remove();
   }
 
-  postsClickHandler = (conferenceId: number, username: string) => {
-    this.setState({ activeIndex: 1, postsDefaultSearch: `conferenceId:${conferenceId} username:${username}` });
+  postsClickHandler = (conferenceShortName: string, username: string) => {
+    this.setState({ activeIndex: 1, postsDefaultSearch: `conference:${conferenceShortName} user:${username}` });
   }
 
   handleTabChange = (e: any, { activeIndex }: any) => this.setState({ activeIndex });

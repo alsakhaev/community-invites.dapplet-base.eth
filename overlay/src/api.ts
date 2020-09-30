@@ -103,6 +103,7 @@ export type ConferenceWithInvitations = { conference: Conference, invitations: {
 
 export type DetailedPost = Post & {
     conference_id: number;
+    conference_short_name: string;
     conference_name: string;
     user_from_namespace: string;
     user_from_username: string;

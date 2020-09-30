@@ -59,6 +59,7 @@ type DetailedPost = {
     author_img: string;
     conference_id: number;
     conference_name: string;
+    conference_short_name: string;
     user_from_namespace: string;
     user_from_username: string;
     user_from_fullname: string;
@@ -81,6 +82,7 @@ export async function getMyDetailedPosts(namespace: string, username: string): P
             u_author.img AS author_img,
             c.id AS conference_id,
             c.name AS conference_name,
+            c.short_name AS conference_short_name,
             u_from.namespace AS user_from_namespace,
             u_from.username AS user_from_username,
             u_from.fullname AS user_from_fullname,

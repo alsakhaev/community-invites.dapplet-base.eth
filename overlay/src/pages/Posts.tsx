@@ -82,12 +82,26 @@ export class Posts extends React.Component<IProps, IState> {
         return result;
     }
 
-    _postFilter = (post: DetailedPost) => {
+    _postFilter = (post: (DetailedPost & { target_user_namespace: string; target_user_username: string; target_user_fullname: string; })) => {
+        let isFound = true;
+
         const parsed = this._parseSearch(this.state.search);
 
-        // parsed.conferenceId !== undefined && parsed.conferenceId === post.conferenceId
-        return (!parsed.username || parsed.username.toLowerCase() === post.authorUsername.toLowerCase()) &&
-            (parsed.search === '' || post.text.toLowerCase().indexOf(parsed.search.toLowerCase()) !== -1 || post.authorUsername.toLowerCase().indexOf(parsed.search.toLowerCase()) !== -1 || post.authorFullname.toLowerCase().indexOf(parsed.search.toLowerCase()) !== -1);
+        const { user, search, conference } = parsed;
+
+        if (user) {
+            isFound = isFound && user.toLowerCase() === post.target_user_username.toLowerCase();
+        }
+
+        if (conference) {
+            isFound = isFound && conference.toLowerCase() === post.conference_short_name.toLowerCase();
+        }
+
+        if (search && search.length > 0) {
+            isFound = isFound && Object.values(post).join(';').toLowerCase().indexOf(search.toLowerCase()) !== -1;
+        }
+        
+        return isFound;
     }
 
     inputChangeHandler = (event: React.ChangeEvent<HTMLInputElement>, data: InputOnChangeData) => {
@@ -106,6 +120,8 @@ export class Posts extends React.Component<IProps, IState> {
 
     render() {
         const { active1, active2 } = this.state;
+        const filteredPosts = this.state.posts.filter(this._postFilter);
+
         return (<div>
             <Input fluid placeholder='Search...' value={this.state.search}
                 icon='search'
@@ -116,8 +132,8 @@ export class Posts extends React.Component<IProps, IState> {
                 <Loader active inline='centered'>Loading</Loader>
             </Segment> :
                     <Accordion style={{ marginTop: '14px'}}  styled>
-                        {Object.entries(groupBy(this.state.posts.filter(this._postFilter), 'conference_id')).map(([conference_id, conf_posts]) => {
-                            const conf = this.state.posts.filter(this._postFilter).find(x => x.conference_id === parseInt(conference_id))!;
+                        {Object.entries(groupBy(filteredPosts, 'conference_id')).map(([conference_id, conf_posts]) => {
+                            const conf = filteredPosts.find(x => x.conference_id === parseInt(conference_id))!;
 
                             return (<React.Fragment key={conference_id}>
                                 <Accordion.Title active={active1 === conference_id} onClick={() => this.setState({ active1: conference_id, active2: null })}><Icon name='dropdown' />{conf.conference_name}</Accordion.Title>

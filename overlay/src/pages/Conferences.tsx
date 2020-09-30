@@ -13,7 +13,7 @@ interface IProps {
   post?: Post;
   profile?: Profile;
   settings: Settings;
-  onPostsClick: (conferenceId: number, username: string) => void;
+  onPostsClick: (conferenceShortName: string, username: string) => void;
 }
 
 interface IState {
@@ -241,7 +241,7 @@ export class Conferences extends React.Component<IProps, IState> {
   }
 
   renderParticipants(conferenceId: number) {
-
+    const conference = this.state.data.find(x => x.conference.id === conferenceId)!.conference;
     const invitations = this.state.data.find(x => x.conference.id === conferenceId)!.invitations;
     const wantsMe = invitations.filter(x => x.to.username === this.props.profile?.username).map(x => ({
       username: x.from.username,
@@ -277,7 +277,7 @@ export class Conferences extends React.Component<IProps, IState> {
             {this.getIcon(r)}
           </Grid.Column>
           <Grid.Column >
-            {r.fullname} @{r.username} <a style={{ cursor: 'pointer' }} onClick={() => this.props.onPostsClick?.(conferenceId, r.username)}>by {r.count} topic(s)</a>
+            {r.fullname} @{r.username} <a style={{ cursor: 'pointer' }} onClick={() => this.props.onPostsClick?.(conference.short_name, r.username)}>by {r.count} topic(s)</a>
           </Grid.Column>
         </Grid.Row>)}
       </Grid>
