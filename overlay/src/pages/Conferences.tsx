@@ -18,7 +18,7 @@ interface IProps {
 
 interface IState {
   data: ConferenceWithInvitations[];
-  activeIndex: number | null;
+  activeIndex: string | null;
   attended: number[];
   invited: number[];
   badgeIndex: number | null;
@@ -161,11 +161,11 @@ export class Conferences extends React.Component<IProps, IState> {
   badgeClickHandler = () => {
     const { badgeIndex } = this.state;
     if (badgeIndex) {
-      this.setState({ activeIndex: badgeIndex });
+      this.setState({ activeIndex: 'my' + badgeIndex });
     } else {
       const newIndex = this.state.data.find(x => x.attendance_from === true)?.conference.id;
       if (newIndex) {
-        this.setState({ activeIndex: newIndex });
+        this.setState({ activeIndex: 'my' + newIndex });
       }
     }
   }
@@ -184,7 +184,7 @@ export class Conferences extends React.Component<IProps, IState> {
     return this.state.loading[key] || false;
   }
 
-  renderAccordion = (data: ConferenceWithInvitations[], header?: any) => {
+  renderAccordion = (data: ConferenceWithInvitations[], header: any, key: string) => {
     if (data.length === 0) return null;
     const { post } = this.props;
     const { activeIndex } = this.state;
@@ -206,12 +206,12 @@ export class Conferences extends React.Component<IProps, IState> {
       {header && data.length > 0 ? header : null}
       <Accordion fluid styled>
         {data.map(d => d.conference).map(c => <React.Fragment key={c.id}>
-          <Accordion.Title active={activeIndex === c.id} index={c.id} onClick={this.accordionClickHandler} style={{ lineHeight: '29px' }}>
+          <Accordion.Title active={activeIndex === key +  c.id} index={key + c.id} onClick={this.accordionClickHandler} style={{ lineHeight: '29px' }}>
             <Icon name='dropdown' />{c.name}
             {post ? <HoverButton loading={this._getLoading('invite-' + c.id)} disabled={this._getLoading('invite-' + c.id)} color={isInvited(c) ? 'green' : 'blue'} hoverColor={isInvited(c) ? 'red' : 'blue'} hoverText={isInvited(c) ? 'Withdraw' : 'Invite'} index={c.id} floated='right' size='mini' onClick={this.inviteButtonClickHandler}>{isInvited(c) ? 'Invited' : 'Invite'}</HoverButton> : null}
             <Button index={c.id} loading={this._getLoading('attend-' + c.id)} disabled={this._getLoading('attend-' + c.id)} color={isAttended(c) ? 'green' : 'blue'} floated='right' size='mini' basic={!!this.props.post} onClick={this.attendButtonClickHandler}>{isAttended(c) ? 'Attended' : 'Attend'}</Button>
           </Accordion.Title>
-          <Accordion.Content active={activeIndex === c.id}>
+          <Accordion.Content active={activeIndex === key + c.id}>
             <p>
               {c.description}<br />
               {c.date_from.toLocaleDateString() + ' - ' + c.date_to.toLocaleDateString()}<br />
@@ -319,14 +319,14 @@ export class Conferences extends React.Component<IProps, IState> {
         </React.Fragment> : null}
         {this.props.post ? <React.Fragment>
           {!this._getLoading('list') ? <React.Fragment>
-            {this.renderAccordion(this.state.data.filter(c => c.attendance_to === true), <Container text style={{ textAlign: 'center', marginBottom: 5 }}>at conferences HE/SHE visits</Container>)}
+            {this.renderAccordion(this.state.data.filter(c => c.attendance_to === true), <Container text style={{ textAlign: 'center', marginBottom: 5 }}>at conferences HE/SHE visits</Container>, 'heshe')}
 
-            {this.renderAccordion(this.state.data.filter(c => c.attendance_from === true), <Container text style={{ textAlign: 'center', marginTop: 10, marginBottom: 5 }}>at conferences YOU visit</Container>)}
+            {this.renderAccordion(this.state.data.filter(c => c.attendance_from === true), <Container text style={{ textAlign: 'center', marginTop: 10, marginBottom: 5 }}>at conferences YOU visit</Container>, 'my')}
 
-            {this.renderAccordion(this.state.data.filter(c => c.attendance_from === false && c.attendance_to === false), <Container text style={{ textAlign: 'center', marginTop: 10, marginBottom: 5 }}>or any other conferences</Container>)}
+            {this.renderAccordion(this.state.data.filter(c => c.attendance_from === false && c.attendance_to === false), <Container text style={{ textAlign: 'center', marginTop: 10, marginBottom: 5 }}>or any other conferences</Container>, 'other')}
           </React.Fragment> : <Loader active inline='centered'>Loading</Loader>}
 
-        </React.Fragment> : this.renderAccordion(this.state.data)}
+        </React.Fragment> : this.renderAccordion(this.state.data, null, 'all')}
       </div>
     );
   }
