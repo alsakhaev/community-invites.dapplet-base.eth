@@ -1,12 +1,9 @@
 import React from 'react';
 import { HashRouter, Route, Switch, Redirect, NavLink, useHistory, withRouter } from "react-router-dom";
 import './App.css';
-import { Invite } from './Invite';
 import { dappletInstance, Post, Profile, Settings } from '../dappletBus';
 import { Segment, Loader, Tab, Menu } from 'semantic-ui-react';
 import { Conferences } from './Conferences';
-import { MyMeetups } from './MyMeetups';
-import { Merged } from './Merged';
 import { Posts } from './Posts';
 import { Api } from '../api';
 
@@ -79,7 +76,7 @@ export class App extends React.Component<IProps, IState> {
       // }, 
       {
         menuItem: "Conferences",
-        render: () => <Tab.Pane as={() => <Merged profile={this.state.profile} post={this.state.post} onPostsClick={this.postsClickHandler} settings={this.state.settings!} />} />,
+        render: () => <Tab.Pane as={() => <Conferences profile={this.state.profile} post={this.state.post} onPostsClick={this.postsClickHandler} settings={this.state.settings!} />} />,
       }, {
         menuItem: "Posts",
         render: () => <Tab.Pane as={() => <Posts profile={this.state.profile} defaultSearch={this.state.postsDefaultSearch} settings={this.state.settings!} />} />,
