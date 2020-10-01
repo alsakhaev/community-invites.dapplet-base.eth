@@ -18,6 +18,7 @@ router.post('/conferences/attend', conference.attend);
 router.post('/conferences/absend', conference.absend);
 
 router.get('/users/:namespace/:username', user.getById);
+router.get('/users/badge/:namespace/:username', user.getBadge);
 router.put('/users', user.put);
 router.post('/users', user.post);
 

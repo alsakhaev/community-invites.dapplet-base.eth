@@ -49,3 +49,21 @@ export async function updateUser(u: Profile): Promise<Profile> {
         return res.rows[0];
     });
 }
+
+export async function getBadge(namespace: string, username: string): Promise<{ id: number, short_name: string } | null> {
+    const query = `
+        SELECT
+            c.id,
+            c.short_name
+        FROM users as u 
+        LEFT JOIN conferences as c on c.id = u.main_conference_id
+        WHERE u.namespace = $1 AND u.username = $2;
+    `;
+    const params = [namespace, username];
+
+    const badge = await execute(c => c.query(query, params).then(r => r.rows[0]));
+
+    if (!badge || !badge.id) return null;
+
+    return badge;
+}

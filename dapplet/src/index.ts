@@ -1,9 +1,15 @@
 import { } from '@dapplets/dapplet-extension';
 import ICON from './icons/icon.png';
 
+type BadgeInfo = { 
+    id: string, 
+    short_name: string 
+} | null;
+
 @Injectable
 export default class Feature {
     private _overlay;
+    private _queue = new Map<string, Promise<BadgeInfo>>();
 
     constructor(
         @Inject("identity-adapter.dapplet-base.eth")
@@ -24,7 +30,17 @@ export default class Feature {
                 label({
                     initial: "DEFAULT",
                     "DEFAULT": {
-                        text: 'Devcon 2020 (+1)',
+                        hidden: true,
+                        init: async (ctx, me) => {
+                            const info = await this._getBadge('twitter.com', ctx.authorUsername);
+                            if (info) {
+                                me.setState("BADGE");
+                                me.text = info.short_name;
+                            }
+                        }
+                    },
+                    "BADGE": {
+                        text: '',
                         exec: (post) => this._openOverlay(this.identityAdapter.getCurrentUser(), post),
                         img: ICON
                     }
@@ -53,5 +69,27 @@ export default class Feature {
         this._overlay.sendAndListen('data', { profile, post, settings: { serverUrl } }, {
 
         });
+    }
+
+    private async _getBadge(namespace: string, username: string): Promise<BadgeInfo> {
+        const key = `${namespace}/${username}`;
+
+        if (!this._queue.has(key)) {
+            this._queue.set(key, this._fetchBadge(namespace, username));
+        }
+
+        return this._queue.get(key);
+    }
+
+    private async _fetchBadge(namespace: string, username: string): Promise<BadgeInfo> {
+        const serverUrl = await Core.storage.get('serverUrl');
+        const json = await fetch(`${serverUrl}/users/badge/${namespace}/${username}`).then(x => x.json());
+        
+        if (!json.success) {
+            console.error(json.message);
+            return null;
+        }
+
+        return json.data;
     }
 }

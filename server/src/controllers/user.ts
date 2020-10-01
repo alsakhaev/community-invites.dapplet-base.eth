@@ -19,3 +19,8 @@ export const put = asyncHandler(async function (req: any, res: any) {
     return res.json({ success: true, data: conf });
 })
 
+export const getBadge = asyncHandler(async function (req: any, res: any) {
+    const { namespace, username } = req.params;
+    const badge = await userService.getBadge(namespace, username);
+    return res.json({ success: true, data: badge });
+})
