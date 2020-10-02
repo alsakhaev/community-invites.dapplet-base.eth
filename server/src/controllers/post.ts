@@ -12,3 +12,8 @@ export const getDetailed = asyncHandler(async function (req: any, res: any) {
     const posts = await postService.getMyDetailedPosts(namespace, username);
     return res.json({ success: true, data: posts });
 })
+
+export const getStat = asyncHandler(async function (req: any, res: any) {
+    const data = await postService.getStat();
+    return res.json({ success: true, data: data });
+})

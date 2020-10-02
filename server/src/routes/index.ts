@@ -19,10 +19,12 @@ router.post('/conferences/absend', conference.absend);
 
 router.get('/users/:namespace/:username', user.getById);
 router.get('/users/badge/:namespace/:username', user.getBadge);
+router.get('/users/stat', user.getStat);
 router.put('/users', user.put);
 router.post('/users', user.post);
 
 router.get('/posts', post.get);
 router.get('/posts/details', post.getDetailed);
+router.get('/posts/stat', post.getStat);
 
 export default router;

@@ -101,3 +101,33 @@ export async function getMyDetailedPosts(namespace: string, username: string): P
 
     return execute(c => c.query(query, params).then(r => r.rows));
 }
+
+export async function getStat(): Promise<any[]> {
+    const data = await execute(async (client) => {
+        const res = await client.query(`
+            SELECT
+                p.*,
+                u.fullname,
+                u.img,
+                (SELECT COUNT(*) 
+                FROM invitations AS i 
+                WHERE i.post_id = p.id) AS invitations_count,
+                (SELECT COUNT(*)
+                FROM (SELECT conference_id 
+                FROM invitations AS i 
+                WHERE i.post_id = p.id
+                GROUP BY i.conference_id) AS x) AS conferences_count
+            FROM posts AS p
+            LEFT JOIN users AS u ON u.namespace = p.namespace
+                AND u.username = p.username
+        `);
+        return res.rows;
+    });
+
+    data.forEach(d => {
+        d.invitations_count = parseInt(d.invitations_count);
+        d.conferences_count = parseInt(d.conferences_count);
+    });
+
+    return data;
+}

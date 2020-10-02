@@ -67,3 +67,34 @@ export async function getBadge(namespace: string, username: string): Promise<{ i
 
     return badge;
 }
+
+export async function getStat(): Promise<any[]> {
+    const data = await execute(async (client) => {
+        const res = await client.query(`
+            SELECT
+                u.*,
+                (SELECT COUNT(*) 
+                FROM invitations AS i 
+                WHERE i.namespace_to = u.namespace
+                    AND i.username_to = u.username) AS invitations_to_count,
+                (SELECT COUNT(*) 
+                FROM invitations AS i 
+                WHERE i.namespace_from = u.namespace
+                    AND i.username_from = u.username) AS invitations_from_count,
+                (SELECT COUNT(*)
+                FROM attendance AS a
+                WHERE a.namespace = u.namespace
+                    AND a.username = u.username) AS attendance_count
+            FROM users AS u
+        `);
+        return res.rows;
+    });
+
+    data.forEach(d => {
+        d.invitations_to_count = parseInt(d.invitations_to_count);
+        d.invitations_from_count = parseInt(d.invitations_from_count);
+        d.attendance_count = parseInt(d.attendance_count);
+    });
+
+    return data;
+}
