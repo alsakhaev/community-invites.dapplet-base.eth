@@ -51,7 +51,7 @@ export class UsersTable extends React.Component<IProps, IState> {
                                     <Header as='h4' image>
                                         <Image src={u.img} rounded size='mini' />
                                         <Header.Content>
-                                            <a href={`https://twitter.com/${u.username}`} target="_blank" style={{ cursor: 'pointer'}}>{u.fullname}</a>
+                                            <a href={`https://twitter.com/${u.username}`} target="_blank" style={{ cursor: 'pointer', color: '#000'}}>{u.fullname}</a>
                                             <Header.Subheader>@{u.username}</Header.Subheader>
                                         </Header.Content>
                                     </Header>

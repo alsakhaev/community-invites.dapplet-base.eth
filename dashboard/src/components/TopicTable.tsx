@@ -49,9 +49,9 @@ export class TopicTable extends React.Component<IProps, IState> {
                                 <Table.Cell>
                                     <Comment.Group minimal>
                                         <Comment>
-                                            <Comment.Avatar as='a' src={d.img} />
+                                            <Comment.Avatar  as='a' src={d.img} />
                                             <Comment.Content>
-                                                <Comment.Author as='a'><a href={`https://twitter.com/${d.username}/status/${d.id}`} target="_blank" style={{ cursor: 'pointer' }}>{d.fullname}</a></Comment.Author>
+                                                <Comment.Author as='a' href={`https://twitter.com/${d.username}/status/${d.id}`} target="_blank" style={{ cursor: 'pointer' }}>{d.fullname}</Comment.Author>
                                                 <Comment.Metadata><span>@{d.username}</span></Comment.Metadata>
                                                 <Comment.Text><p>{d.text}</p></Comment.Text>
                                             </Comment.Content>
