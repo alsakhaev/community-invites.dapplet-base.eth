@@ -50,11 +50,14 @@ export async function updateUser(u: Profile): Promise<Profile> {
     });
 }
 
-export async function getBadge(namespace: string, username: string): Promise<{ id: number, short_name: string } | null> {
+export async function getBadge(namespace: string, username: string): Promise<{ namespace: string, username: string, main_conference_id: number | null, main_conference_short_name: string | null, conferences_count: number } | null> {
     const query = `
         SELECT
-            c.id,
-            c.short_name
+            u.namespace,
+            u.username,
+            c.id as main_conference_id,
+            c.short_name as main_conference_short_name,
+            (select count(*) from (select a.conference_id from attendance as a where a.namespace = $1 and a.username = $2 group by a.conference_id) as x) as conferences_count
         FROM users as u 
         LEFT JOIN conferences as c on c.id = u.main_conference_id
         WHERE u.namespace = $1 AND u.username = $2;
@@ -63,7 +66,9 @@ export async function getBadge(namespace: string, username: string): Promise<{ i
 
     const badge = await execute(c => c.query(query, params).then(r => r.rows[0]));
 
-    if (!badge || !badge.id) return null;
+    if (!badge) return null;
+
+    badge.conferences_count = parseInt(badge.conferences_count);
 
     return badge;
 }

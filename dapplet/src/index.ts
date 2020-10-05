@@ -2,8 +2,11 @@ import { } from '@dapplets/dapplet-extension';
 import ICON from './icons/icon.png';
 
 type BadgeInfo = { 
-    id: string, 
-    short_name: string 
+    namespace: string, 
+    username: string,
+    main_conference_id: number | null, 
+    main_conference_short_name: string | null, 
+    conferences_count: number
 } | null;
 
 @Injectable
@@ -33,9 +36,10 @@ export default class Feature {
                         hidden: true,
                         init: async (ctx, me) => {
                             const info = await this._getBadge('twitter.com', ctx.authorUsername);
-                            if (info) {
+                            if (info && info.main_conference_id) {
                                 me.setState("BADGE");
-                                me.text = info.short_name;
+                                me.text = info.main_conference_short_name;
+                                if (info.conferences_count > 1) me.postfix = `+${info.conferences_count - 1}`
                             }
                         }
                     },
