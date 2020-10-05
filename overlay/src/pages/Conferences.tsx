@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from "react-router-dom";
-import { Button, Divider, Card, Accordion, Icon, Segment, Container, Checkbox, CheckboxProps, Grid, Loader } from 'semantic-ui-react';
+import { Button, Divider, Card, Accordion, Icon, Segment, Container, Checkbox, CheckboxProps, Grid, Loader, Dropdown } from 'semantic-ui-react';
 import { Post, Profile, Settings } from '../dappletBus';
 import { PostCard } from '../components/PostCard';
 import { Api, Conference, ConferenceWithInvitations, getConferences } from '../api';
@@ -24,7 +24,8 @@ interface IState {
   badgeIndex: number | null;
   //detailsIndex: number | null;
   loading: { [key: string]: boolean };
-  profileTo: Profile | null;
+  profileTo: Profile | undefined;
+  selectedConference: number | null;
 }
 
 export class Conferences extends React.Component<IProps, IState> {
@@ -50,7 +51,8 @@ export class Conferences extends React.Component<IProps, IState> {
         img: this.props.post!.authorImg,
         namespace: 'twitter.com',
         main_conference_id: null
-      } : null
+      } : undefined,
+      selectedConference: null
     }
   }
 
@@ -61,7 +63,7 @@ export class Conferences extends React.Component<IProps, IState> {
 
 
   async _loadConferences() {
-    const data = await this._api.getConferencesWithInvitations(this.props.profile!, this.state.profileTo!);
+    const data = await this._api.getConferencesWithInvitations(this.props.profile!, this.state.profileTo);
     this.setState({ data });
   }
 
@@ -78,6 +80,7 @@ export class Conferences extends React.Component<IProps, IState> {
 
     const { index } = titleProps;
     this._setLoading('attend-' + index, true);
+    this.setState({ selectedConference: index });
     try {
       if (this.state.data.find((d) => d.conference.id === index)!.attendance_from) {
 
@@ -87,6 +90,7 @@ export class Conferences extends React.Component<IProps, IState> {
           && x.from.namespace === this.props.profile?.namespace
           && x.to.username === this.state.profileTo?.username
           && x.to.namespace === this.state.profileTo?.namespace
+          && x.post_id === this.props.post?.id
         ))) {
           await this._api.withdraw(this.props.profile!, this.state.profileTo!, index, this.props.post!);
         }
@@ -111,6 +115,7 @@ export class Conferences extends React.Component<IProps, IState> {
       console.error(err);
     } finally {
       this._setLoading('attend-' + index, false);
+      setTimeout(() => this.setState({ selectedConference: null }), 2000);
     }
   }
 
@@ -119,6 +124,7 @@ export class Conferences extends React.Component<IProps, IState> {
 
     const { index } = titleProps;
     this._setLoading('invite-' + index, true);
+    this.setState({ selectedConference: index });
     try {
       // ToDo: move to backend?
       if (this.state.data.find((d) => d.conference.id === index)!.invitations.find(x => (
@@ -126,6 +132,7 @@ export class Conferences extends React.Component<IProps, IState> {
         && x.from.namespace === this.props.profile?.namespace
         && x.to.username === this.state.profileTo?.username
         && x.to.namespace === this.state.profileTo?.namespace
+        && x.post_id === this.props.post?.id
       ))) {
         await this._api.withdraw(this.props.profile!, this.state.profileTo!, index, this.props.post!);
       } else {
@@ -140,35 +147,35 @@ export class Conferences extends React.Component<IProps, IState> {
       console.error(err);
     } finally {
       this._setLoading('invite-' + index, false);
+      setTimeout(() => this.setState({ selectedConference: null }), 2000);
     }
   }
 
-  badgeCheckboxClickHandler = async (_: any, data: CheckboxProps & any) => {
-    const { index } = data;
+  badgeCheckboxClickHandler = async (index: number) => {
     const oldValue = this.state.badgeIndex;
     const newValue = (oldValue === index) ? null : index;
 
     const { profile } = this.props;
     if (profile) {
-      this._setLoading('badge-' + index, true);
+      this._setLoading('badge', true);
       profile.main_conference_id = newValue;
       const newProfile = await this._api.updateUser(profile);
       this.setState({ badgeIndex: newProfile.main_conference_id });
-      this._setLoading('badge-' + index, false);
+      this._setLoading('badge', false);
     }
   }
 
-  badgeClickHandler = () => {
-    const { badgeIndex } = this.state;
-    if (badgeIndex) {
-      this.setState({ activeIndex: 'my' + badgeIndex });
-    } else {
-      const newIndex = this.state.data.find(x => x.attendance_from === true)?.conference.id;
-      if (newIndex) {
-        this.setState({ activeIndex: 'my' + newIndex });
-      }
-    }
-  }
+  // badgeClickHandler = () => {
+  //   const { badgeIndex } = this.state;
+  //   if (badgeIndex) {
+  //     this.setState({ activeIndex: 'my' + badgeIndex });
+  //   } else {
+  //     const newIndex = this.state.data.find(x => x.attendance_from === true)?.conference.id;
+  //     if (newIndex) {
+  //       this.setState({ activeIndex: 'my' + newIndex });
+  //     }
+  //   }
+  // }
 
   // detailsClickHandler = (conferenceId: number) => {
   //   this.setState({ detailsIndex: conferenceId });
@@ -195,6 +202,7 @@ export class Conferences extends React.Component<IProps, IState> {
         && x.from.namespace === this.props.profile?.namespace
         && x.to.username === this.state.profileTo?.username
         && x.to.namespace === this.state.profileTo?.namespace
+        && x.post_id === this.props.post?.id
       ))
     }
 
@@ -206,7 +214,7 @@ export class Conferences extends React.Component<IProps, IState> {
       {header && data.length > 0 ? header : null}
       <Accordion fluid styled>
         {data.map(d => d.conference).map(c => <React.Fragment key={c.id}>
-          <Accordion.Title active={activeIndex === key +  c.id} index={key + c.id} onClick={this.accordionClickHandler} style={{ lineHeight: '29px' }}>
+          <Accordion.Title active={activeIndex === key + c.id} index={key + c.id} onClick={this.accordionClickHandler} style={{ lineHeight: '29px', color: (this.state.selectedConference === c.id) ? '#2185d0' : undefined }} >
             <Icon name='dropdown' />{c.name}
             {post ? <HoverButton loading={this._getLoading('invite-' + c.id)} disabled={this._getLoading('invite-' + c.id)} color={isInvited(c) ? 'green' : 'blue'} hoverColor={isInvited(c) ? 'red' : 'blue'} hoverText={isInvited(c) ? 'Withdraw' : 'Invite'} index={c.id} floated='right' size='mini' onClick={this.inviteButtonClickHandler}>{isInvited(c) ? 'Invited' : 'Invite'}</HoverButton> : null}
             <Button index={c.id} loading={this._getLoading('attend-' + c.id)} disabled={this._getLoading('attend-' + c.id)} color={isAttended(c) ? 'green' : 'blue'} floated='right' size='mini' basic={!!this.props.post} onClick={this.attendButtonClickHandler}>{isAttended(c) ? 'Attended' : 'Attend'}</Button>
@@ -217,7 +225,7 @@ export class Conferences extends React.Component<IProps, IState> {
               {c.date_from.toLocaleDateString() + ' - ' + c.date_to.toLocaleDateString()}<br />
               <a href={c.website}>{c.website}</a>
             </p>
-            {(isAttended(c)) ? <div style={{ marginBottom: '10px' }}>
+            {/* {(isAttended(c)) ? <div style={{ marginBottom: '10px' }}>
               <Checkbox
                 disabled={this._getLoading('badge-' + c.id)}
                 checked={this.state.badgeIndex === c.id}
@@ -225,7 +233,7 @@ export class Conferences extends React.Component<IProps, IState> {
                 onChange={this.badgeCheckboxClickHandler}
                 label='Make visible as a badge'
               />
-            </div> : null}
+            </div> : null} */}
             {this.renderParticipants(c.id)}
           </Accordion.Content>
         </React.Fragment>)}
@@ -286,11 +294,11 @@ export class Conferences extends React.Component<IProps, IState> {
 
   getIcon(r: any) {
     if (r.isWant && r.isWantsMe) {
-      return <Icon name='handshake outline' />
+      return <Icon name='handshake outline' title={`You and ${r.fullname} are invited each other`}/>
     } else if (r.isWant) {
-      return <Icon name='hand paper outline' rotated='clockwise' style={{ position: 'relative', left: '3px' }} />
+      return <Icon name='hand paper outline' title={`You invited ${r.fullname}`} rotated='clockwise' style={{ position: 'relative', left: '3px' }} />
     } else if (r.isWantsMe) {
-      return <Icon name='hand paper outline' style={{ transform: 'scale(-1, 1) rotate(90deg)', position: 'relative', left: '-1px' }} />
+      return <Icon name='hand paper outline' title={`${r.fullname} invited you`} style={{ transform: 'scale(-1, 1) rotate(90deg)', position: 'relative', left: '-1px' }} />
     } else {
       return null;
     }
@@ -303,12 +311,33 @@ export class Conferences extends React.Component<IProps, IState> {
       </Container>;
     }
 
+    const badgeOptions = [
+      { key: null, value: null, text: 'No label' },
+      ...this.state.data.filter(d => d.attendance_from === true).map(d => ({ key: d.conference.id, value: d.conference.id, text: d.conference.short_name }))
+    ];
+
     return (
       <div>
         {/* <Container text style={{ textAlign: 'center' }}>
           Your account is visible as
         </Container> */}
-        <ProfileCard card profile={this.props.profile} badge={this.getCurrentBadge()} onBadgeClick={this.badgeClickHandler}/>
+        <ProfileCard
+          card
+          profile={this.props.profile}
+          // badge={this.getCurrentBadge()} 
+          // onBadgeClick={this.badgeClickHandler}
+          badge={
+            <Dropdown
+              text={this.getCurrentBadge() ?? 'No label'}
+              className='ui blue button mini'
+              style={{ cursor: 'pointer', position: 'relative', top: '-3px', marginLeft: '8px' }}
+              onChange={(e, { value }) => this.badgeCheckboxClickHandler(value as number)}
+              options={badgeOptions as any}
+              value={this.state.badgeIndex as any}
+              loading={this._getLoading('badge') || this.state.loading.list}
+            />
+          }
+        />
 
         {this.props.post ? <React.Fragment>
           <Divider horizontal>Invites for discussion</Divider>

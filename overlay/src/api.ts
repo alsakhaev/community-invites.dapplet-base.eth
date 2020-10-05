@@ -99,7 +99,7 @@ export async function getPosts(): Promise<Post[]> {
     return Promise.resolve(data);
 }
 
-export type ConferenceWithInvitations = { conference: Conference, invitations: { from: Profile, to: Profile, post_id: string }[], attendance_from: boolean, attendance_to: boolean };
+export type ConferenceWithInvitations = { conference: Conference, invitations: { from: Profile, to: Profile, post_id: string }[], attendance_from: boolean, attendance_to?: boolean };
 
 export type DetailedPost = Post & {
     conference_id: number;
@@ -116,9 +116,8 @@ export type DetailedPost = Post & {
 export class Api {
     constructor(private _url: string) { }
 
-    async getConferencesWithInvitations(from: Profile, to: Profile): Promise<ConferenceWithInvitations[]> {
-
-        const data = await this._sendRequest(`/conferences/invitations?namespace_from=${from.namespace}&username_from=${from.username}&namespace_to=${to.namespace}&username_to=${to.username}`);
+    async getConferencesWithInvitations(from: Profile, to?: Profile): Promise<ConferenceWithInvitations[]> {
+        const data = await this._sendRequest(`/conferences/invitations?namespace_from=${from.namespace}&username_from=${from.username}` + ((to) ? `&namespace_to=${to.namespace}&username_to=${to.username}` : ''));
 
         data.forEach((d: any) => d.conference.date_from = new Date(d.conference.date_from));
         data.forEach((d: any) => d.conference.date_to = new Date(d.conference.date_to));

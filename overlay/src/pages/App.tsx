@@ -39,7 +39,7 @@ export class App extends React.Component<IProps, IState> {
         this.setState({ profile: user });
       }
 
-      this.setState({ post, settings });
+      this.setState({ post, settings, activeIndex: 0 });
     });
   }
 
