@@ -18,7 +18,7 @@ interface IState {
     active2: string | null;
 }
 
-export class Posts extends React.Component<IProps, IState> {
+export class MyDiscussions extends React.Component<IProps, IState> {
 
     private _api: Api;
 

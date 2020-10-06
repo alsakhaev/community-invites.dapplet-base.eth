@@ -4,7 +4,7 @@ import './App.css';
 import { dappletInstance, Post, Profile, Settings } from '../dappletBus';
 import { Segment, Loader, Tab, Menu } from 'semantic-ui-react';
 import { Conferences } from './Conferences';
-import { Posts } from './Posts';
+import { MyDiscussions } from './MyDiscussions';
 import { Api } from '../api';
 
 interface IProps {
@@ -68,8 +68,8 @@ export class App extends React.Component<IProps, IState> {
         menuItem: "Conferences",
         render: () => <Tab.Pane as={() => <Conferences profile={this.state.profile} post={this.state.post} onPostsClick={this.postsClickHandler} settings={this.state.settings!} />} />,
       }, {
-        menuItem: "Posts",
-        render: () => <Tab.Pane as={() => <Posts profile={this.state.profile} defaultSearch={this.state.postsDefaultSearch} settings={this.state.settings!} />} />,
+        menuItem: "My Discussions",
+        render: () => <Tab.Pane as={() => <MyDiscussions profile={this.state.profile} defaultSearch={this.state.postsDefaultSearch} settings={this.state.settings!} />} />,
       }
     ];
 
