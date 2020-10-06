@@ -140,7 +140,7 @@ export class MyDiscussions extends React.Component<IProps, IState> {
                                         </Comment.Metadata>
                                         <Comment.Text>{p.post.text}</Comment.Text>
                                         {p.conferences.map(c => <React.Fragment key={c.id}>
-                                            <b>{c.name}:</b> {c.users.map(u => `@${u.username}`).join(', ')} <br />
+                                            <b>{c.name}:</b> {c.users.filter(u => !(u.username === this.props.profile?.username && u.namespace === this.props.profile?.namespace)).map(u => `@${u.username}`).join(', ')} <br />
                                         </React.Fragment>)}
                                     </Comment.Content>
                                 </Comment>
