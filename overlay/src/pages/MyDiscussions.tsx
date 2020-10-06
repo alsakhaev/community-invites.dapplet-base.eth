@@ -1,5 +1,5 @@
 import React from 'react';
-import { Accordion, Icon, Segment, Comment, Input, InputOnChangeData, Loader } from 'semantic-ui-react';
+import { Accordion, Icon, Segment, Comment, Input, InputOnChangeData, Loader, Divider } from 'semantic-ui-react';
 import { Api, DetailedPost, PostWithInvitations } from '../api';
 import { Profile, Settings } from '../dappletBus';
 import { groupBy } from '../helpers';
@@ -139,10 +139,12 @@ export class MyDiscussions extends React.Component<IProps, IState> {
                                             <div>@{p.post.username}</div>
                                         </Comment.Metadata>
                                         <Comment.Text>{p.post.text}</Comment.Text>
+                                    </Comment.Content>
+                                    <div>
                                         {p.conferences.map(c => <React.Fragment key={c.id}>
                                             <b>{c.name}:</b> {c.users.filter(u => !(u.username === this.props.profile?.username && u.namespace === this.props.profile?.namespace)).map(u => `@${u.username}`).join(', ')} <br />
                                         </React.Fragment>)}
-                                    </Comment.Content>
+                                    </div>
                                 </Comment>
                             </Comment.Group>
                         </Segment>
