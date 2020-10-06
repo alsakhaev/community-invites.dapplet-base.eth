@@ -134,13 +134,13 @@ export class Posts extends React.Component<IProps, IState> {
                                 <Comment >
                                     <Comment.Avatar style={{ margin: 0 }} src={p.post.img} />
                                     <Comment.Content style={{ marginLeft: '3.3em', padding: 0 }} >
-                                        <Comment.Author as='a'>{p.post.fullname}</Comment.Author>
+                                        <Comment.Author as='a' target='_blank' href={`https://twitter.com/${p.post.username}/status/${p.post.id}`}>{p.post.fullname}</Comment.Author>
                                         <Comment.Metadata>
                                             <div>@{p.post.username}</div>
                                         </Comment.Metadata>
                                         <Comment.Text>{p.post.text}</Comment.Text>
                                         {p.conferences.map(c => <React.Fragment key={c.id}>
-                                            <b>{c.name}:</b> {c.users.map(u => `@${u.username}`).join(', ')} <br/>
+                                            <b>{c.name}:</b> {c.users.map(u => `@${u.username}`).join(', ')} <br />
                                         </React.Fragment>)}
                                     </Comment.Content>
                                 </Comment>
