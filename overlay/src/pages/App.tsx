@@ -64,16 +64,6 @@ export class App extends React.Component<IProps, IState> {
     }
 
     const panes = [
-      // {
-      //   menuItem: "Community Invite",
-      //   render: () => <Tab.Pane as={() => <Invite profile={this.state.profile} post={this.state.post as any} />} />,
-      // }, {
-      //   menuItem: "Confs",
-      //   render: () => <Tab.Pane as={() => <Conferences profile={this.state.profile} post={this.state.post as Post} />} />,
-      // }, {
-      //   menuItem: "My Meetups",
-      //   render: () => <Tab.Pane as={() => <MyMeetups profile={this.state.profile} post={this.state.post as Post} />} />,
-      // }, 
       {
         menuItem: "Conferences",
         render: () => <Tab.Pane as={() => <Conferences profile={this.state.profile} post={this.state.post} onPostsClick={this.postsClickHandler} settings={this.state.settings!} />} />,

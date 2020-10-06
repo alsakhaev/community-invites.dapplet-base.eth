@@ -25,6 +25,7 @@ router.post('/users', user.post);
 
 router.get('/posts', post.get);
 router.get('/posts/details', post.getDetailed);
+router.get('/posts/invitations', post.getWithInvitations);
 router.get('/posts/stat', post.getStat);
 
 export default router;

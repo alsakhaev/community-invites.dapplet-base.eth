@@ -1,9 +1,7 @@
 import React from 'react';
-import { Link } from "react-router-dom";
-import { Button, Divider, Card, Accordion, Icon, Segment, Image, Comment, Grid, Checkbox, Input, InputOnChangeData, Loader } from 'semantic-ui-react';
-import { Api, DetailedPost, getPosts } from '../api';
-import { Post, Profile, Settings } from '../dappletBus';
-import { PostCard } from '../components/PostCard';
+import { Accordion, Icon, Segment, Comment, Input, InputOnChangeData, Loader } from 'semantic-ui-react';
+import { Api, DetailedPost, PostWithInvitations } from '../api';
+import { Profile, Settings } from '../dappletBus';
 import { groupBy } from '../helpers';
 
 interface IProps {
@@ -13,11 +11,7 @@ interface IProps {
 }
 
 interface IState {
-    posts: (DetailedPost & {
-        target_user_namespace: string;
-        target_user_username: string;
-        target_user_fullname: string;        
-    })[];
+    posts: PostWithInvitations[];
     search: string;
     loading: { [key: string]: boolean };
     active1: string | null;
@@ -45,28 +39,8 @@ export class Posts extends React.Component<IProps, IState> {
     async componentDidMount() {
         const { profile } = this.props;
         if (profile) {
-            const posts = await this._api.getMyDetailedPosts(profile.namespace, profile.username);
-            const posts2 = posts.map(p => ({ ...p, ...((profile.namespace === p.user_from_namespace && profile.username === p.user_from_username) ? {
-                target_user_namespace: p.user_to_namespace,
-                target_user_username: p.user_to_username,
-                target_user_fullname: p.user_to_fullname
-            } : {
-                target_user_namespace: p.user_from_namespace,
-                target_user_username: p.user_from_username,
-                target_user_fullname: p.user_from_fullname
-            })}));
-
-            // expand first item of accordion by default
-            const filteredPosts = posts2.filter(this._postFilter);
-            const conference_id = Object.keys(groupBy(filteredPosts, 'conference_id'))[0];
-            if (conference_id) {
-                const post = posts2.filter(p => p.conference_id === parseInt(conference_id))[0];
-                if (post) {
-                    this.setState({ active1: conference_id, active2: post.target_user_username });
-                }
-            }
-
-            this.setState({ posts: posts2 });
+            const posts = await this._api.getInvitationPosts(profile.namespace, profile.username);
+            this.setState({ posts });
         }
 
         this._setLoading('list', false);
@@ -93,7 +67,7 @@ export class Posts extends React.Component<IProps, IState> {
         return result;
     }
 
-    _postFilter = (post: (DetailedPost & { target_user_namespace: string; target_user_username: string; target_user_fullname: string; })) => {
+    _postFilter = (data: PostWithInvitations) => {
         let isFound = true;
 
         const parsed = this._parseSearch(this.state.search);
@@ -101,17 +75,29 @@ export class Posts extends React.Component<IProps, IState> {
         const { user, search, conference } = parsed;
 
         if (user) {
-            isFound = isFound && user.toLowerCase() === post.target_user_username.toLowerCase();
+            for (const conf of data.conferences) {
+                if (!!conf.users.find(u => user.toLowerCase() === u.username.toLowerCase())) {
+                    isFound = isFound && true;
+                    break;
+                }
+            }
         }
 
         if (conference) {
-            isFound = isFound && conference.toLowerCase() === post.conference_short_name.toLowerCase();
+            const filteredByConference = data.conferences.find(c => conference.toLowerCase() === c.short_name.toLowerCase());
+            if (!user) {
+                isFound = isFound && !!filteredByConference;
+            } else if (filteredByConference) {
+                isFound = isFound && !!filteredByConference.users.find(u => user.toLowerCase() === u.username.toLowerCase())
+            } else {
+                isFound = isFound && false;
+            }
         }
 
         if (search && search.length > 0) {
-            isFound = isFound && Object.values(post).join(';').toLowerCase().indexOf(search.toLowerCase()) !== -1;
+            isFound = isFound && Object.values(data).join(';').toLowerCase().indexOf(search.toLowerCase()) !== -1;
         }
-        
+
         return isFound;
     }
 
@@ -141,43 +127,27 @@ export class Posts extends React.Component<IProps, IState> {
             />
             {this._getLoading('list') ? <Segment>
                 <Loader active inline='centered'>Loading</Loader>
-            </Segment> :
-                    <Accordion style={{ marginTop: '14px'}}  styled>
-                        {Object.entries(groupBy(filteredPosts, 'conference_id')).map(([conference_id, conf_posts]) => {
-                            const conf = filteredPosts.find(x => x.conference_id === parseInt(conference_id))!;
-
-                            return (<React.Fragment key={conference_id}>
-                                <Accordion.Title active={active1 === conference_id} onClick={() => this.setState({ active1: conference_id, active2: null })}><Icon name='dropdown' />{conf.conference_name}</Accordion.Title>
-                                <Accordion.Content active={active1 === conference_id}>
-                                    <Accordion.Accordion style={{ margin: 0}}>
-                                        {Object.entries(groupBy(conf_posts, 'target_user_username')).map(([username, user_posts]) => {
-                                            const user = conf_posts.find(x => x.target_user_username === username)!;
-
-                                            return (<React.Fragment key={username}>
-                                                <Accordion.Title active={active2 === username} onClick={() => this.setState({ active2: username })}><Icon name='dropdown' />{user.target_user_fullname} @{user.target_user_username}</Accordion.Title>
-                                                <Accordion.Content active={active2 === username}>
-                                                    <Comment.Group minimal>
-                                                        {user_posts.map((p, i) =>
-                                                            <Comment key={i}>
-                                                                <Comment.Avatar style={{ margin: 0 }} src={p.authorImg} />
-                                                                <Comment.Content style={{ marginLeft: '3.3em', padding: 0 }} >
-                                                                    <Comment.Author as='a'>{p.authorFullname}</Comment.Author>
-                                                                    <Comment.Metadata>
-                                                                        <div>@{p.authorUsername}</div>
-                                                                    </Comment.Metadata>
-                                                                    <Comment.Text>{p.text}</Comment.Text>
-                                                                </Comment.Content>
-                                                            </Comment>
-                                                        )}
-                                                    </Comment.Group>
-                                                </Accordion.Content>
-                                            </React.Fragment>);
-                                        })}
-                                    </Accordion.Accordion>
-                                </Accordion.Content>
-                            </React.Fragment>);
-                        })}
-                    </Accordion>}
+            </Segment> : <React.Fragment>
+                    {this.state.posts.filter(this._postFilter).map((p, i) =>
+                        <Segment key={i}>
+                            <Comment.Group minimal>
+                                <Comment >
+                                    <Comment.Avatar style={{ margin: 0 }} src={p.post.img} />
+                                    <Comment.Content style={{ marginLeft: '3.3em', padding: 0 }} >
+                                        <Comment.Author as='a'>{p.post.fullname}</Comment.Author>
+                                        <Comment.Metadata>
+                                            <div>@{p.post.username}</div>
+                                        </Comment.Metadata>
+                                        <Comment.Text>{p.post.text}</Comment.Text>
+                                        {p.conferences.map(c => <React.Fragment key={c.id}>
+                                            <b>{c.name}:</b> {c.users.map(u => `@${u.username}`).join(', ')} <br/>
+                                        </React.Fragment>)}
+                                    </Comment.Content>
+                                </Comment>
+                            </Comment.Group>
+                        </Segment>
+                    )}
+                </React.Fragment>}
         </div>);
     }
 }

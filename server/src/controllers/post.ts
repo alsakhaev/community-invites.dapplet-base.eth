@@ -17,3 +17,9 @@ export const getStat = asyncHandler(async function (req: any, res: any) {
     const data = await postService.getStat();
     return res.json({ success: true, data: data });
 })
+
+export const getWithInvitations = asyncHandler(async function (req: any, res: any) {
+    const { namespace, username } = req.query;
+    const data = await postService.getPostsWithInvitations(namespace, username);
+    return res.json({ success: true, data: data });
+})

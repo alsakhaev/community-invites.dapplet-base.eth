@@ -1,5 +1,5 @@
 import { execute } from '../connection';
-import { Post } from '../types';
+import { Invitation, Post } from '../types';
 
 export async function getPosts(namespace?: string, username?: string): Promise<Post[]> {
     if (!namespace !== !username) throw new Error('namespace and username are required');
@@ -68,6 +68,27 @@ type DetailedPost = {
     user_to_fullname: string;
 }
 
+type PostWithInvitations = {
+    post: {
+        id: string;
+        namespace: string;
+        username: string;
+        fullname: string;
+        img: string;
+        text: string;
+    };
+    conferences: {
+        id: number;
+        name: string;
+        short_name: string;
+        users: {
+            namespace: string;
+            username: string;
+            fullname: string;
+        }[];
+    }[];
+}
+
 export async function getMyDetailedPosts(namespace: string, username: string): Promise<DetailedPost[]> {
     if (!namespace || !username) throw new Error('namespace and username are required');
 
@@ -130,4 +151,72 @@ export async function getStat(): Promise<any[]> {
     });
 
     return data;
+}
+
+export async function getPostsWithInvitations(namespace: string, username: string): Promise<PostWithInvitations[]> {
+    if (!namespace || !username) throw new Error('namespace and username are required');
+
+    const params = [namespace, username];
+    const query = `
+        select 
+            json_build_object(
+                'id', p.id,
+                'namespace', p.namespace,
+                'username', p.username,
+                'fullname', u.fullname,
+                'img', u.img,
+                'text', p.text
+            ) as post,
+            (
+                select json_agg(json_build_object(
+                    'id', c.id,
+                    'name', c.name,
+                    'short_name', c.short_name,
+                    'users', (              
+                        select json_agg(distinct iiii.*) 
+                        from (
+                            (
+                                select 
+                                    ii.namespace_from as namespace, 
+                                    ii.username_from as username,
+                                    uu.fullname as fullname
+                                from invitations as ii 
+                                join users as uu on uu.namespace = ii.namespace_from and uu.username = ii.username_from
+                                where ii.post_id = p.id
+                                    and ((ii.namespace_from = $1 and ii.username_from = $2)
+                                        or (ii.namespace_to = $1 and ii.username_to = $2))
+                            )
+                            UNION ALL
+                            (
+                                select 
+                                    iii.namespace_to as namespace, 
+                                    iii.username_to as username,
+                                    uuu.fullname as fullname
+                                from invitations as iii
+                                join users as uuu on uuu.namespace = iii.namespace_to and uuu.username = iii.username_to
+                                where iii.post_id = p.id
+                                    and ((iii.namespace_from = $1 and iii.username_from = $2)
+                                        or (iii.namespace_to = $1 and iii.username_to = $2))
+                            )
+                        ) as iiii
+                    )
+                ))
+                from conferences as c 
+                where c.id in (
+                    select i.conference_id 
+                    from invitations as i 
+                    where i.post_id = p.id
+                )
+            ) as conferences
+        from posts as p
+        join users as u on u.namespace = p.namespace and u.username = p.username
+        where p.id in (
+            select iiiii.post_id
+            from invitations as iiiii
+            where (iiiii.namespace_from = $1 and iiiii.username_from = $2)
+                or (iiiii.namespace_to = $1 and iiiii.username_to = $2)
+        )
+    `;
+
+    return execute(c => c.query(query, params).then(r => r.rows));
 }

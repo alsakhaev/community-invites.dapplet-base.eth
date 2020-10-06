@@ -20,6 +20,27 @@ export type Post = {
     text: string;
 }
 
+export type PostWithInvitations = {
+    post: {
+        id: string;
+        namespace: string;
+        username: string;
+        fullname: string;
+        img: string;
+        text: string;
+    };
+    conferences: {
+        id: number;
+        name: string;
+        short_name: string;
+        users: {
+            namespace: string;
+            username: string;
+            fullname: string;
+        }[];
+    }[];
+}
+
 export async function getConferences(): Promise<Conference[]> {
     return Promise.resolve([{
         id: 6,
@@ -193,6 +214,10 @@ export class Api {
             authorImg: x.author_img,
             ...x
         }));
+    }
+
+    async getInvitationPosts(namespace: string, username: string): Promise<PostWithInvitations[]> {
+        return this._sendRequest(`/posts/invitations?namespace=${namespace}&username=${username}`);
     }
 
     private async _sendRequest(query: string, method: 'POST' | 'GET' | 'PUT' = 'GET', body?: any): Promise<any> {

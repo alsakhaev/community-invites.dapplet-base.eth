@@ -1,13 +1,10 @@
 import React from 'react';
-import { Link } from "react-router-dom";
-import { Button, Divider, Card, Accordion, Icon, Segment, Container, Checkbox, CheckboxProps, Grid, Loader, Dropdown } from 'semantic-ui-react';
+import { Button, Divider, Accordion, Icon, Container, Grid, Loader, Dropdown } from 'semantic-ui-react';
 import { Post, Profile, Settings } from '../dappletBus';
 import { PostCard } from '../components/PostCard';
-import { Api, Conference, ConferenceWithInvitations, getConferences } from '../api';
+import { Api, Conference, ConferenceWithInvitations } from '../api';
 import { ProfileCard } from '../components/ProfileCard'
 import { HoverButton } from '../components/HoverButton';
-import { Participants } from '../components/Participants';
-import { throws } from 'assert';
 
 interface IProps {
   post?: Post;
