@@ -323,15 +323,15 @@ export class Conferences extends React.Component<IProps, IState> {
           profile={this.props.profile}
           // badge={this.getCurrentBadge()} 
           // onBadgeClick={this.badgeClickHandler}
-          badge={
+          badge={(this.state.loading.list) ? null :
             <Dropdown
               text={this.getCurrentBadge() ?? 'No label'}
               className='ui blue button mini'
-              style={{ cursor: 'pointer', position: 'relative', top: '-3px', marginLeft: '8px' }}
+              style={{ cursor: 'pointer', position: 'relative', top: '-3px', marginLeft: '4px', padding: '6px 8px' }}
               onChange={(e, { value }) => this.badgeCheckboxClickHandler(value as number)}
               options={badgeOptions as any}
               value={this.state.badgeIndex as any}
-              loading={this._getLoading('badge') || this.state.loading.list}
+              loading={this._getLoading('badge')}
             />
           }
         />
