@@ -26,36 +26,60 @@ export default class Feature {
         const wallet = Core.wallet();
 
         const { statusLine } = viewportAdapter.exports;
-        const { label, button } = this.identityAdapter.exports;
+        const { label, button, caption } = this.identityAdapter.exports;
 
         this.identityAdapter.attachConfig({
-            POST_USERNAME_LABEL: [
-                label({
-                    initial: "DEFAULT",
-                    "DEFAULT": {
-                        hidden: true,
-                        init: async (ctx, me) => {
-                            const info = await this._getBadge('twitter.com', ctx.authorUsername);
-                            if (info && info.main_conference_id) {
-                                me.setState("BADGE");
-                                me.text = info.main_conference_short_name;
-                                if (info.conferences_count > 1) me.postfix = `+${info.conferences_count - 1}`
-                            }
-                        }
-                    },
-                    "BADGE": {
-                        text: '',
-                        exec: (post) => this._openOverlay(this.identityAdapter.getCurrentUser(), post),
-                        img: ICON
-                    }
-                })
-            ],
+            // POST_USERNAME_LABEL: [
+            //     label({
+            //         initial: "DEFAULT",
+            //         "DEFAULT": {
+            //             hidden: true,
+            //             init: async (ctx, me) => {
+            //                 const info = await this._getBadge('twitter.com', ctx.authorUsername);
+            //                 if (info && info.main_conference_id) {
+            //                     me.setState("BADGE");
+            //                     me.text = info.main_conference_short_name;
+            //                     if (info.conferences_count > 1) me.postfix = `+${info.conferences_count - 1}`
+            //                 }
+            //             }
+            //         },
+            //         "BADGE": {
+            //             text: '',
+            //             exec: (post) => this._openOverlay(this.identityAdapter.getCurrentUser(), post),
+            //             img: ICON
+            //         }
+            //     })
+            // ],
             POST_SOUTH: [
                 button({
                     initial: "DEFAULT",
                     "DEFAULT": {
                         img: ICON,
                         exec: (post) => this._openOverlay(this.identityAdapter.getCurrentUser(), post)
+                    }
+                })
+            ],
+            POST_SOCIAL_CONTEXT: [
+                caption({
+                    initial: "DEFAULT",
+                    "DEFAULT": {
+                        hidden: true,
+                        init: async (ctx, me) => {
+                            const info = await this._getBadge('twitter.com', ctx.authorUsername);
+                            if (info && info.conferences_count > 0) {
+                                me.setState("LABEL");
+                                if (info.main_conference_short_name) {
+                                    me.text = `Attends ${info.main_conference_short_name}` + ((info.conferences_count > 1) ? ` and ${info.conferences_count - 1} other event(s)` : '');
+                                } else {
+                                    me.text = `Attends ${info.conferences_count} event(s)`;
+                                }                                
+                            }
+                        }
+                    },
+                    "LABEL": {
+                        text: '',
+                        exec: (post) => this._openOverlay(this.identityAdapter.getCurrentUser(), post),
+                        img: ICON
                     }
                 })
             ]
