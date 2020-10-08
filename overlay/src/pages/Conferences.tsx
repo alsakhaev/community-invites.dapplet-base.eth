@@ -190,7 +190,7 @@ export class Conferences extends React.Component<IProps, IState> {
 
   renderAccordion = (data: ConferenceWithInvitations[], header: any, key: string) => {
     if (data.length === 0) return null;
-    const { post } = this.props;
+    const { post, profile } = this.props;
     const { activeIndex } = this.state;
 
     const isInvited = (c: Conference) => {
@@ -213,7 +213,7 @@ export class Conferences extends React.Component<IProps, IState> {
         {data.map(d => d.conference).map(c => <React.Fragment key={c.id}>
           <Accordion.Title active={activeIndex === key + c.id} index={key + c.id} onClick={this.accordionClickHandler} style={{ lineHeight: '29px', color: (this.state.selectedConference === c.id) ? '#2185d0' : undefined }} >
             <Icon name='dropdown' />{c.name}
-            {post ? <HoverButton loading={this._getLoading('invite-' + c.id)} disabled={this._getLoading('invite-' + c.id)} color={isInvited(c) ? 'green' : 'blue'} hoverColor={isInvited(c) ? 'red' : 'blue'} hoverText={isInvited(c) ? 'Withdraw' : 'Invite'} index={c.id} floated='right' size='mini' onClick={this.inviteButtonClickHandler}>{isInvited(c) ? 'Invited' : 'Invite'}</HoverButton> : null}
+            {(post && post.authorUsername !== profile?.username) ? <HoverButton loading={this._getLoading('invite-' + c.id)} disabled={this._getLoading('invite-' + c.id)} color={isInvited(c) ? 'green' : 'blue'} hoverColor={isInvited(c) ? 'red' : 'blue'} hoverText={isInvited(c) ? 'Withdraw' : 'Invite'} index={c.id} floated='right' size='mini' onClick={this.inviteButtonClickHandler}>{isInvited(c) ? 'Invited' : 'Invite'}</HoverButton> : null}
             <Button index={c.id} loading={this._getLoading('attend-' + c.id)} disabled={this._getLoading('attend-' + c.id)} color={isAttended(c) ? 'green' : 'blue'} floated='right' size='mini' basic={!!this.props.post} onClick={this.attendButtonClickHandler}>{isAttended(c) ? 'Attended' : 'Attend'}</Button>
           </Accordion.Title>
           <Accordion.Content active={activeIndex === key + c.id}>
@@ -291,7 +291,7 @@ export class Conferences extends React.Component<IProps, IState> {
 
   getIcon(r: any) {
     if (r.isWant && r.isWantsMe) {
-      return <Icon name='handshake outline' title={`You and ${r.fullname} are invited each other`}/>
+      return <Icon name='handshake outline' title={`You and ${r.fullname} are invited each other`} />
     } else if (r.isWant) {
       return <Icon name='hand paper outline' title={`You invited ${r.fullname}`} rotated='clockwise' style={{ position: 'relative', left: '3px' }} />
     } else if (r.isWantsMe) {
@@ -336,14 +336,14 @@ export class Conferences extends React.Component<IProps, IState> {
           }
         />
 
-        {this.props.post ? <React.Fragment>
+        {(this.props.post && this.props.post.authorUsername !== this.props.profile.username) ? <React.Fragment>
           <Divider horizontal>Invites for discussion</Divider>
           {/* <Container text style={{ textAlign: 'center' }}>
             You are about to invite<br /><span style={{ fontWeight: 'bold' }}>@{this.props.post.authorUsername}</span><br />to discuss the following topic
           </Container> */}
           <PostCard post={this.props.post} card />
         </React.Fragment> : null}
-        {this.props.post ? <React.Fragment>
+        {(this.props.post && this.props.post.authorUsername !== this.props.profile.username) ? <React.Fragment>
           {!this._getLoading('list') ? <React.Fragment>
             {this.renderAccordion(this.state.data.filter(c => c.attendance_to === true), <Container text style={{ textAlign: 'center', marginBottom: 5 }}>at conferences HE/SHE visits</Container>, 'heshe')}
 
@@ -352,7 +352,7 @@ export class Conferences extends React.Component<IProps, IState> {
             {this.renderAccordion(this.state.data.filter(c => c.attendance_from === false && c.attendance_to === false), <Container text style={{ textAlign: 'center', marginTop: 10, marginBottom: 5 }}>or any other conferences</Container>, 'other')}
           </React.Fragment> : <Loader active inline='centered'>Loading</Loader>}
 
-        </React.Fragment> : this.renderAccordion(this.state.data, null, 'all')}
+        </React.Fragment> : (!this._getLoading('list') ? this.renderAccordion(this.state.data, null, 'all') : <Loader active inline='centered'>Loading</Loader>)}
       </div>
     );
   }
