@@ -69,7 +69,7 @@ export default class Feature {
                             if (info && info.conferences_count > 0) {
                                 me.setState("LABEL");
                                 if (info.main_conference_short_name) {
-                                    me.text = `Attends ${info.main_conference_short_name}` + ((info.conferences_count > 1) ? ` and ${info.conferences_count - 1} other event(s)` : '');
+                                    me.text = `Attends ${info.main_conference_short_name}` + ((info.conferences_count > 1) ? ` and ${info.conferences_count - 1} other event${(info.conferences_count - 1 > 1) ? 's' : ''}` : '');
                                 } else {
                                     me.text = `Attends ${info.conferences_count} event(s)`;
                                 }                                
