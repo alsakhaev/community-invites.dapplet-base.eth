@@ -51,7 +51,16 @@ export class App extends React.Component<IProps, IState> {
     this.setState({ activeIndex: 1, postsDefaultSearch: `conference:${conferenceShortName} user:${username}` });
   }
 
-  handleTabChange = (e: any, { activeIndex }: any) => this.setState({ activeIndex });
+  handleTabChange = (e: React.MouseEvent<HTMLDivElement, MouseEvent>, { activeIndex }: any) => {
+    if (activeIndex === 2) {
+      e.preventDefault();
+      e.stopPropagation();
+      window.open('https://community-invite-dashboard.herokuapp.com/', '_blank');
+      return;
+    };
+
+    this.setState({ activeIndex });
+  };
 
   render() {
 
@@ -70,6 +79,9 @@ export class App extends React.Component<IProps, IState> {
       }, {
         menuItem: "My Discussions",
         render: () => <Tab.Pane as={() => <MyDiscussions profile={this.state.profile} defaultSearch={this.state.postsDefaultSearch} settings={this.state.settings!} />} />,
+      }, {
+        menuItem: "Dashboard",
+        loading: true
       }
     ];
 
@@ -83,6 +95,7 @@ export class App extends React.Component<IProps, IState> {
                 panes={panes}
                 activeIndex={this.state.activeIndex}
                 onTabChange={this.handleTabChange}
+                renderActiveOnly
               />
             </React.Fragment>
           </Switch>

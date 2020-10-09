@@ -18,6 +18,9 @@ export type UserStat = {
     invitations_to_count: number;
     invitations_from_count: number;
     attendance_count: number;
+    users_to_count: number;
+    confrences_to_count: number;
+    posts_to_count: number;
 }
 
 export class Api {

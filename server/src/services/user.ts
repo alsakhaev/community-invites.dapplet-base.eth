@@ -78,18 +78,49 @@ export async function getStat(): Promise<any[]> {
         const res = await client.query(`
             SELECT
                 u.*,
+                
                 (SELECT COUNT(*) 
                 FROM invitations AS i 
                 WHERE i.namespace_to = u.namespace
                     AND i.username_to = u.username) AS invitations_to_count,
+                    
                 (SELECT COUNT(*) 
                 FROM invitations AS i 
                 WHERE i.namespace_from = u.namespace
                     AND i.username_from = u.username) AS invitations_from_count,
+                    
                 (SELECT COUNT(*)
                 FROM attendance AS a
                 WHERE a.namespace = u.namespace
-                    AND a.username = u.username) AS attendance_count
+                    AND a.username = u.username) AS attendance_count,
+                    
+                (SELECT COUNT(*)
+                FROM (
+                    SELECT i.namespace_from, i.username_from
+                    FROM invitations AS i
+                    WHERE i.namespace_to = u.namespace
+                        AND i.username_to = u.username
+                    GROUP BY i.namespace_from, i.username_from
+                ) AS x) AS users_to_count,
+                    
+                (SELECT COUNT(*)
+                FROM (
+                    SELECT i.conference_id
+                    FROM invitations AS i
+                    WHERE i.namespace_to = u.namespace
+                        AND i.username_to = u.username
+                    GROUP BY i.conference_id
+                ) AS x) AS confrences_to_count,
+                    
+                (SELECT COUNT(*)
+                FROM (
+                    SELECT i.post_id
+                    FROM invitations AS i
+                    WHERE i.namespace_to = u.namespace
+                    	AND i.username_to = u.username
+                    GROUP BY i.post_id
+                ) AS x) AS posts_to_count
+            
             FROM users AS u
         `);
         return res.rows;
@@ -99,6 +130,9 @@ export async function getStat(): Promise<any[]> {
         d.invitations_to_count = parseInt(d.invitations_to_count);
         d.invitations_from_count = parseInt(d.invitations_from_count);
         d.attendance_count = parseInt(d.attendance_count);
+        d.users_to_count = parseInt(d.users_to_count);
+        d.confrences_to_count = parseInt(d.confrences_to_count);
+        d.posts_to_count = parseInt(d.posts_to_count);
     });
 
     return data;
