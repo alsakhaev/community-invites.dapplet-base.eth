@@ -23,7 +23,7 @@ export class PostCard extends React.Component<IProps, IState> {
                 />
                 <Card.Header>{p.authorFullname}</Card.Header>
                 <Card.Meta>@{p.authorUsername}</Card.Meta>
-                <Card.Description style={{ wordBreak: 'break-all'}}>
+                <Card.Description>
                     {p.text}
                 </Card.Description>
             </Card.Content>
