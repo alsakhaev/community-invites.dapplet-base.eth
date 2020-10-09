@@ -22,7 +22,7 @@ export class App extends React.Component<IProps, IState> {
 
   constructor(props: IProps) {
     super(props);
-    this._api = new Api('http://localhost:3003');
+    this._api = new Api('https://community-invite.herokuapp.com');
     this.state = {
       posts: [],
       users: [],
