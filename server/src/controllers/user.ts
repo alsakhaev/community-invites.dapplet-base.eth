@@ -26,6 +26,7 @@ export const getBadge = asyncHandler(async function (req: any, res: any) {
 })
 
 export const getStat = asyncHandler(async function (req: any, res: any) {
-    const data = await userService.getStat();
+    const params = req.body;
+    const data = await userService.getStat(params);
     return res.json({ success: true, data: data });
 })

@@ -14,6 +14,7 @@ interface IState {
   posts: PostStat[];
   users: UserStat[];
   isLoading: boolean;
+  selectedUser: UserStat | null;
 }
 
 export class App extends React.Component<IProps, IState> {
@@ -26,7 +27,8 @@ export class App extends React.Component<IProps, IState> {
     this.state = {
       posts: [],
       users: [],
-      isLoading: true
+      isLoading: true,
+      selectedUser: null
     };
   }
 
@@ -37,6 +39,13 @@ export class App extends React.Component<IProps, IState> {
     ]);
 
     this.setState({ posts, users, isLoading: false });
+  }
+
+  onUserSelectHandler = async (user: UserStat | null) => {
+    this.setState({ selectedUser: user });
+
+    const posts = await this._api.getPostStat((user) ? { username: user.username } : undefined);
+    this.setState({ posts });
   }
 
   render() {
@@ -86,7 +95,7 @@ export class App extends React.Component<IProps, IState> {
                 <h2 style={{ textAlign: 'center' }}>People</h2>
                 <div style={{ marginBottom: '1em' }}><Filter /></div>
                 <Message info>Invite most wanted people to your conference</Message>
-                <UsersTableMini users={s.users} />
+                <UsersTableMini users={s.users} onUserSelect={this.onUserSelectHandler} />
 
               </Grid.Column>
               <Grid.Column>

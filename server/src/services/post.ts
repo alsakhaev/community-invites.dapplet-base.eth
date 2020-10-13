@@ -123,9 +123,10 @@ export async function getMyDetailedPosts(namespace: string, username: string): P
     return execute(c => c.query(query, params).then(r => r.rows));
 }
 
-export async function getStat(): Promise<any[]> {
-    const data = await execute(async (client) => {
-        const res = await client.query(`
+export async function getStat(filters?: { username?: string }): Promise<any[]> {
+
+    const query = {
+        text: `
             SELECT
                 p.*,
                 u.fullname,
@@ -141,9 +142,13 @@ export async function getStat(): Promise<any[]> {
             FROM posts AS p
             LEFT JOIN users AS u ON u.namespace = p.namespace
                 AND u.username = p.username
-        `);
-        return res.rows;
-    });
+            ${filters?.username ? 'WHERE p.username = $1' : ''}
+        `,
+        values: filters?.username ? [filters.username] : undefined
+    };
+
+
+    const data = await execute(c => c.query(query).then(r => r.rows));
 
     data.forEach(d => {
         d.invitations_count = parseInt(d.invitations_count);

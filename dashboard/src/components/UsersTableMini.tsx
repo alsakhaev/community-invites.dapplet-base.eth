@@ -6,6 +6,7 @@ import sortBy from 'lodash.sortby';
 
 interface IProps {
     users: UserStat[];
+    onUserSelect: (user: UserStat | null) => void;
 }
 
 interface IState {
@@ -13,46 +14,6 @@ interface IState {
     direction: 'ascending' | 'descending';
     activeIndex: number;
 }
-
-const panels = [
-    {
-        key: 'what-is-dog',
-        title: 'What is a dog?',
-        content: [
-            'A dog is a type of domesticated animal. Known for its loyalty and faithfulness, it can be found as a welcome',
-            'guest in many households across the world.',
-        ].join(' '),
-    },
-    {
-        key: 'kinds-of-dogs',
-        title: 'What kinds of dogs are there?',
-        content: [
-            'There are many breeds of dogs. Each breed varies in size and temperament. Owners often select a breed of dog',
-            'that they find to be compatible with their own lifestyle and desires from a companion.',
-        ].join(' '),
-    },
-    {
-        key: 'acquire-dog',
-        title: 'How do you acquire a dog?',
-        content: {
-            content: (
-                <div>
-                    <p>
-                        Three common ways for a prospective owner to acquire a dog is from
-                        pet shops, private owners, or shelters.
-            </p>
-                    <p>
-                        A pet shop may be the most convenient way to buy a dog. Buying a dog
-                        from a private owner allows you to assess the pedigree and
-                        upbringing of your dog before choosing to take it home. Lastly,
-                        finding your dog from a shelter, helps give a good home to a dog who
-                        may not find one so readily.
-            </p>
-                </div>
-            ),
-        },
-    },
-]
 
 export class UsersTableMini extends React.Component<IProps, IState> {
 
@@ -74,14 +35,17 @@ export class UsersTableMini extends React.Component<IProps, IState> {
         const { activeIndex } = this.state
         const newIndex = activeIndex === index ? -1 : index
 
-        this.setState({ activeIndex: newIndex })
+        this.setState({ activeIndex: newIndex });
+        this.props.onUserSelect(newIndex === -1 ? null : this.props.users[newIndex]);
     }
 
     render() {
         const { users } = this.props;
         const { column, direction, activeIndex } = this.state;
-        const data = (direction === 'ascending') ? sortBy(users, [column]) : sortBy(users, [column]).reverse();
-        const panels = data.map(u => ({
+
+        //const data = (direction === 'ascending') ? sortBy(users, [column]) : sortBy(users, [column]).reverse();
+
+        const panels = users.map(u => ({
             key: u.namespace + '/' + u.username,
             title: {
                 icon: {
@@ -111,45 +75,10 @@ export class UsersTableMini extends React.Component<IProps, IState> {
             }
         }));
 
-        /*
-            {<Table sortable celled fixed>
-                <Table.Header>
-                    <Table.Row>
-                        <Table.HeaderCell width={2} sorted={column === 'username' ? direction : undefined} onClick={() => this.sortBy('username')}>User</Table.HeaderCell>
-                        <Table.HeaderCell width={1} sorted={column === 'invitations_to_count' ? direction : undefined} onClick={() => this.sortBy('invitations_to_count')}>Invite In</Table.HeaderCell>
-                        <Table.HeaderCell width={1} sorted={column === 'invitations_from_count' ? direction : undefined} onClick={() => this.sortBy('invitations_from_count')}>Invite Out</Table.HeaderCell>
-                        <Table.HeaderCell width={1} sorted={column === 'attendance_count' ? direction : undefined} onClick={() => this.sortBy('attendance_count')}>Attendance</Table.HeaderCell>
-                    </Table.Row>
-                </Table.Header>
-                <Table.Body>
-                    {data.map(u => (
-                        <Table.Row key={u.username}>
-                            <Table.Cell style={{ display: 'flex'}}>
-                                <Header as='h4' image style={{ flex: 'auto'}}>
-                                    <Image src={u.img} rounded size='mini' />
-                                    <Header.Content>
-                                        <a href={`https://twitter.com/${u.username}`} target="_blank" style={{ cursor: 'pointer', color: '#000' }}>{u.fullname}</a>
-                                        <Header.Subheader>@{u.username}</Header.Subheader>
-                                    </Header.Content>
-                                </Header>
-                                <div style={{ width: '10em'}}>
-                                    <div>Rating: {u.invitations_to_count}</div>
-                                    <div>Wanted by: {u.invitations_to_count}</div>
-                                </div>
-                            </Table.Cell>
-                            <Table.Cell>{u.invitations_to_count}</Table.Cell>
-                            <Table.Cell>{u.invitations_from_count}</Table.Cell>
-                            <Table.Cell>{u.attendance_count}</Table.Cell>
-                        </Table.Row>
-                    ))}
-                </Table.Body>
-            </Table>}
-        */
-
         return (
             <Accordion as={Table} sortable celled fixed unstackable>
                 <Table.Body>
-                    {data.map((d, i) => (
+                    {users.map((d, i) => (
                         <Table.Row key={i}>
                             <Table.Cell style={{ width: '3em' }} verticalAlign='top'>{i + 1}</Table.Cell>
                             <Table.Cell>

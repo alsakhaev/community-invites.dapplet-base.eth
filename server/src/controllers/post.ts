@@ -14,7 +14,8 @@ export const getDetailed = asyncHandler(async function (req: any, res: any) {
 })
 
 export const getStat = asyncHandler(async function (req: any, res: any) {
-    const data = await postService.getStat();
+    const params = req.body;
+    const data = await postService.getStat(params);
     return res.json({ success: true, data: data });
 })
 

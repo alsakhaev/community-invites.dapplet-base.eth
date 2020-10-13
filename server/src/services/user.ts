@@ -17,7 +17,7 @@ export async function getUser(namespace: string, username: string): Promise<Prof
 
 export async function createUser(u: Profile): Promise<Profile> {
     if (!u.namespace || !u.username) throw new Error('namespace and username are required!');
-    
+
     return execute(async (client) => {
         const entries = Object.entries(u);
         const values = entries.map(x => x[1]);
@@ -73,7 +73,7 @@ export async function getBadge(namespace: string, username: string): Promise<{ n
     return badge;
 }
 
-export async function getStat(): Promise<any[]> {
+export async function getStat(filters?: {  }): Promise<any[]> {
     const data = await execute(async (client) => {
         const res = await client.query(`
             SELECT

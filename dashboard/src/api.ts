@@ -26,12 +26,12 @@ export type UserStat = {
 export class Api {
     constructor(private _url: string) { }
 
-    async getPostStat(): Promise<PostStat[]> {
-        return this._sendRequest(`/posts/stat`);
+    async getPostStat(filters?: { username?: string }): Promise<PostStat[]> {
+        return this._sendRequest(`/posts/stat`, 'POST', filters);
     }
 
     async getUserStat(): Promise<UserStat[]> {
-        return this._sendRequest(`/users/stat`);
+        return this._sendRequest(`/users/stat`, 'POST');
     }
 
     private async _sendRequest(query: string, method: 'POST' | 'GET' | 'PUT' = 'GET', body?: any): Promise<any> {
