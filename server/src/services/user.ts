@@ -73,7 +73,11 @@ export async function getBadge(namespace: string, username: string): Promise<{ n
     return badge;
 }
 
-export async function getStat(filters?: {  }): Promise<any[]> {
+export async function getStat(filters?: { excludePosts?: string[] }): Promise<any[]> {
+    const isFilter = filters?.excludePosts && filters?.excludePosts.length > 0;
+
+    const params = isFilter ? [filters!.excludePosts] : undefined;
+
     const data = await execute(async (client) => {
         const res = await client.query(`
             SELECT
@@ -82,12 +86,16 @@ export async function getStat(filters?: {  }): Promise<any[]> {
                 (SELECT COUNT(*) 
                 FROM invitations AS i 
                 WHERE i.namespace_to = u.namespace
-                    AND i.username_to = u.username) AS invitations_to_count,
+                    AND i.username_to = u.username
+                    ${isFilter ? 'AND NOT (i.post_id = ANY ($1))' : ''}
+                ) AS invitations_to_count,
                     
                 (SELECT COUNT(*) 
                 FROM invitations AS i 
                 WHERE i.namespace_from = u.namespace
-                    AND i.username_from = u.username) AS invitations_from_count,
+                    AND i.username_from = u.username
+                    ${isFilter ? 'AND NOT (i.post_id = ANY ($1))' : ''}
+                ) AS invitations_from_count,
                     
                 (SELECT COUNT(*)
                 FROM attendance AS a
@@ -100,6 +108,7 @@ export async function getStat(filters?: {  }): Promise<any[]> {
                     FROM invitations AS i
                     WHERE i.namespace_to = u.namespace
                         AND i.username_to = u.username
+                        ${isFilter ? 'AND NOT (i.post_id = ANY ($1))' : ''}
                     GROUP BY i.namespace_from, i.username_from
                 ) AS x) AS users_to_count,
                     
@@ -109,6 +118,7 @@ export async function getStat(filters?: {  }): Promise<any[]> {
                     FROM invitations AS i
                     WHERE i.namespace_to = u.namespace
                         AND i.username_to = u.username
+                        ${isFilter ? 'AND NOT (i.post_id = ANY ($1))' : ''}
                     GROUP BY i.conference_id
                 ) AS x) AS confrences_to_count,
                     
@@ -117,12 +127,13 @@ export async function getStat(filters?: {  }): Promise<any[]> {
                     SELECT i.post_id
                     FROM invitations AS i
                     WHERE i.namespace_to = u.namespace
-                    	AND i.username_to = u.username
+                        AND i.username_to = u.username
+                        ${isFilter ? 'AND NOT (i.post_id = ANY ($1))' : ''}
                     GROUP BY i.post_id
                 ) AS x) AS posts_to_count
             
             FROM users AS u
-        `);
+        `, params);
         return res.rows;
     });
 

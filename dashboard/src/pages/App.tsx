@@ -15,6 +15,7 @@ interface IState {
   users: UserStat[];
   isLoading: boolean;
   selectedUser: UserStat | null;
+  postFilter: { [id: string]: boolean };
 }
 
 export class App extends React.Component<IProps, IState> {
@@ -28,7 +29,8 @@ export class App extends React.Component<IProps, IState> {
       posts: [],
       users: [],
       isLoading: true,
-      selectedUser: null
+      selectedUser: null,
+      postFilter: {}
     };
   }
 
@@ -46,6 +48,16 @@ export class App extends React.Component<IProps, IState> {
 
     const posts = await this._api.getPostStat((user) ? { username: user.username } : undefined);
     this.setState({ posts });
+  }
+
+  onPostCheckHandler = async (post: PostStat, checked: boolean) => {
+    const { postFilter } = this.state;
+    postFilter[post.id] = checked;
+    this.setState({ postFilter });
+
+    const excludePosts = Object.entries(postFilter).filter(x => x[1] === false).map(x => x[0]); // SELECT postid FROM postFilter WHERE checked = false
+    const users = await this._api.getUserStat({ excludePosts });
+    this.setState({ users });
   }
 
   render() {
@@ -102,7 +114,7 @@ export class App extends React.Component<IProps, IState> {
                 <h2 style={{ textAlign: 'center' }}>Topics</h2>
                 <div style={{ marginBottom: '1em' }}><Filter /></div>
                 <Message info>Select topics relevant for your conference</Message>
-                <TopicTable2 posts={s.posts} />
+                <TopicTable2 posts={s.posts} onPostCheck={this.onPostCheckHandler}/>
               </Grid.Column>
             </Grid.Row>
           </Grid>

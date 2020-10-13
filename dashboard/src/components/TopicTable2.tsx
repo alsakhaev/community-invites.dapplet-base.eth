@@ -6,6 +6,7 @@ import sortBy from 'lodash.sortby';
 
 interface IProps {
     posts: PostStat[];
+    onPostCheck: (post: PostStat, checked: boolean) => void;
 }
 
 interface IState {
@@ -52,7 +53,7 @@ export class TopicTable2 extends React.Component<IProps, IState> {
                                         </Comment>
                                     </Comment.Group>
                                 </Table.Cell>
-                                <Table.Cell style={{ width: '3em'}} verticalAlign='top'><Checkbox defaultChecked/></Table.Cell>
+                                <Table.Cell style={{ width: '3em'}} verticalAlign='top'><Checkbox onChange={(_, data) => this.props.onPostCheck(d, data.checked as boolean)} defaultChecked/></Table.Cell>
                             </Table.Row>
                         ))}
                     </Table.Body>

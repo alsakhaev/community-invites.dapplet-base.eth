@@ -30,8 +30,8 @@ export class Api {
         return this._sendRequest(`/posts/stat`, 'POST', filters);
     }
 
-    async getUserStat(): Promise<UserStat[]> {
-        return this._sendRequest(`/users/stat`, 'POST');
+    async getUserStat(filters?: { excludePosts?: string[] }): Promise<UserStat[]> {
+        return this._sendRequest(`/users/stat`, 'POST', filters);
     }
 
     private async _sendRequest(query: string, method: 'POST' | 'GET' | 'PUT' = 'GET', body?: any): Promise<any> {
