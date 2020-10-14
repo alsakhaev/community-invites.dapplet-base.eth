@@ -17,6 +17,7 @@ interface IState {
   settings?: Settings;
   activeIndex: number;
   postsDefaultSearch: string;
+  myDiscussionsKey: number;
 }
 
 export class App extends React.Component<IProps, IState> {
@@ -25,7 +26,7 @@ export class App extends React.Component<IProps, IState> {
 
   constructor(props: IProps) {
     super(props);
-    this.state = { post: undefined, profile: undefined, settings: undefined, activeIndex: 0, postsDefaultSearch: '' };
+    this.state = { post: undefined, profile: undefined, settings: undefined, activeIndex: 0, postsDefaultSearch: '', myDiscussionsKey: 0 };
 
     dappletInstance.onData(async ({ post, profile, settings }) => {
 
@@ -48,7 +49,7 @@ export class App extends React.Component<IProps, IState> {
   }
 
   postsClickHandler = (conferenceShortName: string, username: string) => {
-    this.setState({ activeIndex: 1, postsDefaultSearch: `conference:${conferenceShortName} user:${username}` });
+    this.setState({ activeIndex: 1, postsDefaultSearch: `conference:${conferenceShortName} user:${username}`, myDiscussionsKey: Math.random() });
   }
 
   handleTabChange = (e: React.MouseEvent<HTMLDivElement, MouseEvent>, { activeIndex }: any) => {
@@ -58,6 +59,10 @@ export class App extends React.Component<IProps, IState> {
       window.open('https://community-invite-dashboard.herokuapp.com/', '_blank');
       return;
     };
+
+    if (activeIndex === 1) {
+      this.setState({ postsDefaultSearch: '', myDiscussionsKey: Math.random() });
+    }
 
     this.setState({ activeIndex });
   };
@@ -75,10 +80,14 @@ export class App extends React.Component<IProps, IState> {
     const panes = [
       {
         menuItem: "Conferences",
-        render: () => <Tab.Pane as={() => <Conferences profile={this.state.profile} post={this.state.post} onPostsClick={this.postsClickHandler} settings={this.state.settings!} />} />,
+        pane: <Tab.Pane key='conferences' style={{ padding: '0', border: 'none' }}>
+          <Conferences profile={this.state.profile} post={this.state.post} onPostsClick={this.postsClickHandler} settings={this.state.settings!} />
+        </Tab.Pane>,
       }, {
         menuItem: "My Discussions",
-        render: () => <Tab.Pane as={() => <MyDiscussions profile={this.state.profile} defaultSearch={this.state.postsDefaultSearch} settings={this.state.settings!} />} />,
+        pane: <Tab.Pane key='my-discussions' style={{ padding: '0', border: 'none' }}>
+          <MyDiscussions profile={this.state.profile} defaultSearch={this.state.postsDefaultSearch} settings={this.state.settings!} key={this.state.myDiscussionsKey} />
+        </Tab.Pane>
       }, {
         menuItem: "Dashboard",
         loading: true
@@ -95,7 +104,7 @@ export class App extends React.Component<IProps, IState> {
                 panes={panes}
                 activeIndex={this.state.activeIndex}
                 onTabChange={this.handleTabChange}
-                renderActiveOnly
+                renderActiveOnly={false}
               />
             </React.Fragment>
           </Switch>
