@@ -1,6 +1,6 @@
 import React from 'react';
 //import './App.css';
-import { List, Image, Table, Header, Feed, Comment, Button, Checkbox } from 'semantic-ui-react';
+import { List, Image, Table, Header, Feed, Comment, Button, Checkbox, Icon } from 'semantic-ui-react';
 import { Api, PostStat, UserStat } from '../api';
 import sortBy from 'lodash.sortby';
 
@@ -40,20 +40,22 @@ export class TopicTable2 extends React.Component<IProps, IState> {
                     <Table.Body>
                         {data.map((d, i) => (
                             <Table.Row key={d.id}>
-                                <Table.Cell style={{ width: '3em'}} verticalAlign='top'>{i + 1}</Table.Cell>
+                                <Table.Cell style={{ width: '3em' }} verticalAlign='top'>{i + 1}</Table.Cell>
                                 <Table.Cell>
                                     <Comment.Group minimal>
                                         <Comment>
                                             <Comment.Avatar as='a' src={d.img} />
                                             <Comment.Content>
-                                                <Comment.Author as='a' href={`https://twitter.com/${d.username}/status/${d.id}`} target="_blank" style={{ cursor: 'pointer' }}>{d.fullname}</Comment.Author>
-                                                <Comment.Metadata><span>@{d.username}</span></Comment.Metadata>
-                                                <Comment.Text><p>{d.text}</p></Comment.Text>
+                                                <Comment.Author style={{ display: 'inline' }}>{d.fullname}</Comment.Author>
+                                                <Comment.Metadata>@{d.username} <Button icon='external' title='Open the post in Twitter' basic size='mini' style={{ boxShadow: 'none', padding: '2px', margin: '0', position: 'relative', top: '-1px' }} onClick={() => window.open(`https://twitter.com/${d.username}/status/${d.id}`, '_blank')} /></Comment.Metadata>
+                                                <Comment.Text>{d.text}</Comment.Text>
                                             </Comment.Content>
                                         </Comment>
                                     </Comment.Group>
                                 </Table.Cell>
-                                <Table.Cell style={{ width: '3em'}} verticalAlign='top'><Checkbox onChange={(_, data) => this.props.onPostCheck(d, data.checked as boolean)} defaultChecked/></Table.Cell>
+                                <Table.Cell style={{ width: '3em', overflow: 'hidden', textOverflow: 'clip' }} verticalAlign='top'>
+                                    <Checkbox onChange={(_, data) => this.props.onPostCheck(d, data.checked as boolean)} defaultChecked />
+                                </Table.Cell>
                             </Table.Row>
                         ))}
                     </Table.Body>
