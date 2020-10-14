@@ -106,15 +106,15 @@ export class App extends React.Component<IProps, IState> {
               <Grid.Column >
                 <h2 style={{ textAlign: 'center' }}>People</h2>
                 <div style={{ marginBottom: '1em' }}><Filter /></div>
-                <Message info>Invite most wanted people to your conference</Message>
+                <Message warning style={{ textAlign: 'center' }}>Invite most wanted people to your conference</Message>
                 <UsersTableMini users={s.users} onUserSelect={this.onUserSelectHandler} />
 
               </Grid.Column>
               <Grid.Column>
                 <h2 style={{ textAlign: 'center' }}>Topics</h2>
                 <div style={{ marginBottom: '1em' }}><Filter /></div>
-                <Message info>Select topics relevant for your conference</Message>
-                <TopicTable2 posts={s.posts} onPostCheck={this.onPostCheckHandler}/>
+                <Message warning style={{ textAlign: 'center' }}>Select topics relevant for your conference</Message>
+                <TopicTable2 posts={s.posts} onPostCheck={this.onPostCheckHandler} />
               </Grid.Column>
             </Grid.Row>
           </Grid>
