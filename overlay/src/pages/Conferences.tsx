@@ -213,8 +213,33 @@ export class Conferences extends React.Component<IProps, IState> {
         {data.map(d => d.conference).map(c => <React.Fragment key={c.id}>
           <Accordion.Title active={activeIndex === key + c.id} index={key + c.id} onClick={this.accordionClickHandler} style={{ lineHeight: '29px', color: (this.state.selectedConference === c.id) ? '#2185d0' : undefined }} >
             <Icon name='dropdown' />{c.name}
-            {(post && post.authorUsername !== profile?.username) ? <HoverButton loading={this._getLoading('invite-' + c.id)} disabled={this._getLoading('invite-' + c.id)} color={isInvited(c) ? 'green' : 'blue'} hoverColor={isInvited(c) ? 'red' : 'blue'} hoverText={isInvited(c) ? 'Withdraw' : 'Invite'} index={c.id} floated='right' size='mini' onClick={this.inviteButtonClickHandler}>{isInvited(c) ? 'Invited' : 'Invite'}</HoverButton> : null}
-            <Button index={c.id} loading={this._getLoading('attend-' + c.id)} disabled={this._getLoading('attend-' + c.id)} color={isAttended(c) ? 'green' : 'blue'} floated='right' size='mini' basic={!!this.props.post} onClick={this.attendButtonClickHandler}>{isAttended(c) ? 'Attended' : 'Attend'}</Button>
+
+            {(post && post.authorUsername !== profile?.username) ?
+              <HoverButton
+                style={{ width: '75px', paddingLeft: '0', paddingRight: '0' }}
+                loading={this._getLoading('invite-' + c.id)}
+                disabled={this._getLoading('invite-' + c.id)}
+                color={isInvited(c) ? 'green' : 'blue'}
+                hoverColor={isInvited(c) ? 'red' : 'blue'}
+                hoverText={isInvited(c) ? 'Withdraw' : 'Invite'}
+                index={c.id}
+                floated='right'
+                size='mini'
+                onClick={this.inviteButtonClickHandler}
+              >{isInvited(c) ? 'Invited' : 'Invite'}</HoverButton> : null}
+
+            <Button
+              index={c.id}
+              style={{ width: '75px', paddingLeft: '0', paddingRight: '0' }}
+              loading={this._getLoading('attend-' + c.id)}
+              disabled={this._getLoading('attend-' + c.id)}
+              color={isAttended(c) ? 'green' : 'blue'}
+              floated='right'
+              size='mini'
+              basic={!!this.props.post}
+              onClick={this.attendButtonClickHandler}
+            >{isAttended(c) ? 'Attending' : 'Attend'}</Button>
+            
           </Accordion.Title>
           <Accordion.Content active={activeIndex === key + c.id}>
             <p>
