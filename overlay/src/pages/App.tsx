@@ -71,7 +71,7 @@ export class App extends React.Component<IProps, IState> {
 
     if (!this.state.settings) {
       return (
-        <Segment>
+        <Segment style={{ margin: '15px' }}>
           <Loader active inline='centered'>Context waiting</Loader>
         </Segment>
       );
