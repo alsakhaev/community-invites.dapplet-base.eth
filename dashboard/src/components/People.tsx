@@ -15,7 +15,7 @@ interface IState {
     activeIndex: number;
 }
 
-export class UsersTableMini extends React.Component<IProps, IState> {
+export class People extends React.Component<IProps, IState> {
 
     constructor(props: IProps) {
         super(props);

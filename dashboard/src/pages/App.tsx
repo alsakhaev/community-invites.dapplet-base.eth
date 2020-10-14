@@ -2,8 +2,8 @@ import React from 'react';
 //import './App.css';
 import { List, Image, Table, Container, Grid, Segment, Dimmer, Loader, Placeholder, Message } from 'semantic-ui-react';
 import { Api, PostStat, UserStat } from '../api';
-import { UsersTableMini } from '../components/UsersTableMini';
-import { TopicTable2 } from '../components/TopicTable2';
+import { People } from '../components/People';
+import { Topics } from '../components/Topics';
 import { Filter } from '../components/Filter';
 
 interface IProps {
@@ -107,14 +107,14 @@ export class App extends React.Component<IProps, IState> {
                 <h2 style={{ textAlign: 'center' }}>People</h2>
                 <div style={{ marginBottom: '1em' }}><Filter /></div>
                 <Message warning style={{ textAlign: 'center' }}>Invite most wanted people to your conference</Message>
-                <UsersTableMini users={s.users} onUserSelect={this.onUserSelectHandler} />
+                <People users={s.users} onUserSelect={this.onUserSelectHandler} />
 
               </Grid.Column>
               <Grid.Column>
                 <h2 style={{ textAlign: 'center' }}>Topics</h2>
                 <div style={{ marginBottom: '1em' }}><Filter /></div>
                 <Message warning style={{ textAlign: 'center' }}>Select topics relevant for your conference</Message>
-                <TopicTable2 posts={s.posts} onPostCheck={this.onPostCheckHandler} />
+                <Topics posts={s.posts} onPostCheck={this.onPostCheckHandler} />
               </Grid.Column>
             </Grid.Row>
           </Grid>

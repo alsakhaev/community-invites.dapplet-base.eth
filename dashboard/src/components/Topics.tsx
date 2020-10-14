@@ -1,11 +1,12 @@
 import React from 'react';
 //import './App.css';
-import { List, Image, Table, Header, Feed, Comment } from 'semantic-ui-react';
+import { List, Image, Table, Header, Feed, Comment, Button, Checkbox, Icon } from 'semantic-ui-react';
 import { Api, PostStat, UserStat } from '../api';
 import sortBy from 'lodash.sortby';
 
 interface IProps {
     posts: PostStat[];
+    onPostCheck: (post: PostStat, checked: boolean) => void;
 }
 
 interface IState {
@@ -13,7 +14,7 @@ interface IState {
     direction: 'ascending' | 'descending';
 }
 
-export class TopicTable extends React.Component<IProps, IState> {
+export class Topics extends React.Component<IProps, IState> {
 
     constructor(props: IProps) {
         super(props);
@@ -35,31 +36,26 @@ export class TopicTable extends React.Component<IProps, IState> {
 
         return (
             <div className="App-container">
-                <Table sortable celled fixed>
-                    <Table.Header>
-                        <Table.Row>
-                            <Table.HeaderCell width={4} sorted={column === 'username' ? direction : undefined} onClick={() => this.sortBy('username')}>Post</Table.HeaderCell>
-                            <Table.HeaderCell width={1} sorted={column === 'invitations_count' ? direction : undefined} onClick={() => this.sortBy('invitations_count')}>Invitations</Table.HeaderCell>
-                            <Table.HeaderCell width={1} sorted={column === 'conferences_count' ? direction : undefined} onClick={() => this.sortBy('conferences_count')}>Conferences</Table.HeaderCell>
-                        </Table.Row>
-                    </Table.Header>
+                <Table sortable celled fixed unstackable >
                     <Table.Body>
-                        {data.map(d => (
+                        {data.map((d, i) => (
                             <Table.Row key={d.id}>
+                                <Table.Cell style={{ width: '3em' }} verticalAlign='top'>{i + 1}</Table.Cell>
                                 <Table.Cell>
                                     <Comment.Group minimal>
                                         <Comment>
-                                            <Comment.Avatar  as='a' src={d.img} />
+                                            <Comment.Avatar as='a' src={d.img} />
                                             <Comment.Content>
-                                                <Comment.Author as='a' href={`https://twitter.com/${d.username}/status/${d.id}`} target="_blank" style={{ cursor: 'pointer' }}>{d.fullname}</Comment.Author>
-                                                <Comment.Metadata><span>@{d.username}</span></Comment.Metadata>
-                                                <Comment.Text><p>{d.text}</p></Comment.Text>
+                                                <Comment.Author style={{ display: 'inline' }}>{d.fullname}</Comment.Author>
+                                                <Comment.Metadata>@{d.username} <Button icon='external' title='Open the post in Twitter' basic size='mini' style={{ boxShadow: 'none', padding: '2px', margin: '0', position: 'relative', top: '-1px' }} onClick={() => window.open(`https://twitter.com/${d.username}/status/${d.id}`, '_blank')} /></Comment.Metadata>
+                                                <Comment.Text>{d.text}</Comment.Text>
                                             </Comment.Content>
                                         </Comment>
                                     </Comment.Group>
                                 </Table.Cell>
-                                <Table.Cell>{d.invitations_count}</Table.Cell>
-                                <Table.Cell>{d.conferences_count}</Table.Cell>
+                                <Table.Cell style={{ width: '3em', overflow: 'hidden', textOverflow: 'clip' }} verticalAlign='top'>
+                                    <Checkbox onChange={(_, data) => this.props.onPostCheck(d, data.checked as boolean)} defaultChecked />
+                                </Table.Cell>
                             </Table.Row>
                         ))}
                     </Table.Body>
