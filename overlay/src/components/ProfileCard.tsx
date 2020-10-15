@@ -17,13 +17,15 @@ export class ProfileCard extends React.Component<IProps, IState> {
         const p = this.props.profile;
         if (this.props.card) return (<Card fluid>
             <Card.Content>
+                {this.props.badge ?? null}
+
                 <Image
                     floated='left'
                     size='mini'
                     style={{ borderRadius: 34, marginBottom: 0 }}
                     src={p.img}
                 />
-                <Card.Header>{p.fullname} {this.props.badge ?? null}</Card.Header>
+                <Card.Header>{p.fullname}</Card.Header>
                 <Card.Meta>@{p.username}</Card.Meta>
             </Card.Content>
         </Card>);

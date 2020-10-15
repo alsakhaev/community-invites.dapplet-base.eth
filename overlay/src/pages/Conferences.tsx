@@ -5,6 +5,7 @@ import { PostCard } from '../components/PostCard';
 import { Api, Conference, ConferenceWithInvitations } from '../api';
 import { ProfileCard } from '../components/ProfileCard'
 import { HoverButton } from '../components/HoverButton';
+import ICON from '../icons/icon.png';
 
 interface IProps {
   post?: Post;
@@ -239,7 +240,7 @@ export class Conferences extends React.Component<IProps, IState> {
               basic={!!this.props.post}
               onClick={this.attendButtonClickHandler}
             >{isAttended(c) ? 'Attending' : 'Attend'}</Button>
-            
+
           </Accordion.Title>
           <Accordion.Content active={activeIndex === key + c.id}>
             <p>
@@ -349,15 +350,29 @@ export class Conferences extends React.Component<IProps, IState> {
           // badge={this.getCurrentBadge()} 
           // onBadgeClick={this.badgeClickHandler}
           badge={(this.state.loading.list) ? null :
-            <Dropdown
-              text={this.getCurrentBadge() ?? 'No label'}
-              className='ui blue button mini'
-              style={{ cursor: 'pointer', position: 'relative', top: '-3px', marginLeft: '4px', padding: '6px 8px' }}
-              onChange={(e, { value }) => this.badgeCheckboxClickHandler(value as number)}
-              options={badgeOptions as any}
-              value={this.state.badgeIndex as any}
-              loading={this._getLoading('badge')}
-            />
+            // <Dropdown
+            //   text={this.getCurrentBadge() ?? 'No label'}
+            //   className='ui blue button mini'
+            //   style={{ cursor: 'pointer', position: 'relative', top: '-3px', marginLeft: '4px', padding: '6px 8px' }}
+            //   onChange={(e, { value }) => this.badgeCheckboxClickHandler(value as number)}
+            //   options={badgeOptions as any}
+            //   value={this.state.badgeIndex as any}
+            //   loading={this._getLoading('badge')}
+            // />
+            <div style={{ margin: '0 0 6px 0', color: 'rgb(113, 130, 144)', fontSize: '13px' }}>
+              <img src={ICON} style={{ height: 'auto', width: '13px', margin: '0 12px 0 22px', position: 'relative', top: '-1px' }} />
+              Attends
+              <Dropdown
+                inline
+                text={this.getCurrentBadge() ?? 'No label'}
+                style={{ margin: '0 0.3em', fontWeight: 'normal' }}
+                onChange={(e, { value }) => this.badgeCheckboxClickHandler(value as number)}
+                options={badgeOptions as any}
+                value={this.state.badgeIndex as any}
+                loading={this._getLoading('badge')}
+              />
+              and 1 other event
+            </div>
           }
         />
 
