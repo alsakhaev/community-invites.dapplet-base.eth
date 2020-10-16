@@ -2,7 +2,7 @@ import React from 'react';
 import { HashRouter, Route, Switch, Redirect, NavLink, useHistory, withRouter } from "react-router-dom";
 import './App.css';
 import { dappletInstance, Post, Profile, Settings } from '../dappletBus';
-import { Segment, Loader, Tab, Menu } from 'semantic-ui-react';
+import { Segment, Loader, Tab, Menu, Container } from 'semantic-ui-react';
 import { Conferences } from './Conferences';
 import { MyDiscussions } from './MyDiscussions';
 import { Api } from '../api';
@@ -67,7 +67,22 @@ export class App extends React.Component<IProps, IState> {
     this.setState({ activeIndex });
   };
 
+  changeTab(activeIndex: number) {
+    if (activeIndex === 2) {
+      window.open('https://community-invite-dashboard.herokuapp.com/', '_blank');
+      return;
+    };
+
+    if (activeIndex === 1) {
+      this.setState({ postsDefaultSearch: '', myDiscussionsKey: Math.random() });
+    }
+
+    this.setState({ activeIndex });
+  }
+
   render() {
+
+    const { activeIndex } = this.state;
 
     if (!this.state.settings) {
       return (
@@ -99,13 +114,38 @@ export class App extends React.Component<IProps, IState> {
         <HashRouter>
           <Switch>
             <React.Fragment>
-              <Tab
-                menu={{ secondary: true, pointing: true }}
-                panes={panes}
-                activeIndex={this.state.activeIndex}
-                onTabChange={this.handleTabChange}
-                renderActiveOnly={false}
-              />
+
+              <div style={{ padding: '15px', position: 'fixed', top: '0', left: '0', width: '100%', zIndex: 1000, backgroundColor: '#fff' }}>
+                <Menu pointing secondary>
+                  <Menu.Item
+                    name='Conferences'
+                    active={activeIndex === 0}
+                    onClick={() => this.changeTab(0)}
+                  />
+                  <Menu.Item
+                    name='My Discussions'
+                    active={activeIndex === 1}
+                    onClick={() => this.changeTab(1)}
+                  />
+                  <Menu.Item
+                    name='Dashboard'
+                    active={activeIndex === 2}
+                    onClick={() => this.changeTab(2)}
+                  />
+                </Menu>
+              </div>
+
+              <div style={{ margin: '4em 0' }}>
+
+                <div style={{ display: (activeIndex === 0) ? 'block' : 'none', paddingBottom: '10px' }}>
+                  <Conferences profile={this.state.profile} post={this.state.post} onPostsClick={this.postsClickHandler} settings={this.state.settings!} />
+                </div>
+
+                <div style={{ display: (activeIndex === 1) ? 'block' : 'none', paddingBottom: '10px' }}>
+                  <MyDiscussions profile={this.state.profile} defaultSearch={this.state.postsDefaultSearch} settings={this.state.settings!} key={this.state.myDiscussionsKey} />
+                </div>
+              </div>
+
             </React.Fragment>
           </Switch>
         </HashRouter>

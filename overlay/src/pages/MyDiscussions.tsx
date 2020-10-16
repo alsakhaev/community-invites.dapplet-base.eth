@@ -116,40 +116,44 @@ export class MyDiscussions extends React.Component<IProps, IState> {
     }
 
     render() {
-        const { active1, active2 } = this.state;
+        //const { active1, active2 } = this.state;
         const filteredPosts = this.state.posts.filter(this._postFilter);
 
         return (<div>
-            <Input fluid placeholder='Search...' value={this.state.search}
-                icon='search'
-                iconPosition='left'
-                onChange={this.inputChangeHandler}
-            />
-            {this._getLoading('list') ? <Segment>
-                <Loader active inline='centered'>Loading</Loader>
-            </Segment> : <React.Fragment>
-                    {this.state.posts.filter(this._postFilter).map((p, i) =>
-                        <Segment key={i}>
-                            <Comment.Group minimal>
-                                <Comment >
-                                    <Comment.Avatar style={{ margin: 0 }} src={p.post.img} />
-                                    <Comment.Content style={{ marginLeft: '3.3em', padding: 0 }} >
-                                        <Comment.Author as='a' target='_blank' href={`https://twitter.com/${p.post.username}/status/${p.post.id}`}>{p.post.fullname}</Comment.Author>
-                                        <Comment.Metadata>
-                                            <div>@{p.post.username}</div>
-                                        </Comment.Metadata>
-                                        <Comment.Text>{p.post.text}</Comment.Text>
-                                    </Comment.Content>
-                                    <div>
-                                        {p.conferences.map(c => <React.Fragment key={c.id}>
-                                            <b>{c.name}:</b> {c.users.filter(u => !(u.username === this.props.profile?.username && u.namespace === this.props.profile?.namespace)).map(u => `@${u.username}`).join(', ')} <br />
-                                        </React.Fragment>)}
-                                    </div>
-                                </Comment>
-                            </Comment.Group>
-                        </Segment>
-                    )}
-                </React.Fragment>}
+            <div style={{ padding: '15px', position: 'fixed', top: '4em', left: '0', width: '100%', zIndex: 1000, backgroundColor: '#fff' }}>
+                <Input fluid placeholder='Search...' value={this.state.search}
+                    icon='search'
+                    iconPosition='left'
+                    onChange={this.inputChangeHandler}
+                />
+            </div>
+            <div style={{ marginTop: '8em'}}>
+                {this._getLoading('list') ? <Segment>
+                    <Loader active inline='centered'>Loading</Loader>
+                </Segment> : <React.Fragment>
+                        {filteredPosts.map((p, i) =>
+                            <Segment key={i}>
+                                <Comment.Group minimal>
+                                    <Comment >
+                                        <Comment.Avatar style={{ margin: 0 }} src={p.post.img} />
+                                        <Comment.Content style={{ marginLeft: '3.3em', padding: 0 }} >
+                                            <Comment.Author as='a' target='_blank' href={`https://twitter.com/${p.post.username}/status/${p.post.id}`}>{p.post.fullname}</Comment.Author>
+                                            <Comment.Metadata>
+                                                <div>@{p.post.username}</div>
+                                            </Comment.Metadata>
+                                            <Comment.Text>{p.post.text}</Comment.Text>
+                                        </Comment.Content>
+                                        <div>
+                                            {p.conferences.map(c => <React.Fragment key={c.id}>
+                                                <b>{c.name}:</b> {c.users.filter(u => !(u.username === this.props.profile?.username && u.namespace === this.props.profile?.namespace)).map(u => `@${u.username}`).join(', ')} <br />
+                                            </React.Fragment>)}
+                                        </div>
+                                    </Comment>
+                                </Comment.Group>
+                            </Segment>
+                        )}
+                    </React.Fragment>}
+            </div>
         </div>);
     }
 }
