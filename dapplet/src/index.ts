@@ -1,18 +1,14 @@
 import { } from '@dapplets/dapplet-extension';
 import ICON from './icons/icon.png';
 
-type BadgeInfo = { 
-    namespace: string, 
-    username: string,
-    main_conference_id: number | null, 
-    main_conference_short_name: string | null, 
-    conferences_count: number
-} | null;
+type BadgeInfo = {
+    short_name: string | null;
+};
 
 @Injectable
 export default class Feature {
     private _overlay;
-    private _queue = new Map<string, Promise<BadgeInfo>>();
+    private _queue = new Map<string, Promise<BadgeInfo[]>>();
 
     constructor(
         @Inject("identity-adapter.dapplet-base.eth")
@@ -65,14 +61,19 @@ export default class Feature {
                     "DEFAULT": {
                         hidden: true,
                         init: async (ctx, me) => {
-                            const info = await this._getBadge('twitter.com', ctx.authorUsername);
-                            if (info && info.conferences_count > 0) {
+                            const confs = await this._getUserAttendance('twitter.com', ctx.authorUsername);
+                            if (confs && confs.length > 0) {
                                 me.setState("LABEL");
-                                if (info.main_conference_short_name) {
-                                    me.text = `Attends ${info.main_conference_short_name}` + ((info.conferences_count > 1) ? ` and ${info.conferences_count - 1} other event${(info.conferences_count - 1 > 1) ? 's' : ''}` : '');
-                                } else {
-                                    me.text = `Attends ${info.conferences_count} event(s)`;
-                                }                                
+
+                                if (confs.length === 1) {
+                                    me.text = `Attends ${confs[0].short_name}`;
+                                } else if (confs.length === 2) {
+                                    me.text = `Attends ${confs[0].short_name} and ${confs[1].short_name}`;
+                                } else if (confs.length === 3) {
+                                    me.text = `Attends ${confs[0].short_name}, ${confs[1].short_name}, and 1 other event`;
+                                } else if (confs.length > 3) {
+                                    me.text = `Attends ${confs[0].short_name}, ${confs[1].short_name}, and ${confs.length - 2} others events`;
+                                }
                             }
                         }
                     },
@@ -99,7 +100,7 @@ export default class Feature {
         });
     }
 
-    private async _getBadge(namespace: string, username: string): Promise<BadgeInfo> {
+    private async _getUserAttendance(namespace: string, username: string): Promise<BadgeInfo[]> {
         const key = `${namespace}/${username}`;
 
         if (!this._queue.has(key)) {
@@ -109,9 +110,9 @@ export default class Feature {
         return this._queue.get(key);
     }
 
-    private async _fetchBadge(namespace: string, username: string): Promise<BadgeInfo> {
+    private async _fetchBadge(namespace: string, username: string): Promise<BadgeInfo[]> {
         const serverUrl = await Core.storage.get('serverUrl');
-        const json = await fetch(`${serverUrl}/users/badge/${namespace}/${username}`).then(x => x.json());
+        const json = await fetch(`${serverUrl}/users/attendance/${namespace}/${username}`).then(x => x.json());
         
         if (!json.success) {
             console.error(json.message);

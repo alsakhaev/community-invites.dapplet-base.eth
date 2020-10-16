@@ -92,15 +92,15 @@ export class Conferences extends React.Component<IProps, IState> {
           await this._api.withdraw(this.props.profile!, this.state.profileTo!, index, this.props.post!);
         }
 
-        // ToDo: move to backend?
-        if (this.state.badgeIndex === index) {
-          const { profile } = this.props;
-          if (profile) {
-            profile.main_conference_id = null;
-            const newProfile = await this._api.updateUser(profile);
-            this.setState({ badgeIndex: newProfile.main_conference_id });
-          }
-        }
+        // // ToDo: move to backend?
+        // if (this.state.badgeIndex === index) {
+        //   const { profile } = this.props;
+        //   if (profile) {
+        //     profile.main_conference_id = null;
+        //     const newProfile = await this._api.updateUser(profile);
+        //     this.setState({ badgeIndex: newProfile.main_conference_id });
+        //   }
+        // }
 
         await this._api.absend(this.props.profile!, index);
       } else {
@@ -148,19 +148,19 @@ export class Conferences extends React.Component<IProps, IState> {
     }
   }
 
-  badgeCheckboxClickHandler = async (index: number) => {
-    const oldValue = this.state.badgeIndex;
-    const newValue = (oldValue === index) ? null : index;
+  // badgeCheckboxClickHandler = async (index: number) => {
+  //   const oldValue = this.state.badgeIndex;
+  //   const newValue = (oldValue === index) ? null : index;
 
-    const { profile } = this.props;
-    if (profile) {
-      this._setLoading('badge', true);
-      profile.main_conference_id = newValue;
-      const newProfile = await this._api.updateUser(profile);
-      this.setState({ badgeIndex: newProfile.main_conference_id });
-      this._setLoading('badge', false);
-    }
-  }
+  //   const { profile } = this.props;
+  //   if (profile) {
+  //     this._setLoading('badge', true);
+  //     profile.main_conference_id = newValue;
+  //     const newProfile = await this._api.updateUser(profile);
+  //     this.setState({ badgeIndex: newProfile.main_conference_id });
+  //     this._setLoading('badge', false);
+  //   }
+  // }
 
   // badgeClickHandler = () => {
   //   const { badgeIndex } = this.state;
@@ -348,17 +348,17 @@ export class Conferences extends React.Component<IProps, IState> {
           profile={this.props.profile}
           // badge={this.getCurrentBadge()} 
           // onBadgeClick={this.badgeClickHandler}
-          badge={(this.state.loading.list) ? null :
-            <Dropdown
-              text={this.getCurrentBadge() ?? 'No label'}
-              className='ui blue button mini'
-              style={{ cursor: 'pointer', position: 'relative', top: '-3px', marginLeft: '4px', padding: '6px 8px' }}
-              onChange={(e, { value }) => this.badgeCheckboxClickHandler(value as number)}
-              options={badgeOptions as any}
-              value={this.state.badgeIndex as any}
-              loading={this._getLoading('badge')}
-            />
-          }
+          // badge={(this.state.loading.list) ? null :
+          //   <Dropdown
+          //     text={this.getCurrentBadge() ?? 'No label'}
+          //     className='ui blue button mini'
+          //     style={{ cursor: 'pointer', position: 'relative', top: '-3px', marginLeft: '4px', padding: '6px 8px' }}
+          //     onChange={(e, { value }) => this.badgeCheckboxClickHandler(value as number)}
+          //     options={badgeOptions as any}
+          //     value={this.state.badgeIndex as any}
+          //     loading={this._getLoading('badge')}
+          //   />
+          // }
         />
 
         {(this.props.post && this.props.post.authorUsername !== this.props.profile.username) ? <React.Fragment>

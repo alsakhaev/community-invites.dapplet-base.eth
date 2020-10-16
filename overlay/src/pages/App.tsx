@@ -32,15 +32,15 @@ export class App extends React.Component<IProps, IState> {
 
       this._api = new Api(settings.serverUrl);
 
-      if (profile) {
-        let user = await this._api.getUser(profile.namespace, profile.username);
-        if (!user) {
-          user = await this._api.createUser(profile);
-        }
-        this.setState({ profile: user });
-      }
+      // if (profile) {
+      //   let user = await this._api.getUser(profile.namespace, profile.username);
+      //   if (!user) {
+      //     user = await this._api.createUser(profile);
+      //   }
+      //   this.setState({ profile: user });
+      // }
 
-      this.setState({ post, settings, activeIndex: 0 });
+      this.setState({ post, profile, settings, activeIndex: 0 });
     });
   }
 
