@@ -5,6 +5,7 @@ import { PostCard } from '../components/PostCard';
 import { Api, Conference, ConferenceWithInvitations } from '../api';
 import { ProfileCard } from '../components/ProfileCard'
 import { HoverButton } from '../components/HoverButton';
+import Linkify from 'react-linkify';
 
 interface IProps {
   post?: Post;
@@ -206,7 +207,7 @@ export class Conferences extends React.Component<IProps, IState> {
     const isAttended = (c: Conference) => {
       return this.state.data.find(d => d.conference.id === c.id)!.attendance_from;
     }
-
+    
     return (<React.Fragment>
       {header && data.length > 0 ? header : null}
       <Accordion fluid styled>
@@ -239,11 +240,11 @@ export class Conferences extends React.Component<IProps, IState> {
               basic={!!this.props.post}
               onClick={this.attendButtonClickHandler}
             >{isAttended(c) ? 'Attending' : 'Attend'}</Button>
-            
+
           </Accordion.Title>
           <Accordion.Content active={activeIndex === key + c.id}>
             <p>
-              {c.description}<br />
+              <Linkify componentDecorator={(href: string, text: string, key: string) => <a href={href} key={key} target="_blank">{text}</a>}>{c.description}</Linkify><br />
               {c.date_from.toLocaleDateString() + ' - ' + c.date_to.toLocaleDateString()}<br />
               <a href={c.website}>{c.website}</a>
             </p>
@@ -346,19 +347,19 @@ export class Conferences extends React.Component<IProps, IState> {
         <ProfileCard
           card
           profile={this.props.profile}
-          // badge={this.getCurrentBadge()} 
-          // onBadgeClick={this.badgeClickHandler}
-          // badge={(this.state.loading.list) ? null :
-          //   <Dropdown
-          //     text={this.getCurrentBadge() ?? 'No label'}
-          //     className='ui blue button mini'
-          //     style={{ cursor: 'pointer', position: 'relative', top: '-3px', marginLeft: '4px', padding: '6px 8px' }}
-          //     onChange={(e, { value }) => this.badgeCheckboxClickHandler(value as number)}
-          //     options={badgeOptions as any}
-          //     value={this.state.badgeIndex as any}
-          //     loading={this._getLoading('badge')}
-          //   />
-          // }
+        // badge={this.getCurrentBadge()} 
+        // onBadgeClick={this.badgeClickHandler}
+        // badge={(this.state.loading.list) ? null :
+        //   <Dropdown
+        //     text={this.getCurrentBadge() ?? 'No label'}
+        //     className='ui blue button mini'
+        //     style={{ cursor: 'pointer', position: 'relative', top: '-3px', marginLeft: '4px', padding: '6px 8px' }}
+        //     onChange={(e, { value }) => this.badgeCheckboxClickHandler(value as number)}
+        //     options={badgeOptions as any}
+        //     value={this.state.badgeIndex as any}
+        //     loading={this._getLoading('badge')}
+        //   />
+        // }
         />
 
         {(this.props.post && this.props.post.authorUsername !== this.props.profile.username) ? <React.Fragment>
