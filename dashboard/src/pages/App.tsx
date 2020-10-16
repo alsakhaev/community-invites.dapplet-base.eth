@@ -24,7 +24,7 @@ export class App extends React.Component<IProps, IState> {
 
   constructor(props: IProps) {
     super(props);
-    this._api = new Api('https://community-invite.herokuapp.com');
+    this._api = new Api(process.env.REACT_APP_API_URL as string);
     this.state = {
       posts: [],
       users: [],
