@@ -57,6 +57,7 @@ export async function getUserAttendance(namespace: string, username: string): Pr
         from attendance as a
         join conferences as c on c.id = a.conference_id
         where a.namespace = $1 and a.username = $2
+            and c.date_to >= DATE(NOW() - INTERVAL '3 DAY')
         order by c.date_to DESC;
     `;
     const params = [namespace, username];
@@ -68,66 +69,110 @@ export async function getUserAttendance(namespace: string, username: string): Pr
     return info;
 }
 
-export async function getStat(filters?: { excludePosts?: string[] }): Promise<any[]> {
+export async function getStat(filters?: { excludePosts?: string[], limit?: number }): Promise<any[]> {
     const isFilter = filters?.excludePosts && filters?.excludePosts.length > 0;
 
-    const params = isFilter ? [filters!.excludePosts] : undefined;
+    const params = isFilter ? [filters?.limit ?? 10, filters!.excludePosts] : [filters?.limit ?? 10];
 
     const data = await execute(async (client) => {
         const res = await client.query(`
-            SELECT
-                u.*,
+            SELECT * 
+            FROM (
+                SELECT
+                    u.*,
+                    
+                    (
+                        SELECT COUNT(*) 
+                        FROM invitations AS i 
+                        JOIN conferences AS c ON c.id = i.conference_id
+                        WHERE c.date_to >= DATE(NOW() - INTERVAL '3 DAY')
+                            AND i.namespace_to = u.namespace
+                            AND i.username_to = u.username
+                            ${isFilter ? 'AND NOT (i.post_id = ANY ($2))' : ''}
+                    ) AS invitations_to_count,
+                        
+                    (
+                        SELECT COUNT(*) 
+                        FROM invitations AS i  
+                        JOIN conferences AS c ON c.id = i.conference_id
+                        WHERE c.date_to >= DATE(NOW() - INTERVAL '3 DAY')
+                            AND i.namespace_from = u.namespace
+                            AND i.username_from = u.username
+                            ${isFilter ? 'AND NOT (i.post_id = ANY ($2))' : ''}
+                    ) AS invitations_from_count,
+                        
+                    (
+                        SELECT COUNT(*)
+                        FROM attendance AS a 
+                        JOIN conferences AS c ON c.id = a.conference_id
+                        WHERE c.date_to >= DATE(NOW() - INTERVAL '3 DAY')
+                            AND a.namespace = u.namespace
+                            AND a.username = u.username
+                    ) AS attendance_count,
+                        
+                    (
+                        SELECT COUNT(*)
+                        FROM (
+                            SELECT i.namespace_from, i.username_from
+                            FROM invitations AS i 
+                            JOIN conferences AS c ON c.id = i.conference_id
+                            WHERE c.date_to >= DATE(NOW() - INTERVAL '3 DAY')
+                                AND i.namespace_to = u.namespace
+                                AND i.username_to = u.username
+                                ${isFilter ? 'AND NOT (i.post_id = ANY ($2))' : ''}
+                            GROUP BY i.namespace_from, i.username_from
+                        ) AS x
+                    ) AS users_to_count,
+                        
+                    (
+                        SELECT COUNT(*)
+                        FROM (
+                            SELECT i.conference_id
+                            FROM invitations AS i 
+                            JOIN conferences AS c ON c.id = i.conference_id
+                            WHERE c.date_to >= DATE(NOW() - INTERVAL '3 DAY')
+                                AND i.namespace_to = u.namespace
+                                AND i.username_to = u.username
+                                ${isFilter ? 'AND NOT (i.post_id = ANY ($2))' : ''}
+                            GROUP BY i.conference_id
+                        ) AS x
+                    ) AS confrences_to_count,
+                        
+                    (
+                        SELECT COUNT(*)
+                        FROM (
+                            SELECT i.post_id
+                            FROM invitations AS i 
+                            JOIN conferences AS c ON c.id = i.conference_id
+                            WHERE c.date_to >= DATE(NOW() - INTERVAL '3 DAY')
+                                AND i.namespace_to = u.namespace
+                                AND i.username_to = u.username
+                                ${isFilter ? 'AND NOT (i.post_id = ANY ($2))' : ''}
+                            GROUP BY i.post_id
+                        ) AS x
+                    ) AS posts_to_count
                 
-                (SELECT COUNT(*) 
-                FROM invitations AS i 
-                WHERE i.namespace_to = u.namespace
-                    AND i.username_to = u.username
-                    ${isFilter ? 'AND NOT (i.post_id = ANY ($1))' : ''}
-                ) AS invitations_to_count,
-                    
-                (SELECT COUNT(*) 
-                FROM invitations AS i 
-                WHERE i.namespace_from = u.namespace
-                    AND i.username_from = u.username
-                    ${isFilter ? 'AND NOT (i.post_id = ANY ($1))' : ''}
-                ) AS invitations_from_count,
-                    
-                (SELECT COUNT(*)
-                FROM attendance AS a
-                WHERE a.namespace = u.namespace
-                    AND a.username = u.username) AS attendance_count,
-                    
-                (SELECT COUNT(*)
-                FROM (
-                    SELECT i.namespace_from, i.username_from
+                FROM users AS u
+                WHERE EXISTS (
+                    SELECT *
                     FROM invitations AS i
-                    WHERE i.namespace_to = u.namespace
-                        AND i.username_to = u.username
-                        ${isFilter ? 'AND NOT (i.post_id = ANY ($1))' : ''}
-                    GROUP BY i.namespace_from, i.username_from
-                ) AS x) AS users_to_count,
-                    
-                (SELECT COUNT(*)
-                FROM (
-                    SELECT i.conference_id
-                    FROM invitations AS i
-                    WHERE i.namespace_to = u.namespace
-                        AND i.username_to = u.username
-                        ${isFilter ? 'AND NOT (i.post_id = ANY ($1))' : ''}
-                    GROUP BY i.conference_id
-                ) AS x) AS confrences_to_count,
-                    
-                (SELECT COUNT(*)
-                FROM (
-                    SELECT i.post_id
-                    FROM invitations AS i
-                    WHERE i.namespace_to = u.namespace
-                        AND i.username_to = u.username
-                        ${isFilter ? 'AND NOT (i.post_id = ANY ($1))' : ''}
-                    GROUP BY i.post_id
-                ) AS x) AS posts_to_count
-            
-            FROM users AS u
+                    JOIN conferences AS c ON c.id = i.conference_id
+                    WHERE c.date_to >= DATE(NOW() - INTERVAL '3 DAY')
+                        AND (
+                            i.namespace_from = u.namespace AND i.username_from = u.username
+                            OR i.namespace_to = u.namespace AND i.username_to = u.username
+                        )
+                ) OR EXISTS (
+                    SELECT *
+                    FROM attendance AS a
+                    JOIN conferences AS c ON c.id = a.conference_id
+                    WHERE c.date_to >= DATE(NOW() - INTERVAL '3 DAY')
+                        AND a.namespace = u.namespace
+                        AND a.username = u.username
+                )
+            ) as main
+            ORDER BY main.invitations_to_count DESC
+            LIMIT $1
         `, params);
         return res.rows;
     });

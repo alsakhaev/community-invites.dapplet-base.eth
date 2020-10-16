@@ -1,55 +1,5 @@
 import { execute } from '../connection';
-import { Invitation, Post } from '../types';
-
-export async function getPosts(namespace?: string, username?: string): Promise<Post[]> {
-    if (!namespace !== !username) throw new Error('namespace and username are required');
-
-    const isFilter = namespace && username;
-    const params = (isFilter) ? [namespace, username] : undefined;
-    const query = `
-        SELECT
-            p.id,
-            p.text,
-            u.namespace,
-            u.username,
-            u.fullname,
-            u.img,
-            u.main_conference_id
-        FROM posts as p 
-        JOIN users as u on u.namespace = p.namespace
-            AND u.username = p.username
-        ${isFilter ? `WHERE (
-            SELECT COUNT(*)
-            FROM invitations as i 
-            WHERE i.post_id = p.id
-                AND ((i.namespace_from = $1 AND i.username_from = $2)
-                    OR (i.namespace_to = $1 AND i.username_to = $2))
-        ) <> 0`: ''}
-    `;
-
-    return execute(c => c.query(query, params).then(r => r.rows));
-}
-
-export async function getPost(id: string): Promise<Post[]> {
-    return execute(async (client) => {
-        const res = await client.query('SELECT * FROM posts WHERE id = $1;', [id]);
-        return res.rows[0];
-    });
-}
-
-export async function createPost(u: Post): Promise<Post> {
-    return execute(async (client) => {
-        const entries = Object.entries(u);
-        const values = entries.map(x => x[1]);
-
-        const fields = entries.map(x => x[0]).join(', '); // name, short_name, date_from, date_to
-        const variables = entries.map((_, i) => '$' + (i + 1)).join(', '); // $1, $2, $3, $4
-        const query = `INSERT INTO posts(${fields}) VALUES (${variables}) RETURNING *;`;
-
-        const res = await client.query(query, values);
-        return res.rows[0];
-    });
-}
+import { Post } from '../types';
 
 type DetailedPost = {
     id: string;
@@ -89,6 +39,58 @@ type PostWithInvitations = {
     }[];
 }
 
+export async function getPosts(namespace?: string, username?: string): Promise<Post[]> {
+    if (!namespace !== !username) throw new Error('namespace and username are required');
+
+    const isFilter = namespace && username;
+    const params = (isFilter) ? [namespace, username] : undefined;
+    const query = `
+        SELECT
+            p.id,
+            p.text,
+            u.namespace,
+            u.username,
+            u.fullname,
+            u.img,
+            u.main_conference_id
+        FROM posts as p 
+        JOIN users as u on u.namespace = p.namespace
+            AND u.username = p.username
+        ${isFilter ? `WHERE (
+            SELECT COUNT(*)
+            FROM invitations as i 
+            JOIN conferences as c on c.id = i.conference_id
+            WHERE i.post_id = p.id
+                AND (c.date_to >= DATE(NOW() - INTERVAL '3 DAY'))
+                AND ((i.namespace_from = $1 AND i.username_from = $2)
+                    OR (i.namespace_to = $1 AND i.username_to = $2))
+        ) <> 0`: ''}
+    `;
+
+    return execute(c => c.query(query, params).then(r => r.rows));
+}
+
+export async function getPost(id: string): Promise<Post[]> {
+    return execute(async (client) => {
+        const res = await client.query('SELECT * FROM posts WHERE id = $1;', [id]);
+        return res.rows[0];
+    });
+}
+
+export async function createPost(u: Post): Promise<Post> {
+    return execute(async (client) => {
+        const entries = Object.entries(u);
+        const values = entries.map(x => x[1]);
+
+        const fields = entries.map(x => x[0]).join(', '); // name, short_name, date_from, date_to
+        const variables = entries.map((_, i) => '$' + (i + 1)).join(', '); // $1, $2, $3, $4
+        const query = `INSERT INTO posts(${fields}) VALUES (${variables}) RETURNING *;`;
+
+        const res = await client.query(query, values);
+        return res.rows[0];
+    });
+}
+
 export async function getMyDetailedPosts(namespace: string, username: string): Promise<DetailedPost[]> {
     if (!namespace || !username) throw new Error('namespace and username are required');
 
@@ -116,35 +118,60 @@ export async function getMyDetailedPosts(namespace: string, username: string): P
         LEFT JOIN users AS u_author ON u_author.namespace = p.namespace AND u_author.username = p.username
         LEFT JOIN users AS u_from ON u_from.namespace = i.namespace_from AND u_from.username = i.username_from
         LEFT JOIN users AS u_to ON u_to.namespace = i.namespace_to AND u_to.username = i.username_to
-        WHERE (i.namespace_from = $1 AND i.username_from = $2)
-            OR (i.namespace_to = $1 AND i.username_to = $2)
+        WHERE c.date_to >= DATE(NOW() - INTERVAL '3 DAY')
+            AND ((i.namespace_from = $1 AND i.username_from = $2)
+            OR (i.namespace_to = $1 AND i.username_to = $2))
     `;
 
     return execute(c => c.query(query, params).then(r => r.rows));
 }
 
-export async function getStat(filters?: { username?: string }): Promise<any[]> {
+export async function getStat(filters?: { username?: string, limit?: number }): Promise<any[]> {
 
     const query = {
         text: `
-            SELECT
-                p.*,
-                u.fullname,
-                u.img,
-                (SELECT COUNT(*) 
-                FROM invitations AS i 
-                WHERE i.post_id = p.id) AS invitations_count,
-                (SELECT COUNT(*)
-                FROM (SELECT conference_id 
-                FROM invitations AS i 
-                WHERE i.post_id = p.id
-                GROUP BY i.conference_id) AS x) AS conferences_count
-            FROM posts AS p
-            LEFT JOIN users AS u ON u.namespace = p.namespace
-                AND u.username = p.username
-            ${filters?.username ? 'WHERE p.username = $1' : ''}
+            SELECT *
+            FROM (
+                SELECT
+                    p.*,
+                    u.fullname,
+                    u.img,
+
+                    (
+                        SELECT COUNT(*) 
+                        FROM invitations AS i 
+                        JOIN conferences AS c on c.id = i.conference_id 
+                        WHERE i.post_id = p.id 
+                            AND c.date_to >= DATE(NOW() - INTERVAL '3 DAY')
+                    ) AS invitations_count,
+
+                    (
+                        SELECT COUNT(*) 
+                        FROM (
+                            SELECT conference_id 
+                            FROM invitations AS i 
+                            JOIN conferences AS c ON c.id = i.conference_id
+                            WHERE i.post_id = p.id
+                                AND c.date_to >= DATE(NOW() - INTERVAL '3 DAY')
+                            GROUP BY i.conference_id
+                        ) AS x
+                    ) AS conferences_count
+
+                FROM posts AS p
+                LEFT JOIN users AS u ON u.namespace = p.namespace
+                    AND u.username = p.username
+                WHERE p.id IN (
+                    select i.post_id
+                    from invitations as i
+                    join conferences as c on c.id = i.conference_id
+                    where c.date_to >= DATE(NOW() - INTERVAL '3 DAY')
+                )
+                ${filters?.username ? 'AND p.username = $2' : ''}
+            ) AS main
+            ORDER BY main.invitations_count DESC
+            LIMIT $1
         `,
-        values: filters?.username ? [filters.username] : undefined
+        values: filters?.username ? [filters?.limit ?? 100, filters.username] : [filters?.limit ?? 100]
     };
 
 
@@ -187,7 +214,9 @@ export async function getPostsWithInvitations(namespace: string, username: strin
                                     uu.fullname as fullname
                                 from invitations as ii 
                                 join users as uu on uu.namespace = ii.namespace_from and uu.username = ii.username_from
-                                where ii.post_id = p.id
+                                join conferences as cc on cc.id = ii.conference_id
+                                WHERE cc.date_to >= DATE(NOW() - INTERVAL '3 DAY')
+                                    and ii.post_id = p.id
                                     and ((ii.namespace_from = $1 and ii.username_from = $2)
                                         or (ii.namespace_to = $1 and ii.username_to = $2))
                             )
@@ -199,7 +228,9 @@ export async function getPostsWithInvitations(namespace: string, username: strin
                                     uuu.fullname as fullname
                                 from invitations as iii
                                 join users as uuu on uuu.namespace = iii.namespace_to and uuu.username = iii.username_to
-                                where iii.post_id = p.id
+                                join conferences as ccc on ccc.id = iii.conference_id
+                                WHERE ccc.date_to >= DATE(NOW() - INTERVAL '3 DAY')
+                                    and iii.post_id = p.id
                                     and ((iii.namespace_from = $1 and iii.username_from = $2)
                                         or (iii.namespace_to = $1 and iii.username_to = $2))
                             )
@@ -211,15 +242,17 @@ export async function getPostsWithInvitations(namespace: string, username: strin
                     select i.conference_id 
                     from invitations as i 
                     where i.post_id = p.id
-                )
+                ) and c.date_to >= DATE(NOW() - INTERVAL '3 DAY')
             ) as conferences
         from posts as p
         join users as u on u.namespace = p.namespace and u.username = p.username
         where p.id in (
             select iiiii.post_id
             from invitations as iiiii
-            where (iiiii.namespace_from = $1 and iiiii.username_from = $2)
-                or (iiiii.namespace_to = $1 and iiiii.username_to = $2)
+            join conferences as ccccc on ccccc.id = iiiii.conference_id
+            where ccccc.date_to >= DATE(NOW() - INTERVAL '3 DAY')
+                and ((iiiii.namespace_from = $1 and iiiii.username_from = $2)
+                or (iiiii.namespace_to = $1 and iiiii.username_to = $2))
         )
     `;
 

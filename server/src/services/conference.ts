@@ -2,7 +2,6 @@ import { execute } from '../connection';
 import { Conference, Post, Profile } from '../types';
 import * as userService from './user';
 import * as postService from './post';
-import bodyParser from 'body-parser';
 
 export async function getConferences(): Promise<Conference[]> {
     return execute(async (client) => {
@@ -52,12 +51,12 @@ export async function getConferencesWithInvitations(namespace_from: string, user
             LEFT JOIN (
                 SELECT * 
                 FROM invitations
-                WHERE
-                    (namespace_from = $1 AND username_from = $2)
+                WHERE (namespace_from = $1 AND username_from = $2)
                     OR (namespace_to = $1 AND username_to = $2)
             ) as i on c.id = i.conference_id
             LEFT JOIN users as u_from on u_from.namespace = i.namespace_from and u_from.username = i.username_from
             LEFT JOIN users as u_to on u_to.namespace = i.namespace_to and u_to.username = i.username_to
+            WHERE c.date_to >= DATE(NOW() - INTERVAL '3 DAY')
             GROUP BY c.id
         `, params);
 
