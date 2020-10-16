@@ -36,8 +36,8 @@ export class App extends React.Component<IProps, IState> {
 
   async componentDidMount() {
     const [posts, users] = await Promise.all([
-      this._api.getPostStat(),
-      this._api.getUserStat()
+      this._api.getPostStat({ limit: 100 }),
+      this._api.getUserStat({ limit: 10 })
     ]);
 
     this.setState({ posts, users, isLoading: false });
@@ -46,7 +46,7 @@ export class App extends React.Component<IProps, IState> {
   onUserSelectHandler = async (user: UserStat | null) => {
     this.setState({ selectedUser: user });
 
-    const posts = await this._api.getPostStat((user) ? { username: user.username } : undefined);
+    const posts = await this._api.getPostStat((user) ? { username: user.username, limit: 100 } : { limit: 100 });
     this.setState({ posts });
   }
 
@@ -56,7 +56,7 @@ export class App extends React.Component<IProps, IState> {
     this.setState({ postFilter });
 
     const excludePosts = Object.entries(postFilter).filter(x => x[1] === false).map(x => x[0]); // SELECT postid FROM postFilter WHERE checked = false
-    const users = await this._api.getUserStat({ excludePosts });
+    const users = await this._api.getUserStat({ excludePosts, limit: 10 });
     this.setState({ users });
   }
 
