@@ -1,12 +1,13 @@
 import React from 'react';
 //import './App.css';
-import { List, Image, Table, Header, Feed, Comment, Button, Checkbox, Icon } from 'semantic-ui-react';
+import { List, Image, Table, Header, Feed, Comment, Button, Checkbox, Icon, Container, Segment } from 'semantic-ui-react';
 import { Api, PostStat, UserStat } from '../api';
 import sortBy from 'lodash.sortby';
 
 interface IProps {
-    posts: PostStat[];
+    posts: (PostStat & { checked?: boolean })[];
     onPostCheck: (post: PostStat, checked: boolean) => void;
+    loading: boolean;
 }
 
 interface IState {
@@ -34,8 +35,12 @@ export class Topics extends React.Component<IProps, IState> {
         const { column, direction } = this.state;
         const data = (direction === 'ascending') ? sortBy(users, [column]) : sortBy(users, [column]).reverse();
 
+        if (data.length === 0) {
+            return <Segment textAlign='center'>No matching entries found</Segment>
+        }
+
         return (
-            <div className="App-container">
+            <Segment loading={this.props.loading} style={{ padding: '0', boxShadow: 'initial', border: 'initial'}}>
                 <Table sortable celled fixed unstackable >
                     <Table.Body>
                         {data.map((d, i) => (
@@ -54,13 +59,13 @@ export class Topics extends React.Component<IProps, IState> {
                                     </Comment.Group>
                                 </Table.Cell>
                                 <Table.Cell style={{ width: '3em', overflow: 'hidden', textOverflow: 'clip' }} verticalAlign='top'>
-                                    <Checkbox onChange={(_, data) => this.props.onPostCheck(d, data.checked as boolean)} defaultChecked />
+                                    <Checkbox onChange={(_, data) => this.props.onPostCheck(d, data.checked as boolean)} defaultChecked={d.checked} defaultIndeterminate={d.checked === undefined}/>
                                 </Table.Cell>
                             </Table.Row>
                         ))}
                     </Table.Body>
                 </Table>
-            </div>
+            </Segment>
         );
     }
 }
