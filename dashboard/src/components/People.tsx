@@ -81,7 +81,7 @@ export class People extends React.Component<IProps, IState> {
         }));
 
         return (
-            <Segment loading={this.props.loading} style={{ padding: '0', boxShadow: 'initial', border: 'initial'}}>
+            <Segment loading={this.props.loading} style={{ padding: '0', boxShadow: 'initial', border: 'initial' }}>
                 <Accordion as={Table} sortable celled fixed unstackable>
                     <Table.Body>
                         {users.map((d, i) => (
@@ -91,14 +91,14 @@ export class People extends React.Component<IProps, IState> {
                                     <Accordion.Title style={{ padding: '0' }} active={activeIndex === i} onClick={() => this.setActive(i)}>
                                         <Icon name='dropdown' style={{ top: '0.5em', position: 'relative' }} />
                                         <div style={{ display: 'flex', marginLeft: '1.5em', top: '-1.5em', position: 'relative', height: '1em' }}>
-                                            <Header as='h4' image style={{ flex: 'auto' }}>
-                                                <Image src={d.img} rounded size='mini' />
-                                                <Header.Content style={{ padding: '0 0 0 .75rem' }}>
+                                            <Header as='h4' image style={{ margin: '0 auto 0 0', whiteSpace: 'nowrap' }}>
+                                                <Image src={d.img} rounded size='mini' style={{ display: 'inline-block' }} />
+                                                <Header.Content style={{ padding: '0 0 0 .75rem', display: 'inline-block' }}>
                                                     {d.fullname}
                                                     <Header.Subheader>@{d.username}</Header.Subheader>
                                                 </Header.Content>
                                             </Header>
-                                            <div style={{ width: '10em' }}>
+                                            <div style={{ width: '10em' }} >
                                                 <div>Rating: {d.invitations_to_count}</div>
                                                 <div>Wanted by: {d.users_to_count}</div>
                                             </div>
