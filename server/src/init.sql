@@ -69,61 +69,62 @@ INSERT INTO conferences (short_name, name, description, date_from, date_to)
 VALUES ('MoneyDance', 'MoneyDance: Virtual Hackathon, Summit, and Demo Day with $37K in Prizes', '', '2020-09-27T21:00:00.000Z', '2020-12-08T21:00:00.000Z');
 
 INSERT INTO conferences (short_name, name, description, date_from, date_to) 
-VALUES ('Blockchain Summit 2020', 'Blockchain Summit 2020', 'London, United Kingdom'||chr(10)||'https://www.blockchainsummitlondon.com/#', '2020-10-19T21:00:00.000Z', '2020-10-20T21:00:00.000Z');
+VALUES ('Blockchain', 'Blockchain Summit 2020', 'London, United Kingdom'||chr(10)||'https://www.blockchainsummitlondon.com/#', '2020-10-19T21:00:00.000Z', '2020-10-20T21:00:00.000Z');
 
 INSERT INTO conferences (short_name, name, description, date_from, date_to) 
-VALUES ('Blockchain Life 2020', 'Blockchain Life 2020', 'Moscow, Russia', '2020-10-20T21:00:00.000Z', '2020-10-21T21:00:00.000Z');
+VALUES ('Blockchain', 'Blockchain Life 2020', 'Moscow, Russia', '2020-10-20T21:00:00.000Z', '2020-10-21T21:00:00.000Z');
 
 INSERT INTO conferences (short_name, name, description, date_from, date_to) 
-VALUES ('Future Blockchain Summit 2020', 'Future Blockchain Summit 2020', 'Dubai, United Arab Emirates', '2020-10-26T21:00:00.000Z', '2020-10-27T21:00:00.000Z');
+VALUES ('Blockchain', 'Future Blockchain Summit 2020', 'Dubai, United Arab Emirates', '2020-10-26T21:00:00.000Z', '2020-10-27T21:00:00.000Z');
 
 INSERT INTO conferences (short_name, name, description, date_from, date_to) 
-VALUES ('Blockchain Expo Tokyo [Autumn]', 'Blockchain Expo Tokyo [Autumn]', 'Tokyo, Japan'||chr(10)||'https://www.bc-expo-at.jp/en-gb.html', '2020-10-27T21:00:00.000Z', '2020-10-29T21:00:00.000Z');
+VALUES ('Blockchain', 'Blockchain Expo Tokyo [Autumn]', 'Tokyo, Japan'||chr(10)||'https://www.bc-expo-at.jp/en-gb.html', '2020-10-27T21:00:00.000Z', '2020-10-29T21:00:00.000Z');
 
 INSERT INTO conferences (short_name, name, description, date_from, date_to) 
-VALUES ('Blockchain World Forum Euro 2020', 'Blockchain World Forum Euro 2020', 'London, United Kingdom', '2020-10-28T21:00:00.000Z', '2020-10-29T21:00:00.000Z');
+VALUES ('Blockchain', 'Blockchain World Forum Euro 2020', 'London, United Kingdom', '2020-10-28T21:00:00.000Z', '2020-10-29T21:00:00.000Z');
 
 INSERT INTO conferences (short_name, name, description, date_from, date_to) 
-VALUES ('World Crypto-Bitcoin, Blockchain & Cyber-Security', 'World Crypto-Bitcoin, Blockchain & Cyber-Security', 'Paris, France', '2020-10-29T21:00:00.000Z', '2020-10-30T21:00:00.000Z');
+VALUES ('WorldCrypt', 'World Crypto-Bitcoin, Blockchain & Cyber-Security', 'Paris, France', '2020-10-29T21:00:00.000Z', '2020-10-30T21:00:00.000Z');
 
 INSERT INTO conferences (short_name, name, description, date_from, date_to) 
-VALUES ('The Financial Summit 2020', 'The Financial Summit 2020', 'Bali, Indonesia', '2020-10-31T21:00:00.000Z', '2020-11-06T21:00:00.000Z');
+VALUES ('Financial', 'The Financial Summit 2020', 'Bali, Indonesia', '2020-10-31T21:00:00.000Z', '2020-11-06T21:00:00.000Z');
 
 INSERT INTO conferences (short_name, name, description, date_from, date_to) 
-VALUES ('Romania Blockchain Summit', 'Romania Blockchain Summit', 'Bucharest, Romania'||chr(10)||'https://www.romaniablockchainsummit.com/', '2020-11-01T21:00:00.000Z', '2020-11-02T21:00:00.000Z');
+VALUES ('Blockchain', 'Romania Blockchain Summit', 'Bucharest, Romania'||chr(10)||'https://www.romaniablockchainsummit.com/', '2020-11-01T21:00:00.000Z', '2020-11-02T21:00:00.000Z');
 
 INSERT INTO conferences (short_name, name, description, date_from, date_to) 
-VALUES ('Korea Blockchain Week 2020', 'Korea Blockchain Week 2020', 'Seoul, Korea'||chr(10)||'https://koreablockchainweek.com', '2020-11-01T21:00:00.000Z', '2020-11-07T21:00:00.000Z');
+VALUES ('Blockchain', 'Korea Blockchain Week 2020', 'Seoul, Korea'||chr(10)||'https://koreablockchainweek.com', '2020-11-01T21:00:00.000Z', '2020-11-07T21:00:00.000Z');
 
 INSERT INTO conferences (short_name, name, description, date_from, date_to) 
-VALUES ('Blockchain Expo North America 2020', 'Blockchain Expo North America 2020', 'California, United States'||chr(10)||'https://blockchain-expo.com/northamerica/', '2020-11-03T21:00:00.000Z', '2020-11-04T21:00:00.000Z');
+VALUES ('Blockchain ', 'Blockchain Expo North America 2020', 'California, United States'||chr(10)||'https://blockchain-expo.com/northamerica/', '2020-11-03T21:00:00.000Z', '2020-11-04T21:00:00.000Z');
 
 INSERT INTO conferences (short_name, name, description, date_from, date_to) 
-VALUES ('2nd International Conference on Big Data and Blockchain', '2nd International Conference on Big Data and Blockchain', 'Newcastle, United Kingdom'||chr(10)||'http://www.icobdb.org/', '2020-11-13T21:00:00.000Z', '2020-11-15T21:00:00.000Z');
+VALUES ('Blockchain', '2nd International Conference on Big Data and Blockchain', 'Newcastle, United Kingdom'||chr(10)||'http://www.icobdb.org/', '2020-11-13T21:00:00.000Z', '2020-11-15T21:00:00.000Z');
 
 INSERT INTO conferences (short_name, name, description, date_from, date_to) 
-VALUES ('AIBC Summit Malta 2020', 'AIBC Summit Malta 2020', 'Malta', '2020-11-16T21:00:00.000Z', '2020-11-18T21:00:00.000Z');
+VALUES ('AIBC', 'AIBC Summit Malta 2020', 'Malta', '2020-11-16T21:00:00.000Z', '2020-11-18T21:00:00.000Z');
 
 INSERT INTO conferences (short_name, name, description, date_from, date_to) 
-VALUES ('UK Blockchain Conference 2020', 'UK Blockchain Conference 2020', 'Milton Keynes, United Kingdom'||chr(10)||'https://www.ukblockchainconference.com/', '2020-11-23T21:00:00.000Z', '2020-11-23T21:00:00.000Z');
+VALUES ('Blockchain', 'UK Blockchain Conference 2020', 'Milton Keynes, United Kingdom'||chr(10)||'https://www.ukblockchainconference.com/', '2020-11-23T21:00:00.000Z', '2020-11-23T21:00:00.000Z');
 
 INSERT INTO conferences (short_name, name, description, date_from, date_to) 
-VALUES ('Blockchain Expo Europe 2020', 'Blockchain Expo Europe 2020', 'Amsterdam, Netherlands'||chr(10)||'https://blockchain-expo.com/europe/', '2020-11-23T21:00:00.000Z', '2020-11-24T21:00:00.000Z');
+VALUES ('Blockchain', 'Blockchain Expo Europe 2020', 'Amsterdam, Netherlands'||chr(10)||'https://blockchain-expo.com/europe/', '2020-11-23T21:00:00.000Z', '2020-11-24T21:00:00.000Z');
 
 INSERT INTO conferences (short_name, name, description, date_from, date_to) 
-VALUES ('Paris Blockchain Week Summit 2020', 'Paris Blockchain Week Summit 2020', 'Paris, France', '2020-12-08T21:00:00.000Z', '2020-12-09T21:00:00.000Z');
+VALUES ('Blockchain', 'Paris Blockchain Week Summit 2020', 'Paris, France', '2020-12-08T21:00:00.000Z', '2020-12-09T21:00:00.000Z');
 
 INSERT INTO conferences (short_name, name, description, date_from, date_to) 
-VALUES ('Blockchain World Forum China 2020', 'Blockchain World Forum China 2020', 'Shenzhen, China', '2020-12-09T21:00:00.000Z', '2020-12-10T21:00:00.000Z');
+VALUES ('Blockchain', 'Blockchain World Forum China 2020', 'Shenzhen, China', '2020-12-09T21:00:00.000Z', '2020-12-10T21:00:00.000Z');
 
 INSERT INTO conferences (short_name, name, description, date_from, date_to) 
-VALUES ('European Blockchain Conference Barcelona 2021', 'European Blockchain Conference Barcelona 2021', 'Catalonia, Spain', '2021-01-24T21:00:00.000Z', '2021-01-25T21:00:00.000Z');
+VALUES ('Blockchain', 'European Blockchain Conference Barcelona 2021', 'Catalonia, Spain', '2021-01-24T21:00:00.000Z', '2021-01-25T21:00:00.000Z');
 
 INSERT INTO conferences (short_name, name, description, date_from, date_to) 
-VALUES ('Blockchain Week Rome 2021', 'Blockchain Week Rome 2021', 'Rome, Italy', '2021-03-08T21:00:00.000Z', '2021-03-12T21:00:00.000Z');
+VALUES ('Blockchain', 'Blockchain Week Rome 2021', 'Rome, Italy', '2021-03-08T21:00:00.000Z', '2021-03-12T21:00:00.000Z');
 
 INSERT INTO conferences (short_name, name, description, date_from, date_to) 
-VALUES ('Blockchain Expo Global 2021', 'Blockchain Expo Global 2021', 'London, United Kingdom'||chr(10)||'https://blockchain-expo.com/global/', '2021-03-16T21:00:00.000Z', '2021-03-17T21:00:00.000Z');
+VALUES ('Blockchain', 'Blockchain Expo Global 2021', 'London, United Kingdom'||chr(10)||'https://blockchain-expo.com/global/', '2021-03-16T21:00:00.000Z', '2021-03-17T21:00:00.000Z');
 
 INSERT INTO conferences (short_name, name, description, date_from, date_to) 
 VALUES ('TOKEN2049', 'TOKEN2049', 'Hong Kong'||chr(10)||'https://www.token2049.com/', '2021-03-22T21:00:00.000Z', '2021-03-23T21:00:00.000Z');
+
