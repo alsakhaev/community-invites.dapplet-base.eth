@@ -13,7 +13,6 @@ export type Profile = {
     username: string;
     fullname: string;
     img: string;
-    main_conference_id: number | null;    
 };
 
 export type Settings = {

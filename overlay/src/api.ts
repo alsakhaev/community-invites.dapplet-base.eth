@@ -55,6 +55,23 @@ export type DetailedPost = Post & {
     user_to_fullname: string;
 }
 
+export type MyInvitation = {
+    to_namespace: string;
+    to_username: string;
+    to_fullname: string;
+    to_img: string;
+    conference_id: number;
+    conference_name: string;
+    conference_short_name: string;
+    post_id: string;
+    post_text: string;
+    author_namespace: string;
+    author_username: string;
+    author_fullname: string;
+    author_img: string;
+    private: boolean;
+}
+
 export class Api {
     constructor(private _url: string) { }
 
@@ -139,6 +156,10 @@ export class Api {
 
     async getInvitationPosts(namespace: string, username: string): Promise<PostWithInvitations[]> {
         return this._sendRequest(`/posts/invitations?namespace=${namespace}&username=${username}`);
+    }
+
+    async getMyInvitations(namespace: string, username: string): Promise<MyInvitation[]> {
+        return this._sendRequest(`/invitations?namespace=${namespace}&username=${username}`);
     }
 
     private async _sendRequest(query: string, method: 'POST' | 'GET' | 'PUT' = 'GET', body?: any): Promise<any> {

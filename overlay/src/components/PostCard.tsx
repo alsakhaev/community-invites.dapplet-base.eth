@@ -23,7 +23,7 @@ export class PostCard extends React.Component<IProps, IState> {
                 />
                 <Card.Header>{p.authorFullname}</Card.Header>
                 <Card.Meta>@{p.authorUsername}</Card.Meta>
-                <Card.Description>
+                <Card.Description style={{ textOverflow: 'ellipsis', overflow: 'hidden'}}>
                     {p.text}
                 </Card.Description>
             </Card.Content>

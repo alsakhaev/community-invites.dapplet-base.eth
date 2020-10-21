@@ -3,6 +3,7 @@ import * as home from "../controllers/home";
 import * as conference from "../controllers/conference";
 import * as user from "../controllers/user";
 import * as post from "../controllers/post";
+import * as invitation from "../controllers/invitation";
 
 const router = Router();
 
@@ -27,5 +28,7 @@ router.get('/posts', post.get);
 router.get('/posts/details', post.getDetailed);
 router.get('/posts/invitations', post.getWithInvitations);
 router.post('/posts/stat', post.getStat);
+
+router.get('/invitations', invitation.getMyInvitations);
 
 export default router;

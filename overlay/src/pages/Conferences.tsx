@@ -19,8 +19,6 @@ interface IState {
   activeIndex: string | null;
   attended: number[];
   invited: number[];
-  badgeIndex: number | null;
-  //detailsIndex: number | null;
   loading: { [key: string]: boolean };
   profileTo: Profile | undefined;
   selectedConference: number | null;
@@ -38,8 +36,6 @@ export class Conferences extends React.Component<IProps, IState> {
       activeIndex: null,
       attended: [],
       invited: [],
-      badgeIndex: this.props.profile?.main_conference_id || null,
-      //detailsIndex: null,
       loading: {
         'list': true
       },
@@ -47,8 +43,7 @@ export class Conferences extends React.Component<IProps, IState> {
         username: this.props.post!.authorUsername.toLowerCase(),
         fullname: this.props.post!.authorFullname,
         img: this.props.post!.authorImg,
-        namespace: 'twitter.com',
-        main_conference_id: null
+        namespace: 'twitter.com'
       } : undefined,
       selectedConference: null
     }
@@ -92,16 +87,6 @@ export class Conferences extends React.Component<IProps, IState> {
         ))) {
           await this._api.withdraw(this.props.profile!, this.state.profileTo!, index, this.props.post!);
         }
-
-        // // ToDo: move to backend?
-        // if (this.state.badgeIndex === index) {
-        //   const { profile } = this.props;
-        //   if (profile) {
-        //     profile.main_conference_id = null;
-        //     const newProfile = await this._api.updateUser(profile);
-        //     this.setState({ badgeIndex: newProfile.main_conference_id });
-        //   }
-        // }
 
         await this._api.absend(this.props.profile!, index);
       } else {
@@ -149,36 +134,6 @@ export class Conferences extends React.Component<IProps, IState> {
     }
   }
 
-  // badgeCheckboxClickHandler = async (index: number) => {
-  //   const oldValue = this.state.badgeIndex;
-  //   const newValue = (oldValue === index) ? null : index;
-
-  //   const { profile } = this.props;
-  //   if (profile) {
-  //     this._setLoading('badge', true);
-  //     profile.main_conference_id = newValue;
-  //     const newProfile = await this._api.updateUser(profile);
-  //     this.setState({ badgeIndex: newProfile.main_conference_id });
-  //     this._setLoading('badge', false);
-  //   }
-  // }
-
-  // badgeClickHandler = () => {
-  //   const { badgeIndex } = this.state;
-  //   if (badgeIndex) {
-  //     this.setState({ activeIndex: 'my' + badgeIndex });
-  //   } else {
-  //     const newIndex = this.state.data.find(x => x.attendance_from === true)?.conference.id;
-  //     if (newIndex) {
-  //       this.setState({ activeIndex: 'my' + newIndex });
-  //     }
-  //   }
-  // }
-
-  // detailsClickHandler = (conferenceId: number) => {
-  //   this.setState({ detailsIndex: conferenceId });
-  // }
-
   _setLoading(key: string, value: boolean) {
     const loading = this.state.loading;
     loading[key] = value;
@@ -212,32 +167,32 @@ export class Conferences extends React.Component<IProps, IState> {
       {header && data.length > 0 ? header : null}
       <Accordion fluid styled>
         {data.map(d => d.conference).map(c => <React.Fragment key={c.id}>
-          <Accordion.Title active={activeIndex === key + c.id} index={key + c.id} onClick={this.accordionClickHandler} style={{ lineHeight: '29px', color: (this.state.selectedConference === c.id) ? '#2185d0' : undefined }} >
-            <Icon name='dropdown' />{c.name}
+          <Accordion.Title active={activeIndex === key + c.id} index={key + c.id} onClick={this.accordionClickHandler} style={{ display: 'flex', color: (this.state.selectedConference === c.id) ? '#2185d0' : undefined }} >
+            <Icon name='dropdown' style={{ position: 'relative', top: '8px'}}/>
+            <div style={{  margin: '0 auto 0 0', maxWidth: '250px', padding: '7px 0 0 0', lineHeight: '1.4em'}}>{c.name}</div>
 
             {(post && post.authorUsername !== profile?.username) ?
               <HoverButton
-                style={{ width: '75px', paddingLeft: '0', paddingRight: '0' }}
+                style={{ width: '75px', paddingLeft: '0', paddingRight: '0', height: '30px' }}
                 loading={this._getLoading('invite-' + c.id)}
                 disabled={this._getLoading('invite-' + c.id)}
                 color={isInvited(c) ? 'green' : 'blue'}
                 hoverColor={isInvited(c) ? 'red' : 'blue'}
                 hoverText={isInvited(c) ? 'Withdraw' : 'Invite'}
                 index={c.id}
-                floated='right'
                 size='mini'
                 onClick={this.inviteButtonClickHandler}
               >{isInvited(c) ? 'Invited' : 'Invite'}</HoverButton> : null}
 
             <Button
+              basic
               index={c.id}
-              style={{ width: '75px', paddingLeft: '0', paddingRight: '0' }}
+              style={{ width: '75px', paddingLeft: '0', paddingRight: '0', height: '30px'  }}
               loading={this._getLoading('attend-' + c.id)}
               disabled={this._getLoading('attend-' + c.id)}
               color={isAttended(c) ? 'green' : 'blue'}
-              floated='right'
               size='mini'
-              basic={!!this.props.post}
+              // basic={!!this.props.post}
               onClick={this.attendButtonClickHandler}
             >{isAttended(c) ? 'Attending' : 'Attend'}</Button>
 
@@ -248,27 +203,11 @@ export class Conferences extends React.Component<IProps, IState> {
               {c.date_from.toLocaleDateString() + ' - ' + c.date_to.toLocaleDateString()}<br />
               <a href={c.website}>{c.website}</a>
             </p>
-            {/* {(isAttended(c)) ? <div style={{ marginBottom: '10px' }}>
-              <Checkbox
-                disabled={this._getLoading('badge-' + c.id)}
-                checked={this.state.badgeIndex === c.id}
-                index={c.id}
-                onChange={this.badgeCheckboxClickHandler}
-                label='Make visible as a badge'
-              />
-            </div> : null} */}
             {this.renderParticipants(c.id)}
           </Accordion.Content>
         </React.Fragment>)}
       </Accordion>
     </React.Fragment>);
-  }
-
-  getCurrentBadge() {
-    const { data, badgeIndex } = this.state;
-    if (!badgeIndex) return null;
-
-    return data.find(x => x.conference.id === badgeIndex)?.conference.short_name || undefined;
   }
 
   renderParticipants(conferenceId: number) {
@@ -341,32 +280,10 @@ export class Conferences extends React.Component<IProps, IState> {
 
     return (
       <div>
-        {/* <Container text style={{ textAlign: 'center' }}>
-          Your account is visible as
-        </Container> */}
-        <ProfileCard
-          card
-          profile={this.props.profile}
-        // badge={this.getCurrentBadge()} 
-        // onBadgeClick={this.badgeClickHandler}
-        // badge={(this.state.loading.list) ? null :
-        //   <Dropdown
-        //     text={this.getCurrentBadge() ?? 'No label'}
-        //     className='ui blue button mini'
-        //     style={{ cursor: 'pointer', position: 'relative', top: '-3px', marginLeft: '4px', padding: '6px 8px' }}
-        //     onChange={(e, { value }) => this.badgeCheckboxClickHandler(value as number)}
-        //     options={badgeOptions as any}
-        //     value={this.state.badgeIndex as any}
-        //     loading={this._getLoading('badge')}
-        //   />
-        // }
-        />
+        <ProfileCard card profile={this.props.profile} />
 
         {(this.props.post && this.props.post.authorUsername !== this.props.profile.username) ? <React.Fragment>
           <Divider horizontal>Invites for discussion</Divider>
-          {/* <Container text style={{ textAlign: 'center' }}>
-            You are about to invite<br /><span style={{ fontWeight: 'bold' }}>@{this.props.post.authorUsername}</span><br />to discuss the following topic
-          </Container> */}
           <PostCard post={this.props.post} card />
         </React.Fragment> : null}
         {(this.props.post && this.props.post.authorUsername !== this.props.profile.username) ? <React.Fragment>
