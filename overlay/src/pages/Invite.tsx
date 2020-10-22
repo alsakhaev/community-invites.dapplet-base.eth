@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Divider, Accordion, Icon, Container, Grid, Loader, Dropdown, Segment, Checkbox, Placeholder } from 'semantic-ui-react';
+import { Button, Divider, Accordion, Icon, Container, Grid, Loader, Dropdown, Segment, Checkbox, Placeholder, Breadcrumb } from 'semantic-ui-react';
 import { Post, Profile, Settings } from '../dappletBus';
 import { PostCard } from '../components/PostCard';
 import { Api, Conference, ConferenceWithInvitations, MyInvitation } from '../api';
@@ -8,6 +8,12 @@ import { HoverButton } from '../components/HoverButton';
 import Linkify from 'react-linkify';
 import { AllInvites } from './AllInvites';
 import { Inviting } from './Inviting';
+
+enum Tabs {
+  AllInvites,
+  NewInvite,
+  EditInvite
+}
 
 interface IProps {
   post?: Post;
@@ -21,6 +27,7 @@ interface IState {
   invited: boolean;
   data: MyInvitation[];
   loading: boolean;
+  currentTab: Tabs;
 }
 
 export class Invite extends React.Component<IProps, IState> {
@@ -33,7 +40,8 @@ export class Invite extends React.Component<IProps, IState> {
       isNewInviteOpened: true,
       invited: false,
       data: [],
-      loading: true
+      loading: true,
+      currentTab: props.post ? Tabs.NewInvite : Tabs.AllInvites
     }
   }
 
@@ -44,8 +52,7 @@ export class Invite extends React.Component<IProps, IState> {
   async loadData() {
     this.setState({ loading: true });
     const data = await this._api.getMyInvitations(this.props.profile.namespace, this.props.profile.username);
-    this.setState({ data });
-    this.setState({ loading: false });
+    this.setState({ data, loading: false });
   }
 
   async setInvited() {
@@ -75,43 +82,25 @@ export class Invite extends React.Component<IProps, IState> {
     const p = this.props,
       s = this.state;
 
-    if (p.post) {
-      return <React.Fragment>
-        {(!s.invited) ?
-          <Accordion>
-            <Accordion.Title active={s.isNewInviteOpened} onClick={() => this.setState({ isNewInviteOpened: !s.isNewInviteOpened })}>
-              <Icon name='dropdown' />
-              <h3 style={{ display: 'inline' }}>New Invite</h3>
-            </Accordion.Title>
-            <Accordion.Content active={s.isNewInviteOpened}>
-              <Inviting settings={p.settings} profile={p.profile} post={p.post} onInvited={() => this.setInvited()} />
-            </Accordion.Content>
-          </Accordion> : null}
+    return <React.Fragment>
 
-          {/* <Divider /> */}
+      <Breadcrumb size='large'>
+        <Breadcrumb.Section 
+          link={s.currentTab !== Tabs.AllInvites} 
+          active={s.currentTab === Tabs.AllInvites} 
+          onClick={(s.currentTab !== Tabs.AllInvites) ? () => this.setState({ currentTab: Tabs.AllInvites }) : undefined}
+        >All Invites</Breadcrumb.Section>
 
-        {/* <h3>All Invites</h3>
-        {s.loading ? <Placeholder>
-          <Placeholder.Line />
-          <Placeholder.Line />
-          <Placeholder.Line />
-          <Placeholder.Line />
-          <Placeholder.Line />
-        </Placeholder> :
-          <AllInvites settings={p.settings} profile={p.profile} data={s.data} onWithdraw={(x) => this.withdraw(x)} />} */}
-      </React.Fragment>;
-    } else {
-      return <React.Fragment>
-        <h3>All Invites</h3>
-        {s.loading ? <Placeholder>
-          <Placeholder.Line />
-          <Placeholder.Line />
-          <Placeholder.Line />
-          <Placeholder.Line />
-          <Placeholder.Line />
-        </Placeholder> :
-          <AllInvites settings={p.settings} profile={p.profile} data={s.data} onWithdraw={(x) => this.withdraw(x)} />}
-      </React.Fragment>
-    }
+        {(s.currentTab !== Tabs.AllInvites) ? <React.Fragment>
+          <Breadcrumb.Divider />
+          <Breadcrumb.Section active>New Invite</Breadcrumb.Section>
+        </React.Fragment> : null}
+
+      </Breadcrumb>
+
+      {(s.currentTab === Tabs.AllInvites) ? <AllInvites loading={s.loading} settings={p.settings} profile={p.profile} data={s.data} onWithdraw={(x) => this.withdraw(x)} /> : null}
+      {(s.currentTab === Tabs.NewInvite) ? <Inviting loading={s.loading} settings={p.settings} profile={p.profile} post={p.post!} onInvited={() => (this.setState({ currentTab: Tabs.AllInvites }), this.loadData())} onCancel={() => this.setState({ currentTab: Tabs.AllInvites })}/> : null}
+
+    </React.Fragment>
   }
 }

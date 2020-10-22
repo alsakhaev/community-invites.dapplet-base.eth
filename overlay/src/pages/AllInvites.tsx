@@ -14,6 +14,7 @@ interface IProps {
     settings: Settings;
     data: MyInvitation[];
     onWithdraw: (x: MyInvitation)=> void;
+    loading: boolean;
 }
 
 interface IState {
@@ -31,17 +32,15 @@ export class AllInvites extends React.Component<IProps, IState> {
         this.state = {
         }
     }
-
     
-
     render() {
-        // if (this.state.loading) return <Placeholder>
-        //     <Placeholder.Line />
-        //     <Placeholder.Line />
-        //     <Placeholder.Line />
-        //     <Placeholder.Line />
-        //     <Placeholder.Line />
-        // </Placeholder>;
+        if (this.props.loading) return <Placeholder>
+            <Placeholder.Line />
+            <Placeholder.Line />
+            <Placeholder.Line />
+            <Placeholder.Line />
+            <Placeholder.Line />
+        </Placeholder>;
 
         if (this.props.data.length === 0) {
             return <Segment>No Invitations</Segment>

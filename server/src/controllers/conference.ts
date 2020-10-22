@@ -25,20 +25,6 @@ export const getWithInvitations = asyncHandler(async function (req: any, res: an
     return res.json({ success: true, data });
 })
 
-export const invite = asyncHandler(async function (req: any, res: any) {
-    const json = req.body;
-    if (!json.userFrom || !json.userTo || !json.conferenceId || !json.post) throw Error('userFrom, userTo, conferenceId, post are required');
-    await conferenceService.invite(json.userFrom, json.userTo, json.conferenceId, json.post);
-    return res.json({ success: true });
-})
-
-export const withdraw = asyncHandler(async function (req: any, res: any) {
-    const json = req.body;
-    if (!json.userFrom || !json.userTo || !json.conferenceId || !json.post) throw Error('userFrom, userTo, conferenceId, post are required');
-    await conferenceService.withdraw(json.userFrom, json.userTo, json.conferenceId, json.post);
-    return res.json({ success: true });
-})
-
 export const attend = asyncHandler(async function (req: any, res: any) {
     const json = req.body;
     if (!json.user || !json.conferenceId) throw Error('user, conferenceId are required');

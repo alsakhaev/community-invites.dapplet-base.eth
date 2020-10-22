@@ -12,6 +12,8 @@ interface IProps {
     profile: Profile;
     settings: Settings;
     onInvited: () => void;
+    loading: boolean;
+    onCancel: () => void;
 }
 
 interface IState {
@@ -20,6 +22,7 @@ interface IState {
     selectedConferenceId: number;
     loading: boolean;
     isInvitingLoading: boolean;
+    isPrivate: boolean;
 }
 
 export class Inviting extends React.Component<IProps, IState> {
@@ -41,7 +44,8 @@ export class Inviting extends React.Component<IProps, IState> {
             },
             selectedConferenceId: -1,
             loading: true,
-            isInvitingLoading: false
+            isInvitingLoading: false,
+            isPrivate: false
         }
     }
 
@@ -66,7 +70,7 @@ export class Inviting extends React.Component<IProps, IState> {
             if (!this.state.data.find((d) => d.conference.id === conferenceId)!.attendance_from) {
                 await this._api.attend(this.props.profile, conferenceId);
             }
-            await this._api.invite(this.props.profile, this.state.profileTo, conferenceId, this.props.post);
+            await this._api.invite(this.props.profile, this.state.profileTo, conferenceId, this.props.post, this.state.isPrivate);
             this.props.onInvited();
         } catch (err) {
             console.error(err);
@@ -87,8 +91,8 @@ export class Inviting extends React.Component<IProps, IState> {
             <Divider horizontal>Invites for discussion</Divider>
             <PostCard post={p.post} card />
 
-            {!s.loading ? <React.Fragment>
-                <label style={{ fontWeight: 'bold', display: 'block', marginBottom: '6px' }}>Conference</label>
+            {(!s.loading && !p.loading) ? <React.Fragment>
+                <label style={{ fontWeight: 'bold', display: 'block', marginBottom: '6px' }}>On Conference</label>
                 <Dropdown
                     placeholder='Select Conference'
                     fluid
@@ -101,7 +105,7 @@ export class Inviting extends React.Component<IProps, IState> {
 
                 {selectedConference ? <Segment>
                     <p>
-                        <Linkify componentDecorator={(href: string, text: string, key: string) => <a href={href} key={key} target="_blank">{text}</a>}>{selectedConference.conference.description}</Linkify><br />
+                        {selectedConference.conference.description ? <Linkify componentDecorator={(href: string, text: string, key: string) => <a href={href} key={key} target="_blank">{text}</a>}>{selectedConference.conference.description}<br /></Linkify> : null}
                         {selectedConference.conference.date_from.toLocaleDateString() + ' - ' + selectedConference.conference.date_to.toLocaleDateString()}
                     </p>
                 </Segment> : null}
@@ -114,9 +118,10 @@ export class Inviting extends React.Component<IProps, IState> {
                     Don't make invite private for no reason
                 </p>
 
-                <div style={{ textAlign: 'end'}}>
-                    <Checkbox style={{ margin: '0 20px 0 0' }} label='Private' disabled={s.isInvitingLoading} />
+                <div style={{ textAlign: 'end' }}>
+                    <Checkbox style={{ margin: '0 20px 0 0' }} label='Private' disabled={s.isInvitingLoading} checked={s.isPrivate} onChange={(e, d) => this.setState({ isPrivate: d.checked as boolean })} />
                     <Button primary onClick={() => this.invite()} loading={s.isInvitingLoading} disabled={s.isInvitingLoading}>Invite</Button>
+                    <Button onClick={() => this.props.onCancel()} disabled={s.isInvitingLoading}>Cancel</Button>
                 </div>
             </React.Fragment> : <Placeholder>
                     <Placeholder.Line />

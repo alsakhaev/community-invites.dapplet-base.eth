@@ -56,6 +56,10 @@ export type DetailedPost = Post & {
 }
 
 export type MyInvitation = {
+    id: number;
+    is_private: boolean;
+    created: Date;
+    modified: Date;
     to_namespace: string;
     to_username: string;
     to_fullname: string;
@@ -69,7 +73,6 @@ export type MyInvitation = {
     author_username: string;
     author_fullname: string;
     author_img: string;
-    private: boolean;
 }
 
 export class Api {
@@ -94,18 +97,22 @@ export class Api {
         return conf;
     }
 
-    async invite(userFrom: Profile, userTo: Profile, conferenceId: number, post: Post) {
+    async invite(userFrom: Profile, userTo: Profile, conferenceId: number, post: Post, is_private: boolean) {
         const postDto = {
             id: post.id,
             namespace: 'twitter.com',
             username: post.authorUsername,
             text: post.text
         }
-        return await this._sendRequest('/conferences/invite', 'POST', { userFrom, userTo, conferenceId, post: postDto });
+        return await this._sendRequest('/invitations/invite', 'POST', { userFrom, userTo, conferenceId, post: postDto, is_private });
     }
 
     async withdraw(userFrom: Profile, userTo: Profile, conferenceId: number, post: Post) {
-        await this._sendRequest('/conferences/withdraw', 'POST', { userFrom, userTo, conferenceId, post });
+        await this._sendRequest('/invitations/withdraw', 'POST', { userFrom, userTo, conferenceId, post });
+    }
+
+    async setPrivate(id: number, is_private: boolean) {
+        await this._sendRequest('/invitations/set-private', 'POST', { id, is_private });
     }
 
     async attend(user: Profile, conferenceId: number) {

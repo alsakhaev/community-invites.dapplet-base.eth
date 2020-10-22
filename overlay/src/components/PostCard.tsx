@@ -21,7 +21,7 @@ export class PostCard extends React.Component<IProps, IState> {
                     style={{ borderRadius: 34 }}
                     src={p.authorImg}
                 />
-                <Card.Header>{p.authorFullname}</Card.Header>
+                <Card.Header style={{ fontSize: '1.15em'}}>{p.authorFullname}</Card.Header>
                 <Card.Meta>@{p.authorUsername}</Card.Meta>
                 <Card.Description style={{ textOverflow: 'ellipsis', overflow: 'hidden'}}>
                     {p.text}

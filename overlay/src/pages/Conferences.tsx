@@ -102,37 +102,37 @@ export class Conferences extends React.Component<IProps, IState> {
     }
   }
 
-  inviteButtonClickHandler = async (e: any, titleProps: any) => {
-    e.stopPropagation();
+  // inviteButtonClickHandler = async (e: any, titleProps: any) => {
+  //   e.stopPropagation();
 
-    const { index } = titleProps;
-    this._setLoading('invite-' + index, true);
-    this.setState({ selectedConference: index });
-    try {
-      // ToDo: move to backend?
-      if (this.state.data.find((d) => d.conference.id === index)!.invitations.find(x => (
-        x.from.username === this.props.profile?.username
-        && x.from.namespace === this.props.profile?.namespace
-        && x.to.username === this.state.profileTo?.username
-        && x.to.namespace === this.state.profileTo?.namespace
-        && x.post_id === this.props.post?.id
-      ))) {
-        await this._api.withdraw(this.props.profile!, this.state.profileTo!, index, this.props.post!);
-      } else {
-        if (!this.state.data.find((d) => d.conference.id === index)!.attendance_from) {
-          await this._api.attend(this.props.profile!, index);
-        }
-        await this._api.invite(this.props.profile!, this.state.profileTo!, index, this.props.post!);
-      }
+  //   const { index } = titleProps;
+  //   this._setLoading('invite-' + index, true);
+  //   this.setState({ selectedConference: index });
+  //   try {
+  //     // ToDo: move to backend?
+  //     if (this.state.data.find((d) => d.conference.id === index)!.invitations.find(x => (
+  //       x.from.username === this.props.profile?.username
+  //       && x.from.namespace === this.props.profile?.namespace
+  //       && x.to.username === this.state.profileTo?.username
+  //       && x.to.namespace === this.state.profileTo?.namespace
+  //       && x.post_id === this.props.post?.id
+  //     ))) {
+  //       await this._api.withdraw(this.props.profile!, this.state.profileTo!, index, this.props.post!);
+  //     } else {
+  //       if (!this.state.data.find((d) => d.conference.id === index)!.attendance_from) {
+  //         await this._api.attend(this.props.profile!, index);
+  //       }
+  //       await this._api.invite(this.props.profile!, this.state.profileTo!, index, this.props.post!);
+  //     }
 
-      await this._loadConferences();
-    } catch (err) {
-      console.error(err);
-    } finally {
-      this._setLoading('invite-' + index, false);
-      setTimeout(() => this.setState({ selectedConference: null }), 2000);
-    }
-  }
+  //     await this._loadConferences();
+  //   } catch (err) {
+  //     console.error(err);
+  //   } finally {
+  //     this._setLoading('invite-' + index, false);
+  //     setTimeout(() => this.setState({ selectedConference: null }), 2000);
+  //   }
+  // }
 
   _setLoading(key: string, value: boolean) {
     const loading = this.state.loading;
@@ -171,7 +171,7 @@ export class Conferences extends React.Component<IProps, IState> {
             <Icon name='dropdown' style={{ position: 'relative', top: '8px'}}/>
             <div style={{  margin: '0 auto 0 0', maxWidth: '250px', padding: '7px 0 0 0', lineHeight: '1.4em'}}>{c.name}</div>
 
-            {(post && post.authorUsername !== profile?.username) ?
+            {/* {(post && post.authorUsername !== profile?.username) ?
               <HoverButton
                 style={{ width: '75px', paddingLeft: '0', paddingRight: '0', height: '30px' }}
                 loading={this._getLoading('invite-' + c.id)}
@@ -182,7 +182,7 @@ export class Conferences extends React.Component<IProps, IState> {
                 index={c.id}
                 size='mini'
                 onClick={this.inviteButtonClickHandler}
-              >{isInvited(c) ? 'Invited' : 'Invite'}</HoverButton> : null}
+              >{isInvited(c) ? 'Invited' : 'Invite'}</HoverButton> : null} */}
 
             <Button
               basic

@@ -7,6 +7,7 @@ import { Conferences } from './Conferences';
 import { Invite } from './Invite';
 import { MyDiscussions } from './MyDiscussions';
 import { Api } from '../api';
+import { Topics } from '../pages/Topics';
 
 interface IProps {
   history?: any;
@@ -19,6 +20,7 @@ interface IState {
   activeIndex: number;
   postsDefaultSearch: string;
   myDiscussionsKey: number;
+  myInvitesKey: number;
 }
 
 export class App extends React.Component<IProps, IState> {
@@ -27,11 +29,11 @@ export class App extends React.Component<IProps, IState> {
 
   constructor(props: IProps) {
     super(props);
-    this.state = { post: undefined, profile: undefined, settings: undefined, activeIndex: -1, postsDefaultSearch: '', myDiscussionsKey: 0 };
+    this.state = { post: undefined, profile: undefined, settings: undefined, activeIndex: -1, postsDefaultSearch: '', myDiscussionsKey: 0, myInvitesKey: 0 };
 
     dappletInstance.onData(async ({ post, profile, settings }) => {
       this._api = new Api(settings.serverUrl);
-      this.setState({ post, profile, settings, activeIndex: profile ? 0 : 1 });
+      this.setState({ post, profile, settings, activeIndex: profile ? 0 : 1, myInvitesKey: Math.random() });
     });
   }
 
@@ -44,12 +46,7 @@ export class App extends React.Component<IProps, IState> {
   }
 
   changeTab(activeIndex: number) {
-    if (activeIndex === 3) {
-      window.open('https://community-invite-dashboard.herokuapp.com/', '_blank');
-      return;
-    };
-
-    if (activeIndex === 2) {
+    if (activeIndex === 2 || activeIndex === 3) {
       this.setState({ postsDefaultSearch: '', myDiscussionsKey: Math.random() });
     }
 
@@ -92,7 +89,7 @@ export class App extends React.Component<IProps, IState> {
                     onClick={() => this.changeTab(2)}
                   />
                   <Menu.Item
-                    name='Dashboard'
+                    name='Topics'
                     active={s.activeIndex === 3}
                     onClick={() => this.changeTab(3)}
                   />
@@ -102,7 +99,7 @@ export class App extends React.Component<IProps, IState> {
               <div style={{ margin: '4em 0' }}>
 
                 {s.profile ? <div style={{ display: (s.activeIndex === 0) ? 'block' : 'none', paddingBottom: '10px' }}>
-                  <Invite profile={s.profile} post={s.post} onPostsClick={this.postsClickHandler} settings={s.settings!} />
+                  <Invite profile={s.profile} post={s.post} onPostsClick={this.postsClickHandler} settings={s.settings!} key={s.myInvitesKey} />
                 </div> : null}
 
                 <div style={{ display: (s.activeIndex === 1) ? 'block' : 'none', paddingBottom: '10px' }}>
@@ -111,6 +108,10 @@ export class App extends React.Component<IProps, IState> {
 
                 <div style={{ display: (s.activeIndex === 2) ? 'block' : 'none', paddingBottom: '10px' }}>
                   <MyDiscussions profile={s.profile} defaultSearch={s.postsDefaultSearch} settings={s.settings!} key={s.myDiscussionsKey} />
+                </div>
+
+                <div style={{ display: (s.activeIndex === 3) ? 'block' : 'none', paddingBottom: '10px' }}>
+                  <Topics profile={s.profile} defaultSearch={s.postsDefaultSearch} settings={s.settings!} key={s.myDiscussionsKey} />
                 </div>
               </div>
 

@@ -65,57 +65,6 @@ export async function getConferencesWithInvitations(namespace_from: string, user
 }
 
 
-export async function invite(userFrom: Profile, userTo: Profile, conferenceId: number, post: Post): Promise<void> {
-    return execute(async (client) => {
-        if (!await userService.getUser(userFrom.namespace, userFrom.username)) {
-            await userService.createUser(userFrom);
-        }
-
-        if (!await userService.getUser(userTo.namespace, userTo.username)) {
-            await userService.createUser(userTo);
-        }
-
-        if (!await postService.getPost(post.id)) {
-            await postService.createPost(post);
-        }
-
-        const values = [userFrom.namespace, userTo.namespace, userFrom.username, userTo.username, conferenceId, post.id]
-        const query = `INSERT INTO invitations(
-            namespace_from, namespace_to, username_from, username_to, conference_id, post_id
-        ) VALUES ($1, $2, $3, $4, $5, $6);`;
-
-        await client.query(query, values);
-    });
-}
-
-export async function withdraw(userFrom: Profile, userTo: Profile, conferenceId: number, post: Post): Promise<void> {
-    return execute(async (client) => {
-        if (!await userService.getUser(userFrom.namespace, userFrom.username)) {
-            await userService.createUser(userFrom);
-        }
-
-        if (!await userService.getUser(userTo.namespace, userTo.username)) {
-            await userService.createUser(userTo);
-        }
-
-        if (!await postService.getPost(post.id)) {
-            await postService.createPost(post);
-        }
-
-        const values = [userFrom.namespace, userTo.namespace, userFrom.username, userTo.username, conferenceId, post.id]
-        const query = `DELETE FROM invitations WHERE 
-            namespace_from = $1
-            AND namespace_to = $2
-            AND username_from = $3
-            AND username_to = $4
-            AND conference_id = $5
-            AND post_id = $6;`;
-
-        await client.query(query, values);
-    });
-}
-
-
 export async function attend(user: Profile, conferenceId: number): Promise<void> {
     return execute(async (client) => {
         if (!await userService.getUser(user.namespace, user.username)) {

@@ -13,8 +13,6 @@ router.get('/conferences', conference.get);
 router.get('/conferences/invitations', conference.getWithInvitations);
 router.get('/conferences/:id', conference.getById);
 router.post('/conferences', conference.post);
-router.post('/conferences/invite', conference.invite);
-router.post('/conferences/withdraw', conference.withdraw);
 router.post('/conferences/attend', conference.attend);
 router.post('/conferences/absend', conference.absend);
 
@@ -30,5 +28,8 @@ router.get('/posts/invitations', post.getWithInvitations);
 router.post('/posts/stat', post.getStat);
 
 router.get('/invitations', invitation.getMyInvitations);
+router.post('/invitations/invite', invitation.invite);
+router.post('/invitations/withdraw', invitation.withdraw);
+router.post('/invitations/set-private', invitation.setPrivate);
 
 export default router;

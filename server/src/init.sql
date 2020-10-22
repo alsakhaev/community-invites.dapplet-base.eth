@@ -30,12 +30,16 @@ CREATE TABLE users (
 );
 
 CREATE TABLE invitations (
+  id SERIAL PRIMARY KEY,
   namespace_from varchar(15) NOT NULL,
   namespace_to varchar(15) NOT NULL,
   username_from varchar(50) NOT NULL,
   username_to varchar(50) NOT NULL,
   conference_id INTEGER NOT NULL,
-  post_id varchar(31) NOT NULL
+  post_id varchar(31) NOT NULL,
+  is_private bit NOT NULL,
+  created TIMESTAMPTZ NOT NULL,
+  modified TIMESTAMPTZ NOT NULL
 );
 
 CREATE TABLE attendance (

@@ -23,7 +23,7 @@ export class ProfileCard extends React.Component<IProps, IState> {
                     style={{ borderRadius: 34, marginBottom: 0 }}
                     src={p.img}
                 />
-                <Card.Header>{p.fullname} {this.props.badge ?? null}</Card.Header>
+                <Card.Header style={{ fontSize: '1.15em'}}>{p.fullname} {this.props.badge ?? null}</Card.Header>
                 <Card.Meta>@{p.username}</Card.Meta>
             </Card.Content>
         </Card>);
