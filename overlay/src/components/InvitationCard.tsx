@@ -8,14 +8,15 @@ interface IProps {
     invitation: MyInvitation;
     onClose: () => void;
     onPrivate: (checked: boolean) => void;
+    highlight?: boolean;
 }
 
 interface IState { }
 
 export class InvitationCard extends React.Component<IProps, IState> {
     render() {
-        const { invitation } = this.props;
-        return <Segment>
+        const { invitation, highlight } = this.props;
+        return <Segment style={(highlight) ? { boxShadow: '0 1px 2px 0 #2185d05e', borderColor: '#2185d0'} : undefined}>
             <Icon link name='close' title='Withdraw Invitation' style={{ zIndex: 9, position: 'absolute', top: '10px', right: '10px' }} onClick={() => this.props.onClose()} />
             <div>
                 <Header as='h4' image style={{ margin: '0 auto 0 0', whiteSpace: 'nowrap' }}>

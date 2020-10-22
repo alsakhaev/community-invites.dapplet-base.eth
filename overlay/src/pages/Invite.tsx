@@ -10,6 +10,7 @@ import { AllInvites } from './AllInvites';
 import { NewInvite } from './NewInvite';
 
 enum Tabs {
+  No,
   AllInvites,
   NewInvite,
   EditInvite
@@ -28,6 +29,7 @@ interface IState {
   data: MyInvitation[];
   loading: boolean;
   currentTab: Tabs;
+  highlightedInvitationId: number;
 }
 
 export class Invite extends React.Component<IProps, IState> {
@@ -41,7 +43,8 @@ export class Invite extends React.Component<IProps, IState> {
       invited: false,
       data: [],
       loading: true,
-      currentTab: props.post ? Tabs.NewInvite : Tabs.AllInvites
+      currentTab: Tabs.No,
+      highlightedInvitationId: -1
     }
   }
 
@@ -50,9 +53,15 @@ export class Invite extends React.Component<IProps, IState> {
   }
 
   async loadData() {
+    const p = this.props;
+    const s = this.state;
+
     this.setState({ loading: true });
+    
     const data = await this._api.getMyInvitations(this.props.profile.namespace, this.props.profile.username);
-    this.setState({ data, loading: false });
+    const invitation = p.post ? data.find(x => x.post_id === p.post!.id) : null;
+
+    this.setState({ data, loading: false, currentTab: (!p.post || !!invitation) ? Tabs.AllInvites : Tabs.NewInvite, highlightedInvitationId: invitation?.id ?? -1 });
   }
 
   async setInvited() {
@@ -82,12 +91,19 @@ export class Invite extends React.Component<IProps, IState> {
     const p = this.props,
       s = this.state;
 
+    if (s.loading) return <Placeholder>
+      <Placeholder.Line />
+      <Placeholder.Line />
+      <Placeholder.Line />
+      <Placeholder.Line />
+      <Placeholder.Line />
+    </Placeholder>;
+
     return <React.Fragment>
 
       <Breadcrumb size='large'>
-        <Breadcrumb.Section 
-          link={s.currentTab !== Tabs.AllInvites} 
-          active={s.currentTab === Tabs.AllInvites} 
+        <Breadcrumb.Section
+          active={s.currentTab === Tabs.AllInvites}
           onClick={(s.currentTab !== Tabs.AllInvites) ? () => this.setState({ currentTab: Tabs.AllInvites }) : undefined}
         >All Invites</Breadcrumb.Section>
 
@@ -98,8 +114,8 @@ export class Invite extends React.Component<IProps, IState> {
 
       </Breadcrumb>
 
-      {(s.currentTab === Tabs.AllInvites) ? <AllInvites loading={s.loading} settings={p.settings} profile={p.profile} data={s.data} onWithdraw={(x) => this.withdraw(x)} /> : null}
-      {(s.currentTab === Tabs.NewInvite) ? <NewInvite loading={s.loading} settings={p.settings} profile={p.profile} post={p.post!} onInvited={() => (this.setState({ currentTab: Tabs.AllInvites }), this.loadData())} onCancel={() => this.setState({ currentTab: Tabs.AllInvites })}/> : null}
+      {(s.currentTab === Tabs.AllInvites) ? <AllInvites highlightedInvitationId={s.highlightedInvitationId} loading={s.loading} settings={p.settings} profile={p.profile} data={s.data} onWithdraw={(x) => this.withdraw(x)} /> : null}
+      {(s.currentTab === Tabs.NewInvite) ? <NewInvite loading={s.loading} settings={p.settings} profile={p.profile} post={p.post!} onInvited={() => (this.setState({ currentTab: Tabs.AllInvites }), this.loadData())} onCancel={() => this.setState({ currentTab: Tabs.AllInvites })} /> : null}
 
     </React.Fragment>
   }

@@ -15,6 +15,7 @@ interface IProps {
     data: MyInvitation[];
     onWithdraw: (x: MyInvitation)=> void;
     loading: boolean;
+    highlightedInvitationId: number;
 }
 
 interface IState {
@@ -50,6 +51,7 @@ export class AllInvites extends React.Component<IProps, IState> {
             {this.props.data.map((x, i) =>
                 <InvitationCard
                     key={i}
+                    highlight={x.id === this.props.highlightedInvitationId}
                     invitation={x}
                     onClose={() => this.props.onWithdraw(x)}
                     onPrivate={console.log}
