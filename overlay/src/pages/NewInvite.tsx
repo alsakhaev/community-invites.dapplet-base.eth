@@ -25,7 +25,7 @@ interface IState {
     isPrivate: boolean;
 }
 
-export class Inviting extends React.Component<IProps, IState> {
+export class NewInvite extends React.Component<IProps, IState> {
     private _api: Api;
 
     constructor(props: IProps) {

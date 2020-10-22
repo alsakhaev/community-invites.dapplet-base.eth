@@ -7,7 +7,7 @@ import { ProfileCard } from '../components/ProfileCard'
 import { HoverButton } from '../components/HoverButton';
 import Linkify from 'react-linkify';
 import { AllInvites } from './AllInvites';
-import { Inviting } from './Inviting';
+import { NewInvite } from './NewInvite';
 
 enum Tabs {
   AllInvites,
@@ -99,7 +99,7 @@ export class Invite extends React.Component<IProps, IState> {
       </Breadcrumb>
 
       {(s.currentTab === Tabs.AllInvites) ? <AllInvites loading={s.loading} settings={p.settings} profile={p.profile} data={s.data} onWithdraw={(x) => this.withdraw(x)} /> : null}
-      {(s.currentTab === Tabs.NewInvite) ? <Inviting loading={s.loading} settings={p.settings} profile={p.profile} post={p.post!} onInvited={() => (this.setState({ currentTab: Tabs.AllInvites }), this.loadData())} onCancel={() => this.setState({ currentTab: Tabs.AllInvites })}/> : null}
+      {(s.currentTab === Tabs.NewInvite) ? <NewInvite loading={s.loading} settings={p.settings} profile={p.profile} post={p.post!} onInvited={() => (this.setState({ currentTab: Tabs.AllInvites }), this.loadData())} onCancel={() => this.setState({ currentTab: Tabs.AllInvites })}/> : null}
 
     </React.Fragment>
   }
