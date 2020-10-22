@@ -1,5 +1,5 @@
 import React from 'react';
-import { Accordion, Icon, Segment, Comment, Input, InputOnChangeData, Loader, Divider } from 'semantic-ui-react';
+import { Accordion, Icon, Segment, Comment, Input, InputOnChangeData, Loader, Divider, Label, Select } from 'semantic-ui-react';
 import { Api, DetailedPost, PostWithInvitations } from '../api';
 import { Profile, Settings } from '../dappletBus';
 import { groupBy } from '../helpers';
@@ -17,6 +17,13 @@ interface IState {
     active1: string | null;
     active2: string | null;
 }
+
+const filterOptions = [{
+    key: 'all',
+    text: 'All',
+    value: 'all'
+  }];
+  
 
 export class Topics extends React.Component<IProps, IState> {
 
@@ -121,25 +128,34 @@ export class Topics extends React.Component<IProps, IState> {
 
         return (<div>
             <div style={{ padding: '15px', position: 'fixed', top: '4em', left: '0', width: '100%', zIndex: 1000, backgroundColor: '#fff' }}>
-                <Input fluid placeholder='Search...' value={this.state.search}
-                    icon='search'
-                    iconPosition='left'
+                <Input 
+                    fluid 
+                    placeholder='Search...' 
+                    value={this.state.search}
+                    label={<Select style={{ width: '7em' }} compact options={filterOptions} defaultValue={filterOptions[0].value} onChange={console.log} />}
+                    labelPosition='left'
                     onChange={this.inputChangeHandler}
                 />
             </div>
-            <div style={{ marginTop: '8em'}}>
+            <div style={{ marginTop: '8em' }}>
                 {this._getLoading('list') ? <Segment>
                     <Loader active inline='centered'>Loading</Loader>
                 </Segment> : <React.Fragment>
                         {filteredPosts.map((p, i) =>
                             <Segment key={i}>
-                                <Comment.Group minimal>
+                                <Icon link name='close' title='Reject Topic' style={{ zIndex: 9, position: 'absolute', top: '10px', right: '10px' }} onClick={console.log} />
+                                <Comment.Group minimal style={{ margin: 0 }}>
                                     <Comment >
                                         <Comment.Avatar style={{ margin: 0 }} src={p.post.img} />
                                         <Comment.Content style={{ marginLeft: '3.3em', padding: 0 }} >
-                                            <Comment.Author as='a' target='_blank' href={`https://twitter.com/${p.post.username}/status/${p.post.id}`}>{p.post.fullname}</Comment.Author>
+                                            <Comment.Author as='a' target='_blank' href={`https://twitter.com/${p.post.username}/status/${p.post.id}`}>
+                                                {p.post.fullname}
+                                            </Comment.Author>
                                             <Comment.Metadata>
                                                 <div>@{p.post.username}</div>
+                                                <Label color='blue' as='a' onClick={console.log}>
+                                                    <Icon name='plus' /> Devcon 6
+                                                </Label>
                                             </Comment.Metadata>
                                             <Comment.Text>{p.post.text}</Comment.Text>
                                         </Comment.Content>
