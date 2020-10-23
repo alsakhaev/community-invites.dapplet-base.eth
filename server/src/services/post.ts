@@ -35,6 +35,7 @@ type PostWithInvitations = {
             namespace: string;
             username: string;
             fullname: string;
+            is_private: boolean;
         }[];
     }[];
 }
@@ -219,30 +220,32 @@ export async function getPostsWithInvitations(namespace: string, username: strin
                         from (
                             (
                                 select 
-                                    ii.namespace_from as namespace, 
-                                    ii.username_from as username,
-                                    uu.fullname as fullname
+                                    case when ii.is_private = true then '' else ii.namespace_from end as namespace, 
+                                    case when ii.is_private = true then '' else ii.username_from end as username, 
+                                    case when ii.is_private = true then '' else uu.fullname end as fullname,
+                                    ii.is_private as is_private
                                 from invitations as ii 
                                 join users as uu on uu.namespace = ii.namespace_from and uu.username = ii.username_from
                                 join conferences as cc on cc.id = ii.conference_id
                                 WHERE cc.date_to >= DATE(NOW() - INTERVAL '3 DAY')
                                     and ii.post_id = p.id
-                                    and ((ii.namespace_from = $1 and ii.username_from = $2)
-                                        or (ii.namespace_to = $1 and ii.username_to = $2))
+                                    --and ((ii.namespace_from = $1 and ii.username_from = $2)
+                                    --    or (ii.namespace_to = $1 and ii.username_to = $2))
                             )
                             UNION ALL
                             (
                                 select 
-                                    iii.namespace_to as namespace, 
-                                    iii.username_to as username,
-                                    uuu.fullname as fullname
+                                    case when iii.is_private = true then '' else iii.namespace_to end as namespace, 
+                                    case when iii.is_private = true then '' else iii.username_to end as username, 
+                                    case when iii.is_private = true then '' else uuu.fullname end as fullname,
+                                    iii.is_private as is_private
                                 from invitations as iii
                                 join users as uuu on uuu.namespace = iii.namespace_to and uuu.username = iii.username_to
                                 join conferences as ccc on ccc.id = iii.conference_id
                                 WHERE ccc.date_to >= DATE(NOW() - INTERVAL '3 DAY')
                                     and iii.post_id = p.id
-                                    and ((iii.namespace_from = $1 and iii.username_from = $2)
-                                        or (iii.namespace_to = $1 and iii.username_to = $2))
+                                    --and ((iii.namespace_from = $1 and iii.username_from = $2)
+                                    --    or (iii.namespace_to = $1 and iii.username_to = $2))
                             )
                         ) as iiii
                     )

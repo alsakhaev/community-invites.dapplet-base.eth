@@ -37,6 +37,7 @@ export type PostWithInvitations = {
             namespace: string;
             username: string;
             fullname: string;
+            is_private: boolean;
         }[];
     }[];
 }

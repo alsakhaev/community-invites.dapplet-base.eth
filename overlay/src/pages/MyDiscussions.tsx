@@ -127,7 +127,7 @@ export class MyDiscussions extends React.Component<IProps, IState> {
                     onChange={this.inputChangeHandler}
                 />
             </div>
-            <div style={{ marginTop: '8em'}}>
+            <div style={{ marginTop: '8em' }}>
                 {this._getLoading('list') ? <Segment>
                     <Loader active inline='centered'>Loading</Loader>
                 </Segment> : <React.Fragment>
@@ -144,9 +144,19 @@ export class MyDiscussions extends React.Component<IProps, IState> {
                                             <Comment.Text>{p.post.text}</Comment.Text>
                                         </Comment.Content>
                                         <div>
-                                            {p.conferences.map(c => <React.Fragment key={c.id}>
-                                                <b>{c.name}:</b> {c.users.filter(u => !(u.username === this.props.profile?.username && u.namespace === this.props.profile?.namespace)).map(u => `@${u.username}`).join(', ')} <br />
-                                            </React.Fragment>)}
+                                            {p.conferences.map(c => {
+                                                const exceptMe = c.users.filter(u => !(u.username === this.props.profile?.username && u.namespace === this.props.profile?.namespace));
+                                                const public_users = exceptMe.filter(x => x.is_private === false);
+                                                const private_users = exceptMe.filter(x => x.is_private === true);
+
+                                                return <React.Fragment key={c.id}>
+                                                    <b>{c.name}: </b>
+                                                    me
+                                                    {public_users.map((u, i) => <React.Fragment><span title={u.fullname}>, @{u.username}</span></React.Fragment>)}
+                                                    {(private_users.length > 0) ? <React.Fragment> and {private_users.length} private person{(private_users.length > 1 ? 's' : '')}</React.Fragment> : null}
+                                                    <br />
+                                                </React.Fragment>
+                                            })}
                                         </div>
                                     </Comment>
                                 </Comment.Group>
