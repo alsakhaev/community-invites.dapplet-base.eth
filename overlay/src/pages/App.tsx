@@ -70,7 +70,6 @@ export class App extends React.Component<IProps, IState> {
         <HashRouter>
           <Switch>
             <React.Fragment>
-
               <div style={{ padding: '15px', position: 'fixed', top: '0', left: '0', width: '100%', zIndex: 1000, backgroundColor: '#fff' }}>
                 <Menu pointing secondary>
                   {s.profile ? <Menu.Item

@@ -4,6 +4,8 @@ DROP TABLE users;
 DROP TABLE invitations;
 DROP TABLE attendance;
 
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
 CREATE TABLE posts (
   id VARCHAR(31) PRIMARY KEY,
   namespace varchar(15) NOT NULL,
@@ -46,6 +48,20 @@ CREATE TABLE attendance (
   conference_id INTEGER NOT NULL,
   namespace varchar(15) NOT NULL,
   username varchar(50) NOT NULL
+);
+
+CREATE TABLE tags (
+  id UUID DEFAULT uuid_generate_v4(),
+  name VARCHAR,
+  PRIMARY KEY (id)
+);
+
+CREATE TABLE itemtags (
+  item_id VARCHAR NOT NULL,
+  tag_id UUID NOT NULL,
+  namespace VARCHAR NOT NULL,
+  username VARCHAR NOT NULL,
+  value BOOLEAN NOT NULL
 );
 
 INSERT INTO conferences (short_name, name, description, date_from, date_to) 
@@ -132,3 +148,5 @@ VALUES ('Blockchain', 'Blockchain Expo Global 2021', 'London, United Kingdom'||c
 INSERT INTO conferences (short_name, name, description, date_from, date_to) 
 VALUES ('TOKEN2049', 'TOKEN2049', 'Hong Kong'||chr(10)||'https://www.token2049.com/', '2021-03-22T21:00:00.000Z', '2021-03-23T21:00:00.000Z');
 
+INSERT INTO tags (name) 
+VALUES ('Devcon6');

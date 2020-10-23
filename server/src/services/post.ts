@@ -39,6 +39,16 @@ type PostWithInvitations = {
     }[];
 }
 
+type PostWithTags = {
+    id: string;
+    namespace: string;
+    username: string;
+    fullname: string;
+    img: string;
+    text: string;
+    tags: { id: string, name: string }[];
+}
+
 export async function getPosts(namespace?: string, username?: string): Promise<Post[]> {
     if (!namespace !== !username) throw new Error('namespace and username are required');
 
@@ -254,6 +264,41 @@ export async function getPostsWithInvitations(namespace: string, username: strin
                 and ((iiiii.namespace_from = $1 and iiiii.username_from = $2)
                 or (iiiii.namespace_to = $1 and iiiii.username_to = $2))
         )
+    `;
+
+    return execute(c => c.query(query, params).then(r => r.rows));
+}
+
+export async function getAllWithMyTags(namespace: string, username: string): Promise<PostWithTags[]> {
+
+    const params = [namespace, username];
+    const query = `
+        SELECT
+            p.id,
+            p.text,
+            u.namespace,
+            u.username,
+            u.fullname,
+            u.img,
+            COALESCE(json_agg(t.*) FILTER (WHERE t.id IS NOT NULL), '[]') as tags
+        FROM posts as p 
+        JOIN users as u 
+            on u.namespace = p.namespace
+                and u.username = p.username
+        LEFT JOIN itemtags as it 
+            on it.item_id = p.id 
+                and it.value = true 
+                and it.namespace = $1 
+                and it.username = $2
+        LEFT JOIN tags as t on t.id = it.tag_id
+        WHERE (
+            SELECT COUNT(*)
+            FROM invitations as i 
+            JOIN conferences as c on c.id = i.conference_id
+            WHERE i.post_id = p.id
+                AND (c.date_to >= DATE(NOW() - INTERVAL '3 DAY'))
+        ) <> 0
+        GROUP BY p.id, u.namespace, u.username;
     `;
 
     return execute(c => c.query(query, params).then(r => r.rows));

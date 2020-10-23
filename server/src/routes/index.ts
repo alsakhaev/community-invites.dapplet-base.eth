@@ -4,6 +4,7 @@ import * as conference from "../controllers/conference";
 import * as user from "../controllers/user";
 import * as post from "../controllers/post";
 import * as invitation from "../controllers/invitation";
+import * as tag from "../controllers/tag";
 
 const router = Router();
 
@@ -26,10 +27,15 @@ router.get('/posts', post.get);
 router.get('/posts/details', post.getDetailed);
 router.get('/posts/invitations', post.getWithInvitations);
 router.post('/posts/stat', post.getStat);
+router.get('/posts/my-tags', post.getAllWithMyTags);
 
 router.get('/invitations', invitation.getMyInvitations);
 router.post('/invitations/invite', invitation.invite);
 router.post('/invitations/withdraw', invitation.withdraw);
 router.post('/invitations/set-private', invitation.setPrivate);
+
+router.get('/tags', tag.get);
+router.post('/tags/tag', tag.tag);
+router.post('/tags/untag', tag.untag);
 
 export default router;

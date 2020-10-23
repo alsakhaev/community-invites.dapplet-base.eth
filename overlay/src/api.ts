@@ -75,6 +75,21 @@ export type MyInvitation = {
     author_img: string;
 }
 
+export type PostWithTags = {
+    id: string;
+    namespace: string;
+    username: string;
+    fullname: string;
+    img: string;
+    text: string;
+    tags: { id: string, name: string }[];
+}
+
+export type Tag = {
+    id: string;
+    name: string;
+}
+
 export class Api {
     constructor(private _url: string) { }
 
@@ -104,23 +119,23 @@ export class Api {
             username: post.authorUsername,
             text: post.text
         }
-        return await this._sendRequest('/invitations/invite', 'POST', { userFrom, userTo, conferenceId, post: postDto, is_private });
+        return this._sendRequest('/invitations/invite', 'POST', { userFrom, userTo, conferenceId, post: postDto, is_private });
     }
 
     async withdraw(userFrom: Profile, userTo: Profile, conferenceId: number, post: Post) {
-        await this._sendRequest('/invitations/withdraw', 'POST', { userFrom, userTo, conferenceId, post });
+        return this._sendRequest('/invitations/withdraw', 'POST', { userFrom, userTo, conferenceId, post });
     }
 
     async setPrivate(id: number, is_private: boolean) {
-        await this._sendRequest('/invitations/set-private', 'POST', { id, is_private });
+        return this._sendRequest('/invitations/set-private', 'POST', { id, is_private });
     }
 
     async attend(user: Profile, conferenceId: number) {
-        return await this._sendRequest('/conferences/attend', 'POST', { user, conferenceId });
+        return this._sendRequest('/conferences/attend', 'POST', { user, conferenceId });
     }
 
     async absend(user: Profile, conferenceId: number) {
-        await this._sendRequest('/conferences/absend', 'POST', { user, conferenceId });
+        return this._sendRequest('/conferences/absend', 'POST', { user, conferenceId });
     }
 
     // async getUser(namespace: string, username: string): Promise<Profile> {
@@ -167,6 +182,22 @@ export class Api {
 
     async getMyInvitations(namespace: string, username: string): Promise<MyInvitation[]> {
         return this._sendRequest(`/invitations?namespace=${namespace}&username=${username}`);
+    }
+
+    async getAllTopicsWithMyTags(namespace: string, username: string): Promise<PostWithTags[]> {
+        return this._sendRequest(`/posts/my-tags?namespace=${namespace}&username=${username}`);
+    }
+
+    async tag(item_id: string, tag_id: string, user: Profile) {
+        return this._sendRequest('/tags/tag', 'POST', { item_id, tag_id, user });
+    }
+
+    async untag(item_id: string, tag_id: string, user: Profile) {
+        return this._sendRequest('/tags/untag', 'POST', { item_id, tag_id, user });
+    }
+
+    async getTags(): Promise<Tag[]> {
+        return this._sendRequest('/tags');
     }
 
     private async _sendRequest(query: string, method: 'POST' | 'GET' | 'PUT' = 'GET', body?: any): Promise<any> {

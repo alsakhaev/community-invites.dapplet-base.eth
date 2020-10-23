@@ -24,3 +24,10 @@ export const getWithInvitations = asyncHandler(async function (req: any, res: an
     const data = await postService.getPostsWithInvitations(namespace, username);
     return res.json({ success: true, data: data });
 })
+
+export const getAllWithMyTags = asyncHandler(async function (req: any, res: any) {
+    const { namespace, username } = req.query;
+    if (!namespace || !username) throw new Error('namespace and username are required');
+    const posts = await postService.getAllWithMyTags(namespace, username);
+    return res.json({ success: true, data: posts });
+})
