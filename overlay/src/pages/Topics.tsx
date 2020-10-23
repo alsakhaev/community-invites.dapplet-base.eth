@@ -1,5 +1,5 @@
 import React from 'react';
-import { Accordion, Icon, Segment, Comment, Input, InputOnChangeData, Loader, Divider, Label, Select } from 'semantic-ui-react';
+import { Accordion, Icon, Segment, Comment, Input, InputOnChangeData, Loader, Divider, Label, Select, Message } from 'semantic-ui-react';
 import { Api, DetailedPost, PostWithInvitations, PostWithTags, Tag } from '../api';
 import { Profile, Settings } from '../dappletBus';
 import { groupBy } from '../helpers';
@@ -17,6 +17,7 @@ interface IState {
     active1: string | null;
     active2: string | null;
     tags: Tag[];
+    showMessage: boolean;
 }
 
 const filterOptions = [{
@@ -41,9 +42,20 @@ export class Topics extends React.Component<IProps, IState> {
             },
             active1: null,
             active2: null,
-            tags: []
+            tags: [],
+            showMessage: true
         };
     }
+
+    // setState<K extends keyof IState>(
+    //     state: ((prevState: Readonly<IState>, props: Readonly<IProps>) => (Pick<IState, K> | IState | null)) | (Pick<IState, K> | IState | null),
+    //     callback?: () => void
+    // ): void {
+    //     super.setState(state, callback);
+    //     if ((state as any)?.showMessage !== undefined) {
+    //         localStorage.setItem('showMessage', JSON.stringify((state as any).showMessage));
+    //     }
+    // }
 
     async componentDidMount() {
         const { profile } = this.props;
@@ -164,6 +176,12 @@ export class Topics extends React.Component<IProps, IState> {
                 {this._getLoading('list') ? <Segment>
                     <Loader active inline='centered'>Loading</Loader>
                 </Segment> : <React.Fragment>
+                        {s.showMessage ? <Message 
+                            warning 
+                            style={{ textAlign: 'center' }} 
+                            onDismiss={() => this.setState({ showMessage: false })}
+                            content='Check the rejected topics and add in your conference list necessary ones'
+                        />: null}
                         {filteredPosts.map((p) =>
                             <Segment key={p.id} disabled={this._getLoading(p.id)}>
                                 <Icon link name='close' disabled={this._getLoading(p.id)} title='Reject Topic' style={{ zIndex: 9, position: 'absolute', top: '10px', right: '10px' }} onClick={() => this.untag(p.id, s.tags[0]?.id)} />
@@ -178,7 +196,7 @@ export class Topics extends React.Component<IProps, IState> {
                                                 <div>@{p.username}</div>
                                                 {s.tags.filter(x => !p.tags.find(y => y.id === x.id)).map(x => <Label key={x.id} color='blue' as='a' onClick={() => this.tag(p.id, x.id)}>
                                                     <Icon name='plus' />{x.name}
-                                                </Label>)}                                                
+                                                </Label>)}
                                             </Comment.Metadata>
                                             <Comment.Text>{p.text}</Comment.Text>
                                             <div>{p.tags.map(x => <Label color='blue' key={x.id} disabled={this._getLoading(p.id)}>{x.name}</Label>)}</div>
