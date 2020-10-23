@@ -26,9 +26,10 @@ export class InvitationCard extends React.Component<IProps, IState> {
                         <Header.Subheader>@{invitation.author_username}</Header.Subheader>
                     </Header.Content>
                     <Label>{invitation.conference_short_name}</Label>
+                    {(invitation.is_private) ? <Label title='This invitation is private'>Private</Label> : null}
                 </Header>
                 <p style={{ margin: '10px 0', overflow: 'hidden', textOverflow: 'ellipsis' }}>{invitation.post_text}</p>
-                <div><Checkbox label='Private' checked={invitation.is_private} onChange={(e, d) => this.props.onPrivate(d.checked as boolean)} /></div>
+                {/* <div><Checkbox label='Private' checked={invitation.is_private} onChange={(e, d) => this.props.onPrivate(d.checked as boolean)} /></div> */}
             </div>
         </Segment>;
     }
