@@ -88,26 +88,26 @@ export class Topics extends React.Component<IProps, IState> {
         this._setLoading('list', false);
     }
 
-    _parseSearch(str: string) {
-        const regex = /([a-zA-Z]*):([^ ]*)/gm;
-        let m;
+    // _parseSearch(str: string) {
+    //     const regex = /([a-zA-Z]*):([^ ]*)/gm;
+    //     let m;
 
-        const result: { [key: string]: any, search: string } = { search: str };
+    //     const result: { [key: string]: any, search: string } = { search: str };
 
-        while ((m = regex.exec(str)) !== null) {
-            // This is necessary to avoid infinite loops with zero-width matches
-            if (m.index === regex.lastIndex) {
-                regex.lastIndex++;
-            }
+    //     while ((m = regex.exec(str)) !== null) {
+    //         // This is necessary to avoid infinite loops with zero-width matches
+    //         if (m.index === regex.lastIndex) {
+    //             regex.lastIndex++;
+    //         }
 
-            result.search = result.search.replace(m[0], '');
-            result[m[1]] = m[2];
-        }
+    //         result.search = result.search.replace(m[0], '');
+    //         result[m[1]] = m[2];
+    //     }
 
-        result.search = result.search.trim();
+    //     result.search = result.search.trim();
 
-        return result;
-    }
+    //     return result;
+    // }
 
     _postFilter = (data: PostWithTags) => {
         let isFound = true;
@@ -115,9 +115,9 @@ export class Topics extends React.Component<IProps, IState> {
         const { search, filter } = this.state;
 
         if (search) {
-            const found = data.fullname.indexOf(search) !== -1
-                || data.username.indexOf(search) !== -1
-                || data.text.indexOf(search) !== -1;
+            const found = data.fullname.toLowerCase().indexOf(search.toLowerCase()) !== -1
+                || data.username.toLowerCase().indexOf(search.toLowerCase()) !== -1
+                || data.text.toLowerCase().indexOf(search.toLowerCase()) !== -1;
             isFound = isFound && found;
         }
 

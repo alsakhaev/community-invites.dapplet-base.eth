@@ -95,7 +95,10 @@ export class MyDiscussions extends React.Component<IProps, IState> {
         }
 
         if (search && search.length > 0) {
-            isFound = isFound && Object.values(data).join(';').toLowerCase().indexOf(search.toLowerCase()) !== -1;
+            const found = data.post.fullname.toLowerCase().indexOf(search.toLowerCase()) !== -1
+                || data.post.username.toLowerCase().indexOf(search.toLowerCase()) !== -1
+                || data.post.text.toLowerCase().indexOf(search.toLowerCase()) !== -1;
+            isFound = isFound && found;
         }
 
         return isFound;
@@ -152,7 +155,7 @@ export class MyDiscussions extends React.Component<IProps, IState> {
                                                 return <React.Fragment key={c.id}>
                                                     <b>{c.name}: </b>
                                                     me
-                                                    {public_users.map((u, i) => <React.Fragment><span title={u.fullname}>, @{u.username}</span></React.Fragment>)}
+                                                    {public_users.map((u, i) => <React.Fragment key={i}><span title={u.fullname}>, @{u.username}</span></React.Fragment>)}
                                                     {(private_users.length > 0) ? <React.Fragment> and {private_users.length} private person{(private_users.length > 1 ? 's' : '')}</React.Fragment> : null}
                                                     <br />
                                                 </React.Fragment>
