@@ -1,8 +1,8 @@
 import React from 'react';
-import { HashRouter, Route, Switch, Redirect, NavLink, useHistory, withRouter } from "react-router-dom";
+//import { HashRouter, Route, Switch, Redirect, NavLink, useHistory, withRouter } from "react-router-dom";
 import './App.css';
 import { dappletInstance, Post, Profile, Settings } from '../dappletBus';
-import { Segment, Loader, Tab, Menu, Container } from 'semantic-ui-react';
+import { Segment, Loader, Tab, Menu, Container, Icon } from 'semantic-ui-react';
 import { Conferences } from './Conferences';
 import { Invite } from './Invite';
 import { MyDiscussions } from './MyDiscussions';
@@ -67,56 +67,61 @@ export class App extends React.Component<IProps, IState> {
 
     return (
       <div className="App-container">
-        <HashRouter>
-          <Switch>
-            <React.Fragment>
-              <div style={{ padding: '15px', position: 'fixed', top: '0', left: '0', width: '100%', zIndex: 1000, backgroundColor: '#fff' }}>
-                <Menu pointing secondary>
-                  {s.profile ? <Menu.Item
-                    name='Invite'
-                    active={s.activeIndex === 0}
-                    onClick={() => this.changeTab(0)}
-                  /> : null}
-                  <Menu.Item
-                    name='Conferences'
-                    active={s.activeIndex === 1}
-                    onClick={() => this.changeTab(1)}
-                  />
-                  <Menu.Item
-                    name='Discussions'
-                    active={s.activeIndex === 2}
-                    onClick={() => this.changeTab(2)}
-                  />
-                  <Menu.Item
-                    name='Topics'
-                    active={s.activeIndex === 3}
-                    onClick={() => this.changeTab(3)}
-                  />
-                </Menu>
-              </div>
+        {/* <div style={{ textAlign: 'end'}}>
+          <a href='#' onClick={() => window.open('https://community-invite-dashboard.herokuapp.com', '_blank')}><Icon name='external'/>Dashboard</a>
+        </div> */}
+        <React.Fragment>
+          <div style={{ padding: '15px', position: 'fixed', top: '0', left: '0', width: '100%', zIndex: 1000, backgroundColor: '#fff' }}>
+            <Menu pointing secondary>
+              {s.profile ? <Menu.Item
+                name='Invite'
+                active={s.activeIndex === 0}
+                onClick={() => this.changeTab(0)}
+              /> : null}
+              <Menu.Item
+                name='Conferences'
+                active={s.activeIndex === 1}
+                onClick={() => this.changeTab(1)}
+              />
+              <Menu.Item
+                name='Discussions'
+                active={s.activeIndex === 2}
+                onClick={() => this.changeTab(2)}
+              />
+              <Menu.Item
+                name='Topics'
+                active={s.activeIndex === 3}
+                onClick={() => this.changeTab(3)}
+              />
+              <Menu.Item
+                icon='dashboard'
+                title='Open Dashboard in new tab'
+                style={{ cursor: 'pointer'}}
+                onClick={() => window.open('https://community-invite-dashboard.herokuapp.com', '_blank')}
+              />
+            </Menu>
+          </div>
 
-              <div style={{ margin: '4em 0' }}>
+          <div style={{ margin: '4em 0' }}>
 
-                {s.profile ? <div style={{ display: (s.activeIndex === 0) ? 'block' : 'none', paddingBottom: '10px' }}>
-                  <Invite profile={s.profile} post={s.post} onPostsClick={this.postsClickHandler} settings={s.settings!} key={s.myInvitesKey} />
-                </div> : null}
+            {s.profile ? <div style={{ display: (s.activeIndex === 0) ? 'block' : 'none', paddingBottom: '10px' }}>
+              <Invite profile={s.profile} post={s.post} onPostsClick={this.postsClickHandler} settings={s.settings!} key={s.myInvitesKey} />
+            </div> : null}
 
-                <div style={{ display: (s.activeIndex === 1) ? 'block' : 'none', paddingBottom: '10px' }}>
-                  <Conferences profile={s.profile} post={undefined} onPostsClick={this.postsClickHandler} settings={s.settings!} />
-                </div>
+            <div style={{ display: (s.activeIndex === 1) ? 'block' : 'none', paddingBottom: '10px' }}>
+              <Conferences profile={s.profile} post={undefined} onPostsClick={this.postsClickHandler} settings={s.settings!} />
+            </div>
 
-                <div style={{ display: (s.activeIndex === 2) ? 'block' : 'none', paddingBottom: '10px' }}>
-                  <MyDiscussions profile={s.profile} defaultSearch={s.postsDefaultSearch} settings={s.settings!} key={s.myDiscussionsKey} />
-                </div>
+            <div style={{ display: (s.activeIndex === 2) ? 'block' : 'none', paddingBottom: '10px' }}>
+              <MyDiscussions profile={s.profile} defaultSearch={s.postsDefaultSearch} settings={s.settings!} key={s.myDiscussionsKey} />
+            </div>
 
-                <div style={{ display: (s.activeIndex === 3) ? 'block' : 'none', paddingBottom: '10px' }}>
-                  <Topics profile={s.profile} defaultSearch={s.postsDefaultSearch} settings={s.settings!} key={s.myDiscussionsKey} />
-                </div>
-              </div>
+            <div style={{ display: (s.activeIndex === 3) ? 'block' : 'none', paddingBottom: '10px' }}>
+              <Topics profile={s.profile} defaultSearch={s.postsDefaultSearch} settings={s.settings!} key={s.myDiscussionsKey} />
+            </div>
+          </div>
 
-            </React.Fragment>
-          </Switch>
-        </HashRouter>
+        </React.Fragment>
       </div>
     );
   }
