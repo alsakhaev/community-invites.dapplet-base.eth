@@ -18,12 +18,29 @@ interface IState {
     active2: string | null;
     tags: Tag[];
     showMessage: boolean;
+    filter: string;
 }
 
 const filterOptions = [{
     key: 'all',
     text: 'All',
     value: 'all'
+}, {
+    key: 'not-considered',
+    text: 'Not Considered',
+    value: 'not-considered'
+}, {
+    key: 'last-changed',
+    text: 'Last Changed',
+    value: 'last-changed'
+}, {
+    key: 'accepted',
+    text: 'Accepted',
+    value: 'accepted'
+}, {
+    key: 'rejected',
+    text: 'Rejected',
+    value: 'rejected'
 }];
 
 
@@ -43,7 +60,8 @@ export class Topics extends React.Component<IProps, IState> {
             active1: null,
             active2: null,
             tags: [],
-            showMessage: true
+            showMessage: true,
+            filter: 'not-considered'
         };
     }
 
@@ -94,32 +112,34 @@ export class Topics extends React.Component<IProps, IState> {
     _postFilter = (data: PostWithTags) => {
         let isFound = true;
 
-        const parsed = this._parseSearch(this.state.search);
+        const { search, filter } = this.state;
 
-        const { user, search, conference } = parsed;
+        if (search) {
+            const found = data.fullname.indexOf(search) !== -1
+                || data.username.indexOf(search) !== -1
+                || data.text.indexOf(search) !== -1;
+            isFound = isFound && found;
+        }
 
-        // if (user) {
-        //     for (const conf of data.conferences) {
-        //         if (!!conf.users.find(u => user.toLowerCase() === u.username.toLowerCase())) {
-        //             isFound = isFound && true;
-        //             break;
-        //         }
-        //     }
-        // }
+        switch (filter) {
+            case 'not-considered':
+                isFound = isFound && data.tags.length === 0;
+                break;
 
-        // if (conference) {
-        //     const filteredByConference = data.conferences.find(c => conference.toLowerCase() === c.short_name.toLowerCase());
-        //     if (!user) {
-        //         isFound = isFound && !!filteredByConference;
-        //     } else if (filteredByConference) {
-        //         isFound = isFound && !!filteredByConference.users.find(u => user.toLowerCase() === u.username.toLowerCase())
-        //     } else {
-        //         isFound = isFound && false;
-        //     }
-        // }
+            case 'last-changed':
+                isFound = isFound && data.tags.length > 0;
+                break;
 
-        if (search && search.length > 0) {
-            isFound = isFound && Object.values(data).join(';').toLowerCase().indexOf(search.toLowerCase()) !== -1;
+            case 'accepted':
+                isFound = isFound && !!data.tags.find(x => x.value === true);
+                break;
+
+            case 'rejected':
+                isFound = isFound && !!data.tags.find(x => x.value === false);
+                break;
+
+            default:
+                break;
         }
 
         return isFound;
@@ -167,7 +187,7 @@ export class Topics extends React.Component<IProps, IState> {
                     fluid
                     placeholder='Search...'
                     value={this.state.search}
-                    label={<Select style={{ width: '7em' }} compact options={filterOptions} defaultValue={filterOptions[0].value} onChange={console.log} />}
+                    label={<Select style={{ width: '11em' }} compact options={filterOptions} defaultValue={filterOptions[1].value} onChange={(e, d) => this.setState({ filter: d.value as string })} />}
                     labelPosition='left'
                     onChange={this.inputChangeHandler}
                 />
@@ -176,12 +196,12 @@ export class Topics extends React.Component<IProps, IState> {
                 {this._getLoading('list') ? <Segment>
                     <Loader active inline='centered'>Loading</Loader>
                 </Segment> : <React.Fragment>
-                        {s.showMessage ? <Message 
-                            warning 
-                            style={{ textAlign: 'center' }} 
+                        {s.showMessage ? <Message
+                            warning
+                            style={{ textAlign: 'center' }}
                             onDismiss={() => this.setState({ showMessage: false })}
                             content='Check the rejected topics and add in your conference list necessary ones'
-                        />: null}
+                        /> : null}
                         {filteredPosts.map((p) =>
                             <Segment key={p.id} disabled={this._getLoading(p.id)}>
                                 <Icon link name='close' disabled={this._getLoading(p.id)} title='Reject Topic' style={{ zIndex: 9, position: 'absolute', top: '10px', right: '10px' }} onClick={() => this.untag(p.id, s.tags[0]?.id)} />
@@ -194,12 +214,12 @@ export class Topics extends React.Component<IProps, IState> {
                                             </Comment.Author>
                                             <Comment.Metadata>
                                                 <div>@{p.username}</div>
-                                                {s.tags.filter(x => !p.tags.find(y => y.id === x.id)).map(x => <Label key={x.id} color='blue' as='a' onClick={() => this.tag(p.id, x.id)}>
+                                                {s.tags.filter(x => !p.tags.find(y => y.id === x.id)).map(x => <Label key={x.id} color='blue' as='a' onClick={() => this.tag(p.id, x.id)} title='Add topic to conference'>
                                                     <Icon name='plus' />{x.name}
                                                 </Label>)}
                                             </Comment.Metadata>
                                             <Comment.Text>{p.text}</Comment.Text>
-                                            <div>{p.tags.map(x => <Label color='blue' key={x.id} disabled={this._getLoading(p.id)}>{x.name}</Label>)}</div>
+                                            <div>{p.tags.map(x => <Label color='green' key={x.id} disabled={this._getLoading(p.id)}>{x.name}</Label>)}</div>
                                         </Comment.Content>
                                         {/* <div>
                                             {p.conferences.map(c => <React.Fragment key={c.id}>
@@ -210,6 +230,8 @@ export class Topics extends React.Component<IProps, IState> {
                                 </Comment.Group>
                             </Segment>
                         )}
+
+                        {(filteredPosts.length === 0) ? <Segment>No entries found</Segment> : null}
                     </React.Fragment>}
             </div>
         </div>);

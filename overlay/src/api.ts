@@ -82,7 +82,7 @@ export type PostWithTags = {
     fullname: string;
     img: string;
     text: string;
-    tags: { id: string, name: string }[];
+    tags: { id: string, name: string, value: boolean }[];
 }
 
 export type Tag = {
