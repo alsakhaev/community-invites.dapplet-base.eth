@@ -286,14 +286,8 @@ export async function getAllWithMyTags(namespace: string, username: string): Pro
               	'value', it.value
             )) FILTER (WHERE t.id IS NOT NULL), '[]') as tags
         FROM posts as p 
-        JOIN users as u 
-            on u.namespace = p.namespace
-                and u.username = p.username
-        LEFT JOIN itemtags as it 
-            on it.item_id = p.id 
-                and it.value = true 
-                and it.namespace = $1 
-                and it.username = $2
+        JOIN users as u on u.namespace = p.namespace and u.username = p.username
+        LEFT JOIN itemtags as it on it.item_id = p.id and it.namespace = $1 and it.username = $2
         LEFT JOIN tags as t on t.id = it.tag_id
         WHERE (
             SELECT COUNT(*)
