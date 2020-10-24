@@ -229,6 +229,7 @@ export async function getPostsWithInvitations(namespace: string, username: strin
                                 join conferences as cc on cc.id = ii.conference_id
                                 WHERE cc.date_to >= DATE(NOW() - INTERVAL '3 DAY')
                                     and ii.post_id = p.id
+                                    and cc.id = c.id
                                     --and ((ii.namespace_from = $1 and ii.username_from = $2)
                                     --    or (ii.namespace_to = $1 and ii.username_to = $2))
                             )
@@ -244,6 +245,7 @@ export async function getPostsWithInvitations(namespace: string, username: strin
                                 join conferences as ccc on ccc.id = iii.conference_id
                                 WHERE ccc.date_to >= DATE(NOW() - INTERVAL '3 DAY')
                                     and iii.post_id = p.id
+                                    and ccc.id = c.id
                                     --and ((iii.namespace_from = $1 and iii.username_from = $2)
                                     --    or (iii.namespace_to = $1 and iii.username_to = $2))
                             )
