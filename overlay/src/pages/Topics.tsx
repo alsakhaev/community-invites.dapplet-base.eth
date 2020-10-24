@@ -1,5 +1,5 @@
 import React from 'react';
-import { Accordion, Icon, Segment, Comment, Input, InputOnChangeData, Loader, Divider, Label, Select, Message } from 'semantic-ui-react';
+import { Accordion, Icon, Segment, Comment, Input, InputOnChangeData, Loader, Divider, Label, Select, Message, Dropdown } from 'semantic-ui-react';
 import { Api, DetailedPost, PostWithInvitations, PostWithTags, Tag } from '../api';
 import { Profile, Settings } from '../dappletBus';
 import { groupBy } from '../helpers';
@@ -204,7 +204,6 @@ export class Topics extends React.Component<IProps, IState> {
                         /> : null}
                         {filteredPosts.map((p) =>
                             <Segment key={p.id} disabled={this._getLoading(p.id)}>
-                                <Icon link name='close' disabled={this._getLoading(p.id)} title='Reject Topic' style={{ zIndex: 9, position: 'absolute', top: '10px', right: '10px' }} onClick={() => this.untag(p.id, s.tags[0]?.id)} />
                                 <Comment.Group minimal style={{ margin: 0 }}>
                                     <Comment >
                                         <Comment.Avatar style={{ margin: 0 }} src={p.img} />
@@ -214,18 +213,21 @@ export class Topics extends React.Component<IProps, IState> {
                                             </Comment.Author>
                                             <Comment.Metadata>
                                                 <div>@{p.username}</div>
-                                                {s.tags.filter(x => !p.tags.find(y => y.id === x.id)).map(x => <Label key={x.id} color='blue' as='a' onClick={() => this.tag(p.id, x.id)} title='Add topic to conference'>
-                                                    <Icon name='plus' />{x.name}
-                                                </Label>)}
                                             </Comment.Metadata>
                                             <Comment.Text>{p.text}</Comment.Text>
-                                            <div>{p.tags.map(x => <Label color='green' key={x.id} disabled={this._getLoading(p.id)}>{x.name}</Label>)}</div>
+                                            <div>
+                                                {p.tags.filter(x => x.value === true).map(x => <Label style={{ marginTop: '.14285714em' }} color='green' key={x.id} disabled={this._getLoading(p.id)}>{x.name}<Icon name='delete' disabled={this._getLoading(p.id)} link onClick={() => this.untag(p.id, x.id)} /></Label>)}
+                                                {(s.tags.filter(x => !p.tags.find(y => y.id === x.id && y.value === true)).length > 0) ? <Dropdown
+                                                    trigger={<Label style={{ marginTop: '.14285714em' }} color='blue' disabled={this._getLoading(p.id)}><Icon name='plus' /> Add conference</Label>}
+                                                    pointing='top right'
+                                                    icon={null}
+                                                >
+                                                    <Dropdown.Menu>
+                                                        {s.tags.filter(x => !p.tags.find(y => y.id === x.id && y.value === true)).map(x => <Dropdown.Item key={x.id} onClick={() => this.tag(p.id, x.id)}>{x.name}</Dropdown.Item>)}
+                                                    </Dropdown.Menu>
+                                                </Dropdown> : null}
+                                            </div>
                                         </Comment.Content>
-                                        {/* <div>
-                                            {p.conferences.map(c => <React.Fragment key={c.id}>
-                                                <b>{c.name}:</b> {c.users.filter(u => !(u.username === this.props.profile?.username && u.namespace === this.props.profile?.namespace)).map(u => `@${u.username}`).join(', ')} <br />
-                                            </React.Fragment>)}
-                                        </div> */}
                                     </Comment>
                                 </Comment.Group>
                             </Segment>
