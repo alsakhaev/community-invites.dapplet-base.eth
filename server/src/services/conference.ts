@@ -86,12 +86,20 @@ export async function absend(user: Profile, conferenceId: number): Promise<void>
             await userService.createUser(user);
         }
 
-        const values = [user.namespace, user.username, conferenceId];
-        const query = `DELETE FROM attendance WHERE 
+        const values1 = [user.namespace, user.username, conferenceId];
+        const query1 = `DELETE FROM attendance WHERE 
             namespace = $1
             and username = $2
             and conference_id = $3`;
 
-        await client.query(query, values);
+        await client.query(query1, values1);
+
+        const values2 = [user.namespace, user.username, conferenceId];
+        const query2 = `DELETE FROM invitations WHERE 
+            namespace_from = $1
+            and username_from = $2
+            and conference_id = $3`;
+
+        await client.query(query2, values2);
     });
 }
