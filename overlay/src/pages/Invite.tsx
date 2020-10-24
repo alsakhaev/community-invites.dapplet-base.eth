@@ -26,7 +26,7 @@ interface IProps {
 interface IState {
   isNewInviteOpened: boolean;
   invited: boolean;
-  data: MyInvitation[];
+  data: (MyInvitation & { loading: boolean })[];
   loading: boolean;
   currentTab: Tabs;
   highlightedInvitationId: number;
@@ -49,19 +49,19 @@ export class Invite extends React.Component<IProps, IState> {
   }
 
   async componentDidMount() {
-    await this.loadData();
+    await this.loadData(true);
   }
 
-  async loadData() {
+  async loadData(firstLoading: boolean = false) {
     const p = this.props;
     const s = this.state;
 
     this.setState({ loading: true });
-    
-    const data = await this._api.getMyInvitations(this.props.profile.namespace, this.props.profile.username);
-    const invitation = p.post ? data.find(x => x.post_id === p.post!.id) : null;
 
-    this.setState({ data, loading: false, currentTab: (!p.post || !!invitation) ? Tabs.AllInvites : Tabs.NewInvite, highlightedInvitationId: invitation?.id ?? -1 });
+    const data = await this._api.getMyInvitations(this.props.profile.namespace, this.props.profile.username);
+    // const invitation = p.post ? data.find(x => x.post_id === p.post!.id) : null;
+
+    this.setState({ data: data.map(x => ({ ...x, loading: false })), loading: false, currentTab: (!p.post || !firstLoading) ? Tabs.AllInvites : Tabs.NewInvite });
   }
 
   async setInvited() {
@@ -70,7 +70,10 @@ export class Invite extends React.Component<IProps, IState> {
   }
 
   async withdraw(invitation: MyInvitation) {
-    this.setState({ data: this.state.data.filter(x => x !== invitation) });
+    const data = this.state.data;
+    data.find(x => x === invitation)!.loading = true;
+    this.setState({ data });
+
     const profileTo = {
       username: invitation.author_username.toLowerCase(),
       fullname: invitation.author_fullname,
@@ -85,6 +88,14 @@ export class Invite extends React.Component<IProps, IState> {
       text: invitation.post_text
     }
     await this._api.withdraw(this.props.profile!, profileTo, invitation.conference_id, post);
+
+    this.setState({ data: this.state.data.filter(x => x !== invitation) });
+  }
+
+  async onInvitedHandler(invId: number) {
+    this.setState({ currentTab: Tabs.AllInvites, highlightedInvitationId: invId });
+    await this.loadData();
+    setTimeout(() => this.setState({ highlightedInvitationId: -1 }), 3000);
   }
 
   render() {
@@ -115,7 +126,7 @@ export class Invite extends React.Component<IProps, IState> {
       </Breadcrumb>
 
       {(s.currentTab === Tabs.AllInvites) ? <AllInvites highlightedInvitationId={s.highlightedInvitationId} loading={s.loading} settings={p.settings} profile={p.profile} data={s.data} onWithdraw={(x) => this.withdraw(x)} /> : null}
-      {(s.currentTab === Tabs.NewInvite) ? <NewInvite loading={s.loading} settings={p.settings} profile={p.profile} post={p.post!} onInvited={() => (this.setState({ currentTab: Tabs.AllInvites }), this.loadData())} onCancel={() => this.setState({ currentTab: Tabs.AllInvites })} /> : null}
+      {(s.currentTab === Tabs.NewInvite) ? <NewInvite loading={s.loading} settings={p.settings} profile={p.profile} post={p.post!} onInvited={(invId) => this.onInvitedHandler(invId)} onCancel={() => this.setState({ currentTab: Tabs.AllInvites })} /> : null}
 
     </React.Fragment>
   }

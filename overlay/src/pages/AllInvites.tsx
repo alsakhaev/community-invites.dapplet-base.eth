@@ -12,8 +12,8 @@ interface IProps {
     // post?: Post;
     profile: Profile;
     settings: Settings;
-    data: MyInvitation[];
-    onWithdraw: (x: MyInvitation)=> void;
+    data: (MyInvitation & { loading: boolean })[];
+    onWithdraw: (x: MyInvitation) => void;
     loading: boolean;
     highlightedInvitationId: number;
 }
@@ -31,9 +31,10 @@ export class AllInvites extends React.Component<IProps, IState> {
 
         this._api = new Api(this.props.settings.serverUrl);
         this.state = {
+            loading: {}
         }
     }
-    
+
     render() {
         if (this.props.loading) return <Placeholder>
             <Placeholder.Line />
@@ -54,7 +55,7 @@ export class AllInvites extends React.Component<IProps, IState> {
                     highlight={x.id === this.props.highlightedInvitationId}
                     invitation={x}
                     onClose={() => this.props.onWithdraw(x)}
-                    onPrivate={console.log}
+                    disabled={x.loading}
                 />
             )}
         </React.Fragment>

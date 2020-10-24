@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Divider, Accordion, Icon, Container, Grid, Loader, Dropdown, Segment, Checkbox, Placeholder, Popup } from 'semantic-ui-react';
+import { Button, Divider, Accordion, Icon, Container, Grid, Loader, Dropdown, Segment, Checkbox, Placeholder, Popup, Message, Label } from 'semantic-ui-react';
 import { Post, Profile, Settings } from '../dappletBus';
 import { PostCard } from '../components/PostCard';
 import { Api, Conference, ConferenceWithInvitations } from '../api';
@@ -11,7 +11,7 @@ interface IProps {
     post: Post;
     profile: Profile;
     settings: Settings;
-    onInvited: () => void;
+    onInvited: (id: number) => void;
     loading: boolean;
     onCancel: () => void;
 }
@@ -23,6 +23,7 @@ interface IState {
     loading: boolean;
     isInvitingLoading: boolean;
     isPrivate: boolean;
+    error: string | null;
 }
 
 export class NewInvite extends React.Component<IProps, IState> {
@@ -45,8 +46,17 @@ export class NewInvite extends React.Component<IProps, IState> {
             selectedConferenceId: -1,
             loading: true,
             isInvitingLoading: false,
-            isPrivate: false
+            isPrivate: false,
+            error: null
         }
+    }
+
+    setState<K extends keyof IState>(
+        state: ((prevState: Readonly<IState>, props: Readonly<IProps>) => (Pick<IState, K> | IState | null)) | (Pick<IState, K> | IState | null),
+        callback?: () => void
+    ): void {
+        if ((state as IState).error === undefined) (state as IState).error = null;
+        super.setState(state, callback);
     }
 
     async componentDidMount() {
@@ -70,12 +80,11 @@ export class NewInvite extends React.Component<IProps, IState> {
             if (!this.state.data.find((d) => d.conference.id === conferenceId)!.attendance_from) {
                 await this._api.attend(this.props.profile, conferenceId);
             }
-            await this._api.invite(this.props.profile, this.state.profileTo, conferenceId, this.props.post, this.state.isPrivate);
-            this.props.onInvited();
-        } catch (err) {
-            console.error(err);
-        } finally {
+            const { id } = await this._api.invite(this.props.profile, this.state.profileTo, conferenceId, this.props.post, this.state.isPrivate);
+            this.props.onInvited(id);
             this.setState({ isInvitingLoading: false });
+        } catch (err) {
+            this.setState({ error: err.message, isInvitingLoading: false });
         }
     }
 
@@ -118,11 +127,14 @@ export class NewInvite extends React.Component<IProps, IState> {
                     Don't make invite private for no reason
                 </p>
 
+                {s.error ? <div style={{ textAlign: 'end', marginBottom: '10px' }}><Label basic color='red'>{s.error}</Label></div> : null}
+
                 <div style={{ textAlign: 'end' }}>
                     <Checkbox style={{ margin: '0 20px 0 0' }} label='Private' disabled={s.isInvitingLoading} checked={s.isPrivate} onChange={(e, d) => this.setState({ isPrivate: d.checked as boolean })} />
                     <Button primary onClick={() => this.invite()} loading={s.isInvitingLoading} disabled={s.isInvitingLoading}>Invite</Button>
                     <Button onClick={() => this.props.onCancel()} disabled={s.isInvitingLoading}>Cancel</Button>
                 </div>
+
             </React.Fragment> : <Placeholder>
                     <Placeholder.Line />
                     <Placeholder.Line />

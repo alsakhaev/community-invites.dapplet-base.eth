@@ -11,8 +11,8 @@ export const getMyInvitations = asyncHandler(async function (req: any, res: any)
 export const invite = asyncHandler(async function (req: any, res: any) {
     const json = req.body;
     if (!json.userFrom || !json.userTo || !json.conferenceId || !json.post || json.is_private === undefined) throw Error('userFrom, userTo, conferenceId, post, is_private are required');
-    await invitationService.invite(json.userFrom, json.userTo, json.conferenceId, json.post, json.is_private);
-    return res.json({ success: true });
+    const id = await invitationService.invite(json.userFrom, json.userTo, json.conferenceId, json.post, json.is_private);
+    return res.json({ success: true, data: { id } });
 })
 
 export const withdraw = asyncHandler(async function (req: any, res: any) {

@@ -55,7 +55,7 @@ export async function getInvitations(namespace: string, username: string): Promi
 }
 
 
-export async function invite(userFrom: Profile, userTo: Profile, conferenceId: number, post: Post, is_private: boolean): Promise<void> {
+export async function invite(userFrom: Profile, userTo: Profile, conferenceId: number, post: Post, is_private: boolean): Promise<number> {
     return execute(async (client) => {
         if (!await userService.getUser(userFrom.namespace, userFrom.username)) {
             await userService.createUser(userFrom);
@@ -90,9 +90,10 @@ export async function invite(userFrom: Profile, userTo: Profile, conferenceId: n
         const values = [userFrom.namespace, userTo.namespace, userFrom.username, userTo.username, conferenceId, post.id, is_private, new Date().toISOString(), new Date().toISOString()]
         const query = `INSERT INTO invitations(
             id, namespace_from, namespace_to, username_from, username_to, conference_id, post_id, is_private, created, modified
-        ) VALUES (DEFAULT, $1, $2, $3, $4, $5, $6, $7, $8, $9);`;
+        ) VALUES (DEFAULT, $1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *;`;
 
-        await client.query(query, values);
+        const result = await client.query(query, values);
+        return result.rows[0].id;
     });
 }
 
