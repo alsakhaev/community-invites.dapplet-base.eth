@@ -1,8 +1,7 @@
 import React from 'react';
-import { Accordion, Icon, Segment, Comment, Input, InputOnChangeData, Loader, Divider, Label, Select, Message, Dropdown } from 'semantic-ui-react';
-import { Api, DetailedPost, PostWithInvitations, PostWithTags, Tag } from '../api';
+import { Icon, Segment, Comment, Input, InputOnChangeData, Loader, Label, Select, Message, Dropdown } from 'semantic-ui-react';
+import { Api, PostWithTags, Tag } from '../api';
 import { Profile, Settings } from '../dappletBus';
-import { groupBy } from '../helpers';
 
 interface IProps {
     defaultSearch: string;
@@ -65,16 +64,6 @@ export class Topics extends React.Component<IProps, IState> {
         };
     }
 
-    // setState<K extends keyof IState>(
-    //     state: ((prevState: Readonly<IState>, props: Readonly<IProps>) => (Pick<IState, K> | IState | null)) | (Pick<IState, K> | IState | null),
-    //     callback?: () => void
-    // ): void {
-    //     super.setState(state, callback);
-    //     if ((state as any)?.showMessage !== undefined) {
-    //         localStorage.setItem('showMessage', JSON.stringify((state as any).showMessage));
-    //     }
-    // }
-
     async componentDidMount() {
         const { profile } = this.props;
         if (profile) {
@@ -87,27 +76,6 @@ export class Topics extends React.Component<IProps, IState> {
 
         this._setLoading('list', false);
     }
-
-    // _parseSearch(str: string) {
-    //     const regex = /([a-zA-Z]*):([^ ]*)/gm;
-    //     let m;
-
-    //     const result: { [key: string]: any, search: string } = { search: str };
-
-    //     while ((m = regex.exec(str)) !== null) {
-    //         // This is necessary to avoid infinite loops with zero-width matches
-    //         if (m.index === regex.lastIndex) {
-    //             regex.lastIndex++;
-    //         }
-
-    //         result.search = result.search.replace(m[0], '');
-    //         result[m[1]] = m[2];
-    //     }
-
-    //     result.search = result.search.trim();
-
-    //     return result;
-    // }
 
     _postFilter = (data: PostWithTags) => {
         let isFound = true;

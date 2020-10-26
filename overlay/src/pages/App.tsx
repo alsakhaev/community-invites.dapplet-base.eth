@@ -1,8 +1,7 @@
 import React from 'react';
-//import { HashRouter, Route, Switch, Redirect, NavLink, useHistory, withRouter } from "react-router-dom";
 import './App.css';
 import { dappletInstance, Post, Profile, Settings } from '../dappletBus';
-import { Segment, Loader, Tab, Menu, Container, Icon } from 'semantic-ui-react';
+import { Segment, Loader, Menu } from 'semantic-ui-react';
 import { Conferences } from './Conferences';
 import { Invite } from './Invite';
 import { MyDiscussions } from './MyDiscussions';
@@ -25,14 +24,11 @@ interface IState {
 
 export class App extends React.Component<IProps, IState> {
 
-  private _api?: Api;
-
   constructor(props: IProps) {
     super(props);
     this.state = { post: undefined, profile: undefined, settings: undefined, activeIndex: -1, postsDefaultSearch: '', myDiscussionsKey: 0, myInvitesKey: 0 };
 
     dappletInstance.onData(async ({ post, profile, settings }) => {
-      this._api = new Api(settings.serverUrl);
       this.setState({ post, profile, settings, activeIndex: profile ? 0 : 1, myInvitesKey: Math.random() });
     });
   }
@@ -67,9 +63,6 @@ export class App extends React.Component<IProps, IState> {
 
     return (
       <div className="App-container">
-        {/* <div style={{ textAlign: 'end'}}>
-          <a href='#' onClick={() => window.open('https://community-invite-dashboard.herokuapp.com', '_blank')}><Icon name='external'/>Dashboard</a>
-        </div> */}
         <React.Fragment>
           <div style={{ padding: '15px', position: 'fixed', top: '0', left: '0', width: '100%', zIndex: 1000, backgroundColor: '#fff' }}>
             <Menu pointing secondary>

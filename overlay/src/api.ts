@@ -139,31 +139,6 @@ export class Api {
         return this._sendRequest('/conferences/absend', 'POST', { user, conferenceId });
     }
 
-    // async getUser(namespace: string, username: string): Promise<Profile> {
-    //     return await this._sendRequest(`/users/${namespace}/${username}`);
-    // }
-
-    // async updateUser(user: Profile): Promise<Profile> {
-    //     return await this._sendRequest(`/users`, 'PUT', user);
-    // }
-
-    // async createUser(user: Profile): Promise<Profile> {
-    //     return await this._sendRequest(`/users`, 'POST', user);
-    // }
-
-    // async getPosts(namespace: string, username: string): Promise<Post[]> {
-    //     const data = await this._sendRequest(`/posts?namespace=${namespace}&username=${username}`);
-
-    //     return data.map((x: any) => ({
-    //         id: x.id,
-    //         text: x.text,
-    //         authorNamespace: x.namespace,
-    //         authorUsername: x.username,
-    //         authorFullname: x.fullname,
-    //         authorImg: x.img
-    //      }));
-    // }
-
     async getMyDetailedPosts(namespace: string, username: string): Promise<DetailedPost[]> {
         const data = await this._sendRequest(`/posts/details?namespace=${namespace}&username=${username}`);
         return data.map((x: any) => ({

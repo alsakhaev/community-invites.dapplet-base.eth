@@ -1,15 +1,10 @@
 import React from 'react';
-import { Button, Divider, Accordion, Icon, Container, Grid, Loader, Dropdown, Segment, Checkbox, Placeholder } from 'semantic-ui-react';
-import { Post, Profile, Settings } from '../dappletBus';
-import { PostCard } from '../components/PostCard';
-import { Api, Conference, ConferenceWithInvitations, MyInvitation } from '../api';
-import { ProfileCard } from '../components/ProfileCard'
-import { HoverButton } from '../components/HoverButton';
-import Linkify from 'react-linkify';
+import { Segment, Placeholder } from 'semantic-ui-react';
+import { Profile, Settings } from '../dappletBus';
+import { Api, MyInvitation } from '../api';
 import { InvitationCard } from '../components/InvitationCard';
 
 interface IProps {
-    // post?: Post;
     profile: Profile;
     settings: Settings;
     data: (MyInvitation & { loading: boolean })[];
@@ -19,8 +14,7 @@ interface IProps {
 }
 
 interface IState {
-    // loading: boolean;
-    // data: MyInvitation[];
+    
 }
 
 export class AllInvites extends React.Component<IProps, IState> {

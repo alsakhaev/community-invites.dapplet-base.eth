@@ -1,14 +1,11 @@
 import React from 'react';
-import { Button, Divider, Accordion, Icon, Container, Grid, Loader, Dropdown, Modal, Header } from 'semantic-ui-react';
-import { Post, Profile, Settings } from '../dappletBus';
-import { PostCard } from '../components/PostCard';
+import { Button, Accordion, Icon, Container, Grid, Loader, Modal, Header } from 'semantic-ui-react';
+import { Profile, Settings } from '../dappletBus';
 import { Api, Conference, ConferenceWithInvitations } from '../api';
 import { ProfileCard } from '../components/ProfileCard'
-import { HoverButton } from '../components/HoverButton';
 import Linkify from 'react-linkify';
 
 interface IProps {
-  //post?: Post;
   profile?: Profile;
   settings: Settings;
   onPostsClick: (conferenceShortName: string, username: string) => void;
@@ -20,7 +17,6 @@ interface IState {
   attended: number[];
   invited: number[];
   loading: { [key: string]: boolean };
-  //profileTo: Profile | undefined;
   selectedConference: number | null;
   absending: number | null;
 }
@@ -40,12 +36,6 @@ export class Conferences extends React.Component<IProps, IState> {
       loading: {
         'list': true
       },
-      // profileTo: this.props.post ? {
-      //   username: this.props.post!.authorUsername.toLowerCase(),
-      //   fullname: this.props.post!.authorFullname,
-      //   img: this.props.post!.authorImg,
-      //   namespace: 'twitter.com'
-      // } : undefined,
       selectedConference: null,
       absending: null
     }
@@ -79,18 +69,6 @@ export class Conferences extends React.Component<IProps, IState> {
     this.setState({ selectedConference: index });
     try {
       if (this.state.data.find((d) => d.conference.id === index)!.attendance_from) {
-
-        // // ToDo: move to backend?
-        // if (this.state.data.find((d) => d.conference.id === index)!.invitations.find(x => (
-        //   x.from.username === this.props.profile?.username
-        //   && x.from.namespace === this.props.profile?.namespace
-        //   && x.to.username === this.state.profileTo?.username
-        //   && x.to.namespace === this.state.profileTo?.namespace
-        //   && x.post_id === this.props.post?.id
-        // ))) {
-        //   await this._api.withdraw(this.props.profile!, this.state.profileTo!, index, this.props.post!);
-        // }
-
         await this._api.absend(this.props.profile!, index);
       } else {
         await this._api.attend(this.props.profile!, index);
@@ -105,38 +83,6 @@ export class Conferences extends React.Component<IProps, IState> {
     }
   }
 
-  // inviteButtonClickHandler = async (e: any, titleProps: any) => {
-  //   e.stopPropagation();
-
-  //   const { index } = titleProps;
-  //   this._setLoading('invite-' + index, true);
-  //   this.setState({ selectedConference: index });
-  //   try {
-  //     // ToDo: move to backend?
-  //     if (this.state.data.find((d) => d.conference.id === index)!.invitations.find(x => (
-  //       x.from.username === this.props.profile?.username
-  //       && x.from.namespace === this.props.profile?.namespace
-  //       && x.to.username === this.state.profileTo?.username
-  //       && x.to.namespace === this.state.profileTo?.namespace
-  //       && x.post_id === this.props.post?.id
-  //     ))) {
-  //       await this._api.withdraw(this.props.profile!, this.state.profileTo!, index, this.props.post!);
-  //     } else {
-  //       if (!this.state.data.find((d) => d.conference.id === index)!.attendance_from) {
-  //         await this._api.attend(this.props.profile!, index);
-  //       }
-  //       await this._api.invite(this.props.profile!, this.state.profileTo!, index, this.props.post!);
-  //     }
-
-  //     await this._loadConferences();
-  //   } catch (err) {
-  //     console.error(err);
-  //   } finally {
-  //     this._setLoading('invite-' + index, false);
-  //     setTimeout(() => this.setState({ selectedConference: null }), 2000);
-  //   }
-  // }
-
   _setLoading(key: string, value: boolean) {
     const loading = this.state.loading;
     loading[key] = value;
@@ -149,18 +95,7 @@ export class Conferences extends React.Component<IProps, IState> {
 
   renderAccordion = (data: ConferenceWithInvitations[], header: any, key: string) => {
     if (data.length === 0) return null;
-    const { profile } = this.props;
     const { activeIndex } = this.state;
-
-    // const isInvited = (c: Conference) => {
-    //   return this.state.data.find((d) => d.conference.id === c.id)!.invitations.find(x => (
-    //     x.from.username === this.props.profile?.username
-    //     && x.from.namespace === this.props.profile?.namespace
-    //     && x.to.username === this.state.profileTo?.username
-    //     && x.to.namespace === this.state.profileTo?.namespace
-    //     && x.post_id === this.props.post?.id
-    //   ))
-    // }
 
     const isAttended = (c: Conference) => {
       return this.state.data.find(d => d.conference.id === c.id)!.attendance_from;
@@ -174,18 +109,6 @@ export class Conferences extends React.Component<IProps, IState> {
             <Icon name='dropdown' style={{ position: 'relative', top: '8px' }} />
             <div style={{ margin: '0 auto 0 0', maxWidth: '250px', padding: '7px 0 0 0', lineHeight: '1.4em' }}>{c.name}</div>
 
-            {/* {(post && post.authorUsername !== profile?.username) ?
-              <HoverButton
-                style={{ width: '75px', paddingLeft: '0', paddingRight: '0', height: '30px' }}
-                loading={this._getLoading('invite-' + c.id)}
-                disabled={this._getLoading('invite-' + c.id)}
-                color={isInvited(c) ? 'green' : 'blue'}
-                hoverColor={isInvited(c) ? 'red' : 'blue'}
-                hoverText={isInvited(c) ? 'Withdraw' : 'Invite'}
-                index={c.id}
-                size='mini'
-                onClick={this.inviteButtonClickHandler}
-              >{isInvited(c) ? 'Invited' : 'Invite'}</HoverButton> : null} */}
             {isAttended(c) ? (
               (this.state.data.find(x => x.conference.id === c.id)!.invitations.filter(x => x.from.username === this.props.profile?.username && x.from.namespace === this.props.profile?.namespace).length > 0) ? <Modal
                 closeIcon
@@ -199,7 +122,6 @@ export class Conferences extends React.Component<IProps, IState> {
                     disabled={this._getLoading('attend-' + c.id)}
                     color='green'
                     size='mini'
-                  // basic={!!this.props.post}
                   >Attending</Button>
                 }
                 onClose={() => this.setState({ absending: null })}
@@ -229,7 +151,6 @@ export class Conferences extends React.Component<IProps, IState> {
                 color='green'
                 size='mini'
                 onClick={this.attendButtonClickHandler}
-              // basic={!!this.props.post}
               >Attending</Button>
 
             ) : <Button
@@ -241,7 +162,6 @@ export class Conferences extends React.Component<IProps, IState> {
               color='blue'
               size='mini'
               onClick={this.attendButtonClickHandler}
-            // basic={!!this.props.post}
             >Attend</Button>}
 
 
@@ -322,29 +242,9 @@ export class Conferences extends React.Component<IProps, IState> {
       </Container>;
     }
 
-    const badgeOptions = [
-      { key: null, value: null, text: 'No label' },
-      ...this.state.data.filter(d => d.attendance_from === true).map(d => ({ key: d.conference.id, value: d.conference.id, text: d.conference.short_name }))
-    ];
-
     return (
       <div>
         <ProfileCard card profile={this.props.profile} />
-
-        {/* {(this.props.post && this.props.post.authorUsername !== this.props.profile.username) ? <React.Fragment>
-          <Divider horizontal>Invites for discussion</Divider>
-          <PostCard post={this.props.post} card />
-        </React.Fragment> : null} */}
-        {/* {(this.props.post && this.props.post.authorUsername !== this.props.profile.username) ? <React.Fragment>
-          {!this._getLoading('list') ? <React.Fragment>
-            {this.renderAccordion(this.state.data.filter(c => c.attendance_to === true), <Container text style={{ textAlign: 'center', marginBottom: 5 }}>at conferences HE/SHE visits</Container>, 'heshe')}
-
-            {this.renderAccordion(this.state.data.filter(c => c.attendance_from === true), <Container text style={{ textAlign: 'center', marginTop: 10, marginBottom: 5 }}>at conferences YOU visit</Container>, 'my')}
-
-            {this.renderAccordion(this.state.data.filter(c => c.attendance_from === false && c.attendance_to === false), <Container text style={{ textAlign: 'center', marginTop: 10, marginBottom: 5 }}>or any other conferences</Container>, 'other')}
-          </React.Fragment> : <Loader active inline='centered'>Loading</Loader>} */}
-
-        {/* </React.Fragment> :  */}
         {(!this._getLoading('list') ? this.renderAccordion(this.state.data, null, 'all') : <Loader active inline='centered'>Loading</Loader>)}
       </div>
     );

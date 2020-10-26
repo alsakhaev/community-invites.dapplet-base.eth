@@ -1,8 +1,7 @@
 import React from 'react';
-import { Accordion, Icon, Segment, Comment, Input, InputOnChangeData, Loader, Divider } from 'semantic-ui-react';
-import { Api, DetailedPost, PostWithInvitations } from '../api';
+import { Segment, Comment, Input, InputOnChangeData, Loader } from 'semantic-ui-react';
+import { Api, PostWithInvitations } from '../api';
 import { Profile, Settings } from '../dappletBus';
-import { groupBy } from '../helpers';
 
 interface IProps {
     defaultSearch: string;
@@ -119,7 +118,6 @@ export class MyDiscussions extends React.Component<IProps, IState> {
     }
 
     render() {
-        //const { active1, active2 } = this.state;
         const filteredPosts = this.state.posts.filter(this._postFilter);
 
         return (<div>

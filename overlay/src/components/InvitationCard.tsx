@@ -1,7 +1,5 @@
 import React from 'react';
-import { Link } from "react-router-dom";
-import { Button, Divider, Card, Accordion, Icon, Segment, Image, Comment, Label, Checkbox, Header } from 'semantic-ui-react';
-import { Post } from '../dappletBus';
+import { Icon, Segment, Image, Label, Header } from 'semantic-ui-react';
 import { MyInvitation } from '../api';
 
 interface IProps {

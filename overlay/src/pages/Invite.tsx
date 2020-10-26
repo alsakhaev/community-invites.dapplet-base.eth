@@ -1,11 +1,7 @@
 import React from 'react';
-import { Button, Divider, Accordion, Icon, Container, Grid, Loader, Dropdown, Segment, Checkbox, Placeholder, Breadcrumb } from 'semantic-ui-react';
+import { Placeholder, Breadcrumb } from 'semantic-ui-react';
 import { Post, Profile, Settings } from '../dappletBus';
-import { PostCard } from '../components/PostCard';
-import { Api, Conference, ConferenceWithInvitations, MyInvitation } from '../api';
-import { ProfileCard } from '../components/ProfileCard'
-import { HoverButton } from '../components/HoverButton';
-import Linkify from 'react-linkify';
+import { Api, MyInvitation } from '../api';
 import { AllInvites } from './AllInvites';
 import { NewInvite } from './NewInvite';
 
@@ -54,12 +50,10 @@ export class Invite extends React.Component<IProps, IState> {
 
   async loadData(firstLoading: boolean = false) {
     const p = this.props;
-    const s = this.state;
 
     this.setState({ loading: true });
 
     const data = await this._api.getMyInvitations(this.props.profile.namespace, this.props.profile.username);
-    // const invitation = p.post ? data.find(x => x.post_id === p.post!.id) : null;
 
     this.setState({ data: data.map(x => ({ ...x, loading: false })), loading: false, currentTab: (!p.post || !firstLoading) ? Tabs.AllInvites : Tabs.NewInvite });
   }
