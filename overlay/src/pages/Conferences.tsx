@@ -186,40 +186,53 @@ export class Conferences extends React.Component<IProps, IState> {
                 size='mini'
                 onClick={this.inviteButtonClickHandler}
               >{isInvited(c) ? 'Invited' : 'Invite'}</HoverButton> : null} */}
-            {isAttended(c) ? <Modal
-              closeIcon
-              open={this.state.absending !== null}
-              trigger={
-                <Button
-                  basic
-                  index={c.id}
-                  style={{ width: '75px', paddingLeft: '0', paddingRight: '0', height: '30px' }}
-                  loading={this._getLoading('attend-' + c.id)}
-                  disabled={this._getLoading('attend-' + c.id)}
-                  color='green'
-                  size='mini'
-                // basic={!!this.props.post}
-                >Attending</Button>
-              }
-              onClose={() => this.setState({ absending: null })}
-              onOpen={() => this.setState({ absending: c.id })}
-              dimmer='inverted'
-            >
-              <Header content='Conference Absend' />
-              <Modal.Content>
-                <p>
-                Are not you going to attend the conference any more?<br/>All your invitations to this conference will be revoked.
-                </p>
-              </Modal.Content>
-              <Modal.Actions>
-                <Button color='red' onClick={() => this.setState({ absending: null })}>
-                  <Icon name='remove' /> No
+            {isAttended(c) ? (
+              (this.state.data.find(x => x.conference.id === c.id)!.invitations.filter(x => x.from.username === this.props.profile?.username && x.from.namespace === this.props.profile?.namespace).length > 0) ? <Modal
+                closeIcon
+                open={this.state.absending !== null}
+                trigger={
+                  <Button
+                    basic
+                    index={c.id}
+                    style={{ width: '75px', paddingLeft: '0', paddingRight: '0', height: '30px' }}
+                    loading={this._getLoading('attend-' + c.id)}
+                    disabled={this._getLoading('attend-' + c.id)}
+                    color='green'
+                    size='mini'
+                  // basic={!!this.props.post}
+                  >Attending</Button>
+                }
+                onClose={() => this.setState({ absending: null })}
+                onOpen={() => this.setState({ absending: c.id })}
+                dimmer='inverted'
+              >
+                <Header content='Cancel your Attendance?' />
+                <Modal.Content>
+                  <p>
+                    All you not going to attend the conference any more?<br />All of your {this.state.absending && this.state.data.find(x => x.conference.id === this.state.absending)!.invitations.filter(x => x.from.username === this.props.profile?.username && x.from.namespace === this.props.profile?.namespace).length} invites to this conference will be revoked.
+                  </p>
+                </Modal.Content>
+                <Modal.Actions>
+                  <Button color='red' onClick={() => this.setState({ absending: null })}>
+                    <Icon name='remove' /> No
                 </Button>
-                <Button color='green' onClick={() => this.attendButtonClickHandler(null, { index: this.state.absending })}>
-                  <Icon name='checkmark' /> Yes
+                  <Button color='green' onClick={() => this.attendButtonClickHandler(null, { index: this.state.absending })}>
+                    <Icon name='checkmark' /> Yes
                 </Button>
-              </Modal.Actions>
-            </Modal> : <Button
+                </Modal.Actions>
+              </Modal> : <Button
+                basic
+                index={c.id}
+                style={{ width: '75px', paddingLeft: '0', paddingRight: '0', height: '30px' }}
+                loading={this._getLoading('attend-' + c.id)}
+                disabled={this._getLoading('attend-' + c.id)}
+                color='green'
+                size='mini'
+                onClick={this.attendButtonClickHandler}
+              // basic={!!this.props.post}
+              >Attending</Button>
+
+            ) : <Button
               basic
               index={c.id}
               style={{ width: '75px', paddingLeft: '0', paddingRight: '0', height: '30px' }}

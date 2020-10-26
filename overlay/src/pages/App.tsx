@@ -46,7 +46,7 @@ export class App extends React.Component<IProps, IState> {
   }
 
   changeTab(activeIndex: number) {
-    if (activeIndex === 2 || activeIndex === 3) {
+    if (activeIndex === 2 || activeIndex === 3 || activeIndex === 1) {
       this.setState({ postsDefaultSearch: '', myDiscussionsKey: Math.random() });
     }
 
@@ -109,7 +109,7 @@ export class App extends React.Component<IProps, IState> {
             </div> : null}
 
             <div style={{ display: (s.activeIndex === 1) ? 'block' : 'none', paddingBottom: '10px' }}>
-              <Conferences profile={s.profile}  onPostsClick={this.postsClickHandler} settings={s.settings!} />
+              <Conferences profile={s.profile}  onPostsClick={this.postsClickHandler} settings={s.settings!} key={s.myDiscussionsKey} />
             </div>
 
             <div style={{ display: (s.activeIndex === 2) ? 'block' : 'none', paddingBottom: '10px' }}>
