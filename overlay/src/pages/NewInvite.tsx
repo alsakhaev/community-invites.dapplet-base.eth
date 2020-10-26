@@ -120,11 +120,11 @@ export class NewInvite extends React.Component<IProps, IState> {
                 </Segment> : null}
 
                 <p style={{ margin: '10px 4px', textAlign: 'end' }}>
+                    Don't make private invite without good reason.
                     <Popup
-                        trigger={<Icon name='info circle' />}
-                        content='While public invites may result into group conversation, a private invite is a request for strictly separate and private one'
+                        trigger={<a style={{ cursor: 'default', marginLeft: '4px'}}>Why? <Icon name='info circle' color='blue'/></a>}
+                        content='While public invites usually lead to single group conversation, a private one requires an extra time slot, which maybe not available.'
                     />
-                    Don't make invite private for no reason
                 </p>
 
                 {s.error ? <div style={{ textAlign: 'end', marginBottom: '10px' }}><Label basic color='red'>{s.error}</Label></div> : null}
