@@ -263,7 +263,7 @@ export async function getPostsWithInvitations(namespace: string, username: strin
 
             for (const invitation of conference.invitations) {
                 if ((invitation.namespace_from === namespace && invitation.username_from === username) || (invitation.namespace_to === namespace && invitation.username_to === username)) {
-                    invitation.is_private = true;
+                    invitation.is_private = false;
                 }
 
                 if (!users.find(x => x.namespace === invitation.namespace_from && x.username === invitation.username_from && x.is_private === invitation.is_private)) {
