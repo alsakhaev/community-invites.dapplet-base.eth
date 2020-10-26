@@ -215,41 +215,24 @@ export async function getPostsWithInvitations(namespace: string, username: strin
                     'id', c.id,
                     'name', c.name,
                     'short_name', c.short_name,
-                    'users', (              
-                        select json_agg(distinct iiii.*) 
-                        from (
-                            (
-                                select 
-                                    case when ii.is_private = true then '' else ii.namespace_from end as namespace, 
-                                    case when ii.is_private = true then '' else ii.username_from end as username, 
-                                    case when ii.is_private = true then '' else uu.fullname end as fullname,
-                                    ii.is_private as is_private
-                                from invitations as ii 
-                                join users as uu on uu.namespace = ii.namespace_from and uu.username = ii.username_from
-                                join conferences as cc on cc.id = ii.conference_id
-                                WHERE cc.date_to >= DATE(NOW() - INTERVAL '3 DAY')
-                                    and ii.post_id = p.id
-                                    and cc.id = c.id
-                                    --and ((ii.namespace_from = $1 and ii.username_from = $2)
-                                    --    or (ii.namespace_to = $1 and ii.username_to = $2))
-                            )
-                            UNION ALL
-                            (
-                                select 
-                                    case when iii.is_private = true then '' else iii.namespace_to end as namespace, 
-                                    case when iii.is_private = true then '' else iii.username_to end as username, 
-                                    case when iii.is_private = true then '' else uuu.fullname end as fullname,
-                                    iii.is_private as is_private
-                                from invitations as iii
-                                join users as uuu on uuu.namespace = iii.namespace_to and uuu.username = iii.username_to
-                                join conferences as ccc on ccc.id = iii.conference_id
-                                WHERE ccc.date_to >= DATE(NOW() - INTERVAL '3 DAY')
-                                    and iii.post_id = p.id
-                                    and ccc.id = c.id
-                                    --and ((iii.namespace_from = $1 and iii.username_from = $2)
-                                    --    or (iii.namespace_to = $1 and iii.username_to = $2))
-                            )
-                        ) as iiii
+                    'invitations', (              
+                        select 
+                            json_agg(json_build_object(
+                                'id', ii.id,
+                                'namespace_from', ii.namespace_from,
+                                'username_from', ii.username_from,
+                                'fullname_from', uu_from.fullname,
+                                'namespace_to', ii.namespace_to,
+                                'username_to', ii.username_to,
+                                'fullname_to', uu_to.fullname,
+                                'is_private', ii.is_private
+                            ))
+                        from invitations as ii 
+                        join users as uu_from on uu_from.namespace = ii.namespace_from and uu_from.username = ii.username_from
+                        join users as uu_to on uu_to.namespace = ii.namespace_to and uu_to.username = ii.username_to
+                        join conferences as cc on cc.id = ii.conference_id
+                        WHERE ii.post_id = p.id
+                            and cc.id = c.id
                     )
                 ))
                 from conferences as c 
@@ -271,7 +254,56 @@ export async function getPostsWithInvitations(namespace: string, username: strin
         )
     `;
 
-    return execute(c => c.query(query, params).then(r => r.rows));
+    const data = await execute(c => c.query(query, params).then(r => r.rows));
+
+    // ToDo: simplify it
+    for (const row of data) {
+        for (const conference of row.conferences) {
+            const users: any[] = [];
+
+            for (const invitation of conference.invitations) {
+                if ((invitation.namespace_from === namespace && invitation.username_from === username) || (invitation.namespace_to === namespace && invitation.username_to === username)) {
+                    invitation.is_private = true;
+                }
+
+                if (!users.find(x => x.namespace === invitation.namespace_from && x.username === invitation.username_from && x.is_private === invitation.is_private)) {
+                    users.push({
+                        namespace: invitation.namespace_from,
+                        username: invitation.username_from,
+                        fullname: invitation.fullname_from,
+                        is_private: invitation.is_private
+                    });
+                }
+                if (!users.find(x => x.namespace === invitation.namespace_to && x.username === invitation.username_to && x.is_private === invitation.is_private)) {
+                    users.push({
+                        namespace: invitation.namespace_to,
+                        username: invitation.username_to,
+                        fullname: invitation.fullname_to,
+                        is_private: false
+                    });
+                }
+            }
+
+            conference.users = users.filter(x => x.is_private === false);
+
+            for (const u of users.filter(x => x.is_private === true)) {
+                if (!conference.users.find((x: any) => x.namespace === u.namespace && x.username === u.username)) {
+                    conference.users.push(u);
+                }
+            }
+
+            conference.users.filter((x: any) => x.is_private === true).forEach((x: any) => {
+                x.namespace = '';
+                x.username = '';
+                x.fullname = '';
+            })
+
+            delete conference.invitations;
+        }
+    }
+
+    //data.forEach(x => x.conferences.forEach((y: any) => delete y.invitations));
+    return data;
 }
 
 export async function getAllWithMyTags(namespace: string, username: string): Promise<PostWithTags[]> {
