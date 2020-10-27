@@ -5,7 +5,6 @@ import { Segment, Loader, Menu } from 'semantic-ui-react';
 import { Conferences } from './Conferences';
 import { Invite } from './Invite';
 import { MyDiscussions } from './MyDiscussions';
-import { Api } from '../api';
 import { Topics } from '../pages/Topics';
 
 interface IProps {
@@ -18,18 +17,17 @@ interface IState {
   settings?: Settings;
   activeIndex: number;
   postsDefaultSearch: string;
-  myDiscussionsKey: number;
-  myInvitesKey: number;
+  key: number;
 }
 
 export class App extends React.Component<IProps, IState> {
 
   constructor(props: IProps) {
     super(props);
-    this.state = { post: undefined, profile: undefined, settings: undefined, activeIndex: -1, postsDefaultSearch: '', myDiscussionsKey: 0, myInvitesKey: 0 };
+    this.state = { post: undefined, profile: undefined, settings: undefined, activeIndex: -1, postsDefaultSearch: '', key: 0 };
 
     dappletInstance.onData(async ({ post, profile, settings }) => {
-      this.setState({ post, profile, settings, activeIndex: profile ? 0 : 1, myInvitesKey: Math.random() });
+      this.setState({ post, profile, settings, activeIndex: profile ? 0 : 1, key: Math.random() });
     });
   }
 
@@ -38,15 +36,11 @@ export class App extends React.Component<IProps, IState> {
   }
 
   postsClickHandler = (conferenceShortName: string, username: string) => {
-    this.setState({ activeIndex: 2, postsDefaultSearch: `conference:${conferenceShortName} user:${username}`, myDiscussionsKey: Math.random() });
+    this.setState({ activeIndex: 2, postsDefaultSearch: `conference:${conferenceShortName} user:${username}`, key: Math.random() });
   }
 
   changeTab(activeIndex: number) {
-    if (activeIndex === 2 || activeIndex === 3 || activeIndex === 1) {
-      this.setState({ postsDefaultSearch: '', myDiscussionsKey: Math.random() });
-    }
-
-    this.setState({ activeIndex });
+    this.setState({ activeIndex, key: Math.random(), postsDefaultSearch: '' });
   }
 
   render() {
@@ -89,7 +83,7 @@ export class App extends React.Component<IProps, IState> {
               <Menu.Item
                 icon='dashboard'
                 title='Open Dashboard in new tab'
-                style={{ cursor: 'pointer'}}
+                style={{ cursor: 'pointer' }}
                 onClick={() => window.open('https://community-invite-dashboard.herokuapp.com', '_blank')}
               />
             </Menu>
@@ -98,20 +92,21 @@ export class App extends React.Component<IProps, IState> {
           <div style={{ margin: '4em 0' }}>
 
             {s.profile ? <div style={{ display: (s.activeIndex === 0) ? 'block' : 'none', paddingBottom: '10px' }}>
-              <Invite profile={s.profile} post={s.post} onPostsClick={this.postsClickHandler} settings={s.settings!} key={s.myInvitesKey} />
+              <Invite profile={s.profile} post={s.post} onPostsClick={this.postsClickHandler} settings={s.settings!} key={s.key} />
             </div> : null}
 
             <div style={{ display: (s.activeIndex === 1) ? 'block' : 'none', paddingBottom: '10px' }}>
-              <Conferences profile={s.profile}  onPostsClick={this.postsClickHandler} settings={s.settings!} key={s.myDiscussionsKey} />
+              <Conferences profile={s.profile} onPostsClick={this.postsClickHandler} settings={s.settings!} key={s.key} />
             </div>
 
             <div style={{ display: (s.activeIndex === 2) ? 'block' : 'none', paddingBottom: '10px' }}>
-              <MyDiscussions profile={s.profile} defaultSearch={s.postsDefaultSearch} settings={s.settings!} key={s.myDiscussionsKey} />
+              <MyDiscussions profile={s.profile} defaultSearch={s.postsDefaultSearch} settings={s.settings!} key={s.key} />
             </div>
 
             <div style={{ display: (s.activeIndex === 3) ? 'block' : 'none', paddingBottom: '10px' }}>
-              <Topics profile={s.profile} defaultSearch={s.postsDefaultSearch} settings={s.settings!} key={s.myDiscussionsKey} />
+              <Topics profile={s.profile} defaultSearch={s.postsDefaultSearch} settings={s.settings!} key={s.key} />
             </div>
+
           </div>
 
         </React.Fragment>

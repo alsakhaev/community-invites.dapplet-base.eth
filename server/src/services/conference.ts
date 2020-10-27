@@ -64,6 +64,20 @@ export async function getConferencesWithInvitations(namespace_from: string, user
     });
 }
 
+export async function isAttended(user: Profile, conferenceId: number): Promise<boolean> {
+    
+    const query = `
+        SELECT *
+        FROM attendance as a
+        WHERE a.namespace = $1
+            AND a.username = $2
+            AND a.conference_id = $3
+    `;
+
+    const params = [user.namespace, user.username, conferenceId];
+    
+    return execute(c => c.query(query, params)).then(x => x.rowCount > 0);
+}
 
 export async function attend(user: Profile, conferenceId: number): Promise<void> {
     return execute(async (client) => {

@@ -77,9 +77,6 @@ export class NewInvite extends React.Component<IProps, IState> {
         this.setState({ isInvitingLoading: true });
 
         try {
-            if (!this.state.data.find((d) => d.conference.id === conferenceId)!.attendance_from) {
-                await this._api.attend(this.props.profile, conferenceId);
-            }
             const { id } = await this._api.invite(this.props.profile, this.state.profileTo, conferenceId, this.props.post, this.state.isPrivate);
             this.props.onInvited(id);
             this.setState({ isInvitingLoading: false });
@@ -119,19 +116,24 @@ export class NewInvite extends React.Component<IProps, IState> {
                     </p>
                 </Segment> : null}
 
+                {!selectedConference!.attendance_from ? <Message warning>
+                    You will automatically participate in {selectedConference!.conference.name} when you invite a person there.
+                </Message> : null}
+
                 <p style={{ margin: '10px 4px', textAlign: 'end' }}>
                     Don't make private invite without good reason.
                     <Popup
-                        trigger={<a style={{ cursor: 'default', marginLeft: '4px'}}>Why? <Icon name='info circle' color='blue'/></a>}
+                        trigger={<a style={{ cursor: 'default', marginLeft: '4px' }}>Why? <Icon name='info circle' color='blue' /></a>}
                         content='While public invites usually lead to single group conversation, a private one requires an extra time slot, which maybe not available.'
                     />
                 </p>
 
                 {s.error ? <div style={{ textAlign: 'end', marginBottom: '10px' }}><Label basic color='red'>{s.error}</Label></div> : null}
 
+
                 <div style={{ textAlign: 'end' }}>
                     <Checkbox style={{ margin: '0 20px 0 0' }} label='Private' disabled={s.isInvitingLoading} checked={s.isPrivate} onChange={(e, d) => this.setState({ isPrivate: d.checked as boolean })} />
-                    <Button primary onClick={() => this.invite()} loading={s.isInvitingLoading} disabled={s.isInvitingLoading}>Invite</Button>
+                    <Button primary onClick={() => this.invite()} loading={s.isInvitingLoading} disabled={s.isInvitingLoading}>{(!selectedConference!.attendance_from) ? 'Attend & Invite' : 'Invite'}</Button>
                     <Button onClick={() => this.props.onCancel()} disabled={s.isInvitingLoading}>Cancel</Button>
                 </div>
 

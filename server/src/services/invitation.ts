@@ -2,6 +2,7 @@ import { execute } from '../connection';
 import { Conference, Post, Profile } from '../types';
 import * as userService from './user';
 import * as postService from './post';
+import * as conferenceService from './conference';
 
 type MyInvitation = {
     to_namespace: string;
@@ -67,6 +68,11 @@ export async function invite(userFrom: Profile, userTo: Profile, conferenceId: n
 
         if (!await postService.getPost(post.id)) {
             await postService.createPost(post);
+        }
+
+        // auto attending
+        if (!await conferenceService.isAttended(userFrom, conferenceId)) {
+            await conferenceService.attend(userFrom, conferenceId);
         }
 
         // existance checking
