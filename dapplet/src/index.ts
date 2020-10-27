@@ -18,34 +18,10 @@ export default class Feature {
         public viewportAdapter: any
     ) {
         Core.onAction(() => this._openOverlay(this.identityAdapter.getCurrentUser()));
-
-        const wallet = Core.wallet();
-
-        const { statusLine } = viewportAdapter.exports;
-        const { label, button, caption } = this.identityAdapter.exports;
+        
+        const { button, caption } = this.identityAdapter.exports;
 
         this.identityAdapter.attachConfig({
-            // POST_USERNAME_LABEL: [
-            //     label({
-            //         initial: "DEFAULT",
-            //         "DEFAULT": {
-            //             hidden: true,
-            //             init: async (ctx, me) => {
-            //                 const info = await this._getBadge('twitter.com', ctx.authorUsername);
-            //                 if (info && info.main_conference_id) {
-            //                     me.setState("BADGE");
-            //                     me.text = info.main_conference_short_name;
-            //                     if (info.conferences_count > 1) me.postfix = `+${info.conferences_count - 1}`
-            //                 }
-            //             }
-            //         },
-            //         "BADGE": {
-            //             text: '',
-            //             exec: (post) => this._openOverlay(this.identityAdapter.getCurrentUser(), post),
-            //             img: ICON
-            //         }
-            //     })
-            // ],
             POST_SOUTH: [
                 button({
                     initial: "DEFAULT",
