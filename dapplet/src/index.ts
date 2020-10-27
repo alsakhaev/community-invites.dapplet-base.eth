@@ -18,7 +18,7 @@ export default class Feature {
         public viewportAdapter: any
     ) {
         Core.onAction(() => this._openOverlay(this.identityAdapter.getCurrentUser()));
-        
+
         const { button, caption } = this.identityAdapter.exports;
 
         this.identityAdapter.attachConfig({
@@ -70,7 +70,7 @@ export default class Feature {
         }
 
         const serverUrl = await Core.storage.get('serverUrl');
-        profile.namespace = 'twitter.com';
+        if (profile) profile.namespace = 'twitter.com';
         this._overlay.sendAndListen('data', { profile, post, settings: { serverUrl } }, {
 
         });
