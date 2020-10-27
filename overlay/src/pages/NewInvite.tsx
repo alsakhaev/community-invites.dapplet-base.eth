@@ -60,8 +60,16 @@ export class NewInvite extends React.Component<IProps, IState> {
     }
 
     async componentDidMount() {
-        await this.loadConferences();
-        this.setState({ loading: false });
+        try {
+            await this.loadConferences();
+            this.setState({ loading: false });
+        } catch (err) {
+            if (err.name !== 'AbortError') console.error(err);
+        }
+    }
+
+    async componentWillUnmount() {
+        this._api.controller.abort();
     }
 
     async loadConferences() {

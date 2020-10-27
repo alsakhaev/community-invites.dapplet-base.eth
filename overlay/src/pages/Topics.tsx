@@ -65,16 +65,24 @@ export class Topics extends React.Component<IProps, IState> {
     }
 
     async componentDidMount() {
-        const { profile } = this.props;
-        if (profile) {
-            const posts = await this._api.getAllTopicsWithMyTags(profile.namespace, profile.username);
-            this.setState({ posts });
+        try {
+            const { profile } = this.props;
+            if (profile) {
+                const posts = await this._api.getAllTopicsWithMyTags(profile.namespace, profile.username);
+                this.setState({ posts });
+            }
+
+            const tags = await this._api.getTags();
+            this.setState({ tags });
+
+            this._setLoading('list', false);
+        } catch (err) {
+            if (err.name !== 'AbortError') console.error(err);
         }
+    }
 
-        const tags = await this._api.getTags();
-        this.setState({ tags });
-
-        this._setLoading('list', false);
+    async componentWillUnmount() {
+        this._api.controller.abort();
     }
 
     _postFilter = (data: PostWithTags) => {

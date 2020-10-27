@@ -92,6 +92,8 @@ export type Tag = {
 }
 
 export class Api {
+    public readonly controller = new AbortController();
+
     constructor(private _url: string) { }
 
     async getConferencesWithInvitations(from: Profile, to?: Profile): Promise<ConferenceWithInvitations[]> {
@@ -177,7 +179,7 @@ export class Api {
     }
 
     private async _sendRequest(query: string, method: 'POST' | 'GET' | 'PUT' = 'GET', body?: any): Promise<any> {
-        const init = body ? { body: JSON.stringify(body), headers: { 'Content-Type': 'application/json' }, method } : { method };
+        const init = body ? { body: JSON.stringify(body), headers: { 'Content-Type': 'application/json' }, method, signal: this.controller.signal } : { method, signal: this.controller.signal };
         const resp = await fetch(this._url + query, init);
         const json = await resp.json();
         if (!json.success) throw Error(json.message);

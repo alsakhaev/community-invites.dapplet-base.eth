@@ -42,14 +42,22 @@ export class Conferences extends React.Component<IProps, IState> {
   }
 
   async componentDidMount() {
-    await this._loadConferences();
-    this._setLoading('list', false);
+    try {
+      await this._loadConferences();
+      this._setLoading('list', false);
+    } catch (err) {
+      if (err.name !== 'AbortError') console.error(err);
+    }
   }
 
 
   async _loadConferences() {
     const data = await this._api.getConferencesWithInvitations(this.props.profile!, undefined);
     this.setState({ data });
+  }
+
+  async componentWillUnmount() {
+    this._api.controller.abort();
   }
 
   accordionClickHandler = (e: any, titleProps: any) => {

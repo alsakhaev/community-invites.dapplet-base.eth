@@ -18,12 +18,10 @@ interface IState {
 }
 
 export class AllInvites extends React.Component<IProps, IState> {
-    private _api: Api;
 
     constructor(props: IProps) {
         super(props);
 
-        this._api = new Api(this.props.settings.serverUrl);
         this.state = {
             loading: {}
         }

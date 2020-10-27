@@ -45,7 +45,11 @@ export class Invite extends React.Component<IProps, IState> {
   }
 
   async componentDidMount() {
-    await this.loadData(true);
+    try {
+      await this.loadData(true);
+    } catch (err) {
+      if (err.name !== 'AbortError') console.error(err);
+    }
   }
 
   async loadData(firstLoading: boolean = false) {
@@ -54,8 +58,11 @@ export class Invite extends React.Component<IProps, IState> {
     this.setState({ loading: true });
 
     const data = await this._api.getMyInvitations(this.props.profile.namespace, this.props.profile.username);
-
     this.setState({ data: data.map(x => ({ ...x, loading: false })), loading: false, currentTab: (!p.post || !firstLoading) ? Tabs.AllInvites : Tabs.NewInvite });
+  }
+
+  async componentWillUnmount() {
+    this._api.controller.abort();
   }
 
   async setInvited() {

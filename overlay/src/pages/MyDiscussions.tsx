@@ -36,13 +36,21 @@ export class MyDiscussions extends React.Component<IProps, IState> {
     }
 
     async componentDidMount() {
-        const { profile } = this.props;
-        if (profile) {
-            const posts = await this._api.getInvitationPosts(profile.namespace, profile.username);
-            this.setState({ posts });
-        }
+        try {
+            const { profile } = this.props;
+            if (profile) {
+                const posts = await this._api.getInvitationPosts(profile.namespace, profile.username);
+                this.setState({ posts });
+            }
 
-        this._setLoading('list', false);
+            this._setLoading('list', false);
+        } catch (err) {
+            if (err.name !== 'AbortError') console.error(err);
+        }
+    }
+
+    async componentWillUnmount() {
+        this._api.controller.abort();
     }
 
     _parseSearch(str: string) {
