@@ -236,7 +236,7 @@ export class Topics extends React.Component<IProps, IState> {
                                             </Comment.Metadata>
                                             <Comment.Text>{p.text}</Comment.Text>
                                             <div>
-                                                {p.tags.filter(x => x.value === true).map(x => <Label onClick={() => this._tagFilter(x.name)} style={{ marginTop: '.14285714em' }} as='a' color='green' key={x.id} disabled={this._getLoading(p.id)}>{x.name}<Icon name='delete' disabled={this._getLoading(p.id)} link onClick={() => this.untag(p.id, x.id)} /></Label>)}
+                                                {p.tags.filter(x => x.value === true).map(x => <Label onClick={() => this._tagFilter(x.name)} style={{ marginTop: '.14285714em' }} as='a' color='green' key={x.id} disabled={this._getLoading(p.id)}>{x.name}<Icon name='delete' disabled={this._getLoading(p.id)} link onClick={(e: any) => (e.stopPropagation(), this.untag(p.id, x.id))} /></Label>)}
                                                 {(s.tags.filter(x => !p.tags.find(y => y.id === x.id && y.value === true)).length > 0) ? <Dropdown
                                                     trigger={<Label style={{ marginTop: '.14285714em' }} color='blue' disabled={this._getLoading(p.id)}><Icon name='plus' /> Add conference</Label>}
                                                     pointing='top right'
