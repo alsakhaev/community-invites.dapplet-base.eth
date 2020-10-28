@@ -1,10 +1,9 @@
 import React from 'react';
-import { Button, Divider, Accordion, Icon, Container, Grid, Loader, Dropdown, Segment, Checkbox, Placeholder, Popup, Message, Label } from 'semantic-ui-react';
+import { Button, Divider, Icon, Dropdown, Segment, Checkbox, Placeholder, Popup, Message, Label } from 'semantic-ui-react';
 import { Post, Profile, Settings } from '../dappletBus';
 import { PostCard } from '../components/PostCard';
-import { Api, Conference, ConferenceWithInvitations } from '../api';
+import { Api, ConferenceWithInvitations } from '../api';
 import { ProfileCard } from '../components/ProfileCard'
-import { HoverButton } from '../components/HoverButton';
 import Linkify from 'react-linkify';
 
 interface IProps {
@@ -119,7 +118,7 @@ export class NewInvite extends React.Component<IProps, IState> {
 
                 {selectedConference ? <Segment>
                     <p>
-                        {selectedConference.conference.description ? <Linkify componentDecorator={(href: string, text: string, key: string) => <a href={href} key={key} target="_blank">{text}</a>}>{selectedConference.conference.description}<br /></Linkify> : null}
+                        {selectedConference.conference.description ? <Linkify componentDecorator={(href: string, text: string, key: string) => <a href={href} key={key} target="_blank" rel="noopener noreferrer">{text}</a>}>{selectedConference.conference.description}<br /></Linkify> : null}
                         {selectedConference.conference.date_from.toLocaleDateString() + ' - ' + selectedConference.conference.date_to.toLocaleDateString()}
                     </p>
                 </Segment> : null}

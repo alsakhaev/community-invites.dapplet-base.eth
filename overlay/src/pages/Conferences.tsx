@@ -176,7 +176,7 @@ export class Conferences extends React.Component<IProps, IState> {
           </Accordion.Title>
           <Accordion.Content active={activeIndex === key + c.id}>
             <p>
-              <Linkify componentDecorator={(href: string, text: string, key: string) => <a href={href} key={key} target="_blank">{text}</a>}>{c.description}</Linkify><br />
+              <Linkify componentDecorator={(href: string, text: string, key: string) => <a href={href} key={key} target="_blank" rel="noopener noreferrer">{text}</a>}>{c.description}</Linkify><br />
               {c.date_from.toLocaleDateString() + ' - ' + c.date_to.toLocaleDateString()}<br />
               <a href={c.website}>{c.website}</a>
             </p>

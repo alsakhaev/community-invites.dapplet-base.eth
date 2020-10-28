@@ -1,7 +1,7 @@
 import React from 'react';
 import { Segment, Placeholder } from 'semantic-ui-react';
 import { Profile, Settings } from '../dappletBus';
-import { Api, MyInvitation } from '../api';
+import { MyInvitation } from '../api';
 import { InvitationCard } from '../components/InvitationCard';
 
 interface IProps {
