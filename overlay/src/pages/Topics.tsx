@@ -85,16 +85,49 @@ export class Topics extends React.Component<IProps, IState> {
         this._api.controller.abort();
     }
 
+    _parseSearch(str: string) {
+        const regex = /([a-zA-Z]*):([^ ]*)/gm;
+        let m;
+
+        const result: { [key: string]: any, search: string } = { search: str };
+
+        while ((m = regex.exec(str)) !== null) {
+            // This is necessary to avoid infinite loops with zero-width matches
+            if (m.index === regex.lastIndex) {
+                regex.lastIndex++;
+            }
+
+            result.search = result.search.replace(m[0], '');
+            
+            if (!result[m[1]]) result[m[1]] = [];
+            
+            result[m[1]].push(m[2]);
+        }
+
+        result.search = result.search.trim();
+
+        return result;
+    }
+
     _postFilter = (data: PostWithTags) => {
         let isFound = true;
 
         const { search, filter } = this.state;
 
-        if (search) {
-            const found = data.fullname.toLowerCase().indexOf(search.toLowerCase()) !== -1
-                || data.username.toLowerCase().indexOf(search.toLowerCase()) !== -1
-                || data.text.toLowerCase().indexOf(search.toLowerCase()) !== -1;
+        const parsed = this._parseSearch(search);
+
+        if (parsed.search) {
+            const found = data.fullname.toLowerCase().indexOf(parsed.search.toLowerCase()) !== -1
+                || data.username.toLowerCase().indexOf(parsed.search.toLowerCase()) !== -1
+                || data.text.toLowerCase().indexOf(parsed.search.toLowerCase()) !== -1;
             isFound = isFound && found;
+        }
+
+        if (parsed.tag) {
+            parsed.tag.forEach((t: string) => {
+                const found = !!data.tags.find(x => x.name === t && x.value === true);
+                isFound = isFound && found;
+            })            
         }
 
         switch (filter) {
@@ -119,6 +152,17 @@ export class Topics extends React.Component<IProps, IState> {
         }
 
         return isFound;
+    }
+
+    _tagFilter(tag: string) {
+        const expression = 'tag:' + tag;
+
+        // remove filter is it exists
+        if (this.state.search.indexOf(expression) !== -1) {
+            this.setState({ search: this.state.search.replace(expression, '').trim() });
+        } else {
+            this.setState({ search: (this.state.search + ' ' + expression).trim() });
+        }
     }
 
     inputChangeHandler = (event: React.ChangeEvent<HTMLInputElement>, data: InputOnChangeData) => {
@@ -192,7 +236,7 @@ export class Topics extends React.Component<IProps, IState> {
                                             </Comment.Metadata>
                                             <Comment.Text>{p.text}</Comment.Text>
                                             <div>
-                                                {p.tags.filter(x => x.value === true).map(x => <Label style={{ marginTop: '.14285714em' }} color='green' key={x.id} disabled={this._getLoading(p.id)}>{x.name}<Icon name='delete' disabled={this._getLoading(p.id)} link onClick={() => this.untag(p.id, x.id)} /></Label>)}
+                                                {p.tags.filter(x => x.value === true).map(x => <Label onClick={() => this._tagFilter(x.name)} style={{ marginTop: '.14285714em' }} as='a' color='green' key={x.id} disabled={this._getLoading(p.id)}>{x.name}<Icon name='delete' disabled={this._getLoading(p.id)} link onClick={() => this.untag(p.id, x.id)} /></Label>)}
                                                 {(s.tags.filter(x => !p.tags.find(y => y.id === x.id && y.value === true)).length > 0) ? <Dropdown
                                                     trigger={<Label style={{ marginTop: '.14285714em' }} color='blue' disabled={this._getLoading(p.id)}><Icon name='plus' /> Add conference</Label>}
                                                     pointing='top right'
