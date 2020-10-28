@@ -6,6 +6,7 @@ import { Conferences } from './Conferences';
 import { Invite } from './Invite';
 import { MyDiscussions } from './MyDiscussions';
 import { Topics } from '../pages/Topics';
+import { SERVFAIL } from 'dns';
 
 interface IProps {
   history?: any;
@@ -49,10 +50,20 @@ export class App extends React.Component<IProps, IState> {
 
     if (!s.settings) {
       return (
-        <Segment style={{ margin: '15px' }}>
-          <Loader active inline='centered'>Context waiting</Loader>
-        </Segment>
+        <div className="App-container">
+          <Segment>
+            <Loader active inline='centered'>Context waiting</Loader>
+          </Segment>
+        </div>
       );
+    }
+
+    if (!s.profile) {
+      return (<div className="App-container">
+        <Segment>
+          You are not logged in
+      </Segment>
+      </div>)
     }
 
     return (
