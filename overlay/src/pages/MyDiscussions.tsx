@@ -140,7 +140,7 @@ export class MyDiscussions extends React.Component<IProps, IState> {
                 {this._getLoading('list') ? <Segment>
                     <Loader active inline='centered'>Loading</Loader>
                 </Segment> : <React.Fragment>
-                        {filteredPosts.map((p, i) =>
+                        {(filteredPosts.length > 0) ? filteredPosts.map((p, i) =>
                             <Segment key={i}>
                                 <Comment.Group minimal>
                                     <Comment >
@@ -170,7 +170,7 @@ export class MyDiscussions extends React.Component<IProps, IState> {
                                     </Comment>
                                 </Comment.Group>
                             </Segment>
-                        )}
+                        ) : <Segment>No entries found</Segment>}
                     </React.Fragment>}
             </div>
         </div>);
