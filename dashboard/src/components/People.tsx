@@ -21,7 +21,7 @@ export class People extends React.Component<IProps, IState> {
     constructor(props: IProps) {
         super(props);
         this.state = {
-            column: 'invitations_to_count',
+            column: 'agg_invitations_to_count',
             direction: 'descending',
             activeIndex: -1
         };
@@ -42,43 +42,11 @@ export class People extends React.Component<IProps, IState> {
 
     render() {
         const { users } = this.props;
-        const { column, direction, activeIndex } = this.state;
-
-        //const data = (direction === 'ascending') ? sortBy(users, [column]) : sortBy(users, [column]).reverse();
+        const { activeIndex } = this.state;
 
         if (users.length === 0) {
             return <Segment textAlign='center'>No matching entries found</Segment>
         }
-
-        const panels = users.map(u => ({
-            key: u.namespace + '/' + u.username,
-            title: {
-                icon: {
-                    style: { top: '0.5em', position: 'relative' },
-                    name: 'dropdown icon'
-                },
-                content: <div style={{ display: 'flex', marginLeft: '1.5em', top: '-1.5em', position: 'relative', height: '1em' }}>
-                    <Header as='h4' image style={{ flex: 'auto' }}>
-                        <Image src={u.img} rounded size='mini' />
-                        <Header.Content style={{ padding: '0 0 0 .75rem' }}>
-                            {u.fullname}
-                            <Header.Subheader>@{u.username}</Header.Subheader>
-                        </Header.Content>
-                    </Header>
-                    <div style={{ width: '10em' }}>
-                        <div>Rating: {u.invitations_to_count}</div>
-                        <div>Wanted by: {u.users_to_count}</div>
-                    </div>
-                </div>
-            },
-            content: {
-                content: <div>
-                    Incoming: {u.invitations_to_count} <br />
-                    Outgoing: {u.invitations_from_count} <br />
-                    Attendance: {u.attendance_count}
-                </div>
-            }
-        }));
 
         return (
             <Segment loading={this.props.loading} style={{ padding: '0', boxShadow: 'initial', border: 'initial' }}>
@@ -99,7 +67,7 @@ export class People extends React.Component<IProps, IState> {
                                                 </Header.Content>
                                             </Header>
                                             <div style={{ width: '10em' }} >
-                                                <div>Rating: {d.invitations_to_count}</div>
+                                                <div>Rating: {d.agg_invitations_to_count}</div>
                                                 <div>Wanted by: {d.users_to_count}</div>
                                             </div>
                                         </div>

@@ -122,8 +122,8 @@ export class App extends React.Component<IProps, IState> {
     let users = await this._api.getUserStat(filters);
 
     if (query.sort) users = users.sort((a, b) => {
-      if (query.sort[0] === 'rating-asc') return a.invitations_to_count > b.invitations_to_count ? 1 : -1;
-      if (query.sort[0] === 'rating-desc') return a.invitations_to_count < b.invitations_to_count ? 1 : -1;
+      if (query.sort[0] === 'rating-asc') return a.agg_invitations_to_count > b.agg_invitations_to_count ? 1 : -1;
+      if (query.sort[0] === 'rating-desc') return a.agg_invitations_to_count < b.agg_invitations_to_count ? 1 : -1;
       if (query.sort[0] === 'followers-asc') return a.users_to_count > b.users_to_count ? 1 : -1;
       if (query.sort[0] === 'followers-desc') return a.users_to_count < b.users_to_count ? 1 : -1;
       return 0;

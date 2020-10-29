@@ -90,6 +90,20 @@ export async function getStat(filters?: { excludePosts?: string[], limit?: numbe
                             AND i.username_to = u.username
                             ${isFilter ? 'AND NOT (i.post_id = ANY ($2))' : ''}
                     ) AS invitations_to_count,
+                    
+                    (
+                        SELECT COUNT(*)
+                        FROM (
+                            SELECT COUNT(*) 
+                            FROM invitations AS i 
+                            JOIN conferences AS c ON c.id = i.conference_id
+                            WHERE c.date_to >= DATE(NOW() - INTERVAL '3 DAY')
+                                AND i.namespace_to = u.namespace
+                                AND i.username_to = u.username
+                                ${isFilter ? 'AND NOT (i.post_id = ANY ($2))' : ''}
+                            GROUP BY i.namespace_from, i.username_from, i.post_id
+                        ) AS x
+                    ) AS agg_invitations_to_count,
                         
                     (
                         SELECT COUNT(*) 
@@ -171,7 +185,7 @@ export async function getStat(filters?: { excludePosts?: string[], limit?: numbe
                         AND a.username = u.username
                 )
             ) as main
-            ORDER BY main.invitations_to_count DESC
+            ORDER BY main.agg_invitations_to_count DESC
             LIMIT $1
         `, params);
         return res.rows;
@@ -179,6 +193,7 @@ export async function getStat(filters?: { excludePosts?: string[], limit?: numbe
 
     data.forEach(d => {
         d.invitations_to_count = parseInt(d.invitations_to_count);
+        d.agg_invitations_to_count = parseInt(d.agg_invitations_to_count);
         d.invitations_from_count = parseInt(d.invitations_from_count);
         d.attendance_count = parseInt(d.attendance_count);
         d.users_to_count = parseInt(d.users_to_count);
