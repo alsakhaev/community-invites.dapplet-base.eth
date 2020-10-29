@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Accordion, Icon, Container, Grid, Loader, Modal, Header, Image } from 'semantic-ui-react';
+import { Button, Accordion, Icon, Container, Grid, Loader, Modal, Header } from 'semantic-ui-react';
 import { Profile, Settings } from '../dappletBus';
 import { Api, Conference, ConferenceWithInvitations } from '../api';
 import { ProfileCard } from '../components/ProfileCard'

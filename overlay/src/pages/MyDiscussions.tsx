@@ -160,7 +160,7 @@ export class MyDiscussions extends React.Component<IProps, IState> {
 
                                                 return <React.Fragment key={c.id}>
                                                     <b>{c.name}: </b>
-                                                    me
+                                                    {c.users.find(u => u.username === this.props.profile?.username && u.namespace === this.props.profile?.namespace) ? 'me' : null}
                                                     {public_users.map((u, i) => <React.Fragment key={i}><span title={u.fullname}>, @<span style={{ textDecoration: (u.username === p.post.username) ? 'underline' : undefined }}>{u.username}</span></span></React.Fragment>)}
                                                     {(private_users.length > 0) ? <React.Fragment> and {private_users.length} private person{(private_users.length > 1 ? 's' : '')}</React.Fragment> : null}
                                                     <br />
