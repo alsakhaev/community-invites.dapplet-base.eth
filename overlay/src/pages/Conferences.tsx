@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Accordion, Icon, Container, Grid, Loader, Modal, Header } from 'semantic-ui-react';
+import { Button, Accordion, Icon, Container, Grid, Loader, Modal, Header, Image } from 'semantic-ui-react';
 import { Profile, Settings } from '../dappletBus';
 import { Api, Conference, ConferenceWithInvitations } from '../api';
 import { ProfileCard } from '../components/ProfileCard'
@@ -109,6 +109,8 @@ export class Conferences extends React.Component<IProps, IState> {
       return this.state.data.find(d => d.conference.id === c.id)!.attendance_from;
     }
 
+    const absendingInvitations = this.state.absending ? this.state.data.find(x => x.conference.id === this.state.absending)!.invitations.filter(x => x.from.username === this.props.profile?.username && x.from.namespace === this.props.profile?.namespace) : [];
+
     return (<React.Fragment>
       {header && data.length > 0 ? header : null}
       <Accordion fluid styled>
@@ -139,7 +141,11 @@ export class Conferences extends React.Component<IProps, IState> {
                 <Header content='Cancel your Attendance?' />
                 <Modal.Content>
                   <p>
-                    All you not going to attend the conference any more?<br />All of your {this.state.absending && this.state.data.find(x => x.conference.id === this.state.absending)!.invitations.filter(x => x.from.username === this.props.profile?.username && x.from.namespace === this.props.profile?.namespace).length} invites to this conference will be revoked.
+                    All you not going to attend the conference any more?<br />
+                    All of your {absendingInvitations.length} invites to this conference will be revoked.
+                  </p>
+                  <p>
+                  {(this.state.absending) ? this.renderParticipants(this.state.absending, true) : null}
                   </p>
                 </Modal.Content>
                 <Modal.Actions>
@@ -187,7 +193,7 @@ export class Conferences extends React.Component<IProps, IState> {
     </React.Fragment>);
   }
 
-  renderParticipants(conferenceId: number) {
+  renderParticipants(conferenceId: number, forModal: boolean = false) {
     const conference = this.state.data.find(x => x.conference.id === conferenceId)!.conference;
     const invitations = this.state.data.find(x => x.conference.id === conferenceId)!.invitations;
     const wantsMe = invitations.filter(x => x.to.username === this.props.profile?.username).map(x => ({
@@ -219,12 +225,14 @@ export class Conferences extends React.Component<IProps, IState> {
     return (<div>
       <br />
       <Grid columns='equal'>
-        {data.map((r, i) => <Grid.Row style={{ padding: 0 }} key={i}>
+        {data.filter(x => (forModal) ? x.isWant === true : true).map((r, i) => <Grid.Row style={{ padding: 0 }} key={i}>
           <Grid.Column width={1}>
             {this.getIcon(r)}
           </Grid.Column>
           <Grid.Column >
-            {r.fullname} @{r.username} <a style={{ cursor: 'pointer' }} onClick={() => this.props.onPostsClick?.(conference.short_name, r.username)}>by {r.count} topic(s)</a>
+            {r.fullname} @{r.username} {(forModal) ? 
+              <span>by {r.count} topic{(r.count > 1) ? 's' : ''}</span> : 
+              <a style={{ cursor: 'pointer' }} onClick={() => this.props.onPostsClick?.(conference.short_name, r.username)}>by {r.count} topic{(r.count > 1) ? 's' : ''}</a>}
           </Grid.Column>
         </Grid.Row>)}
       </Grid>
