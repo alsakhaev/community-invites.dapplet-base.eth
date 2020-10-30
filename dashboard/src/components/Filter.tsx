@@ -1,7 +1,6 @@
 import React from 'react';
 //import './App.css';
-import { List, Image, Table, Header, Feed, Comment, Input, Dropdown, Select } from 'semantic-ui-react';
-import { Api, PostStat, UserStat } from '../api';
+import { Input, Select } from 'semantic-ui-react';
 import SearchString from 'search-string';
 
 type Condition = {

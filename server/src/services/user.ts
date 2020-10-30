@@ -203,3 +203,34 @@ export async function getStat(filters?: { excludePosts?: string[], limit?: numbe
 
     return data;
 }
+
+type UserSettings = {
+    teamId?: string;
+    teamName?: string;
+}
+
+const settings: any = {};
+
+export async function getUserSettings(namespace: string, username: string): Promise<UserSettings> {
+    const key = namespace + '/' + username;
+    const view = settings[key] || {};
+    if (view.teamId) {
+        view.teamName = (await getTeam(view.teamId)).name;
+    }
+    return Promise.resolve(view);
+}
+
+export async function setUserSettings(namespace: string, username: string, s: UserSettings): Promise<void> {
+    const key = namespace + '/' + username;
+    if (s.teamId) getTeam(s.teamId);
+    settings[key] = s;
+    return Promise.resolve();
+}
+
+export async function getTeam(id: string) {
+    if (id !== '41168223-824b-42df-847b-7f339c47622a') throw Error('Team doesn\'t exist');
+    return Promise.resolve({
+        id: '41168223-824b-42df-847b-7f339c47622a',
+        name: 'Devcon6'
+    });
+}

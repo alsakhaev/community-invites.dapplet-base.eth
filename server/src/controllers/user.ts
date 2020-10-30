@@ -30,3 +30,22 @@ export const getStat = asyncHandler(async function (req: any, res: any) {
     const data = await userService.getStat(params);
     return res.json({ success: true, data: data });
 })
+
+export const getUserSettings = asyncHandler(async function (req: any, res: any) {
+    const { namespace, username } = req.query;
+    const data = await userService.getUserSettings(namespace, username);
+    return res.json({ success: true, data });
+})
+
+export const setUserSettings = asyncHandler(async function (req: any, res: any) {
+    const { namespace, username } = req.query;
+    const settings = req.body;
+    await userService.setUserSettings(namespace, username, settings);
+    return res.json({ success: true });
+})
+
+export const getTeam = asyncHandler(async function (req: any, res: any) {
+    const { id } = req.query;
+    const data = await userService.getTeam(id);
+    return res.json({ success: true, data });
+})

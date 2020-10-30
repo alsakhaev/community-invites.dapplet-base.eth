@@ -91,6 +91,16 @@ export type Tag = {
     name: string;
 }
 
+export type UserSettings = {
+    teamId?: string;
+    teamName?: string;
+}
+
+export type Team = {
+    id: string;
+    name: string;
+}
+
 export class Api {
     public readonly controller = new AbortController();
 
@@ -162,20 +172,32 @@ export class Api {
         return this._sendRequest(`/invitations?namespace=${namespace}&username=${username}`);
     }
 
-    async getAllTopicsWithMyTags(namespace: string, username: string): Promise<PostWithTags[]> {
-        return this._sendRequest(`/posts/my-tags?namespace=${namespace}&username=${username}`);
+    async getAllTopicsWithMyTags(namespace: string, username: string, teamId?: string): Promise<PostWithTags[]> {
+        return this._sendRequest((teamId) ? `/posts/my-tags?namespace=${namespace}&username=${username}&teamId=${teamId}` : `/posts/my-tags?namespace=${namespace}&username=${username}`);
     }
 
-    async tag(item_id: string, tag_id: string, user: Profile) {
-        return this._sendRequest('/tags/tag', 'POST', { item_id, tag_id, user });
+    async tag(item_id: string, tag_id: string, user: Profile, teamId?: string) {
+        return this._sendRequest((teamId) ? `/tags/tag?teamId=${teamId}` : '/tags/tag', 'POST', { item_id, tag_id, user });
     }
 
-    async untag(item_id: string, tag_id: string, user: Profile) {
-        return this._sendRequest('/tags/untag', 'POST', { item_id, tag_id, user });
+    async untag(item_id: string, tag_id: string, user: Profile, teamId?: string) {
+        return this._sendRequest((teamId) ? `/tags/untag?teamId=${teamId}` : '/tags/tag', 'POST', { item_id, tag_id, user });
     }
 
-    async getTags(): Promise<Tag[]> {
-        return this._sendRequest('/tags');
+    async getTags(teamId?: string): Promise<Tag[]> {
+        return this._sendRequest((teamId) ? `/tags?teamId=${teamId}` : '/tags');
+    }
+
+    async getUserSettings(namespace: string, username: string): Promise<UserSettings> {
+        return this._sendRequest(`/users/settings?namespace=${namespace}&username=${username}`);
+    }
+
+    async setUserSettings(namespace: string, username: string, settings: UserSettings) {
+        return this._sendRequest(`/users/settings?namespace=${namespace}&username=${username}`, 'POST', settings);
+    }
+
+    async getTeam(teamId: string): Promise<Team> {
+        return this._sendRequest(`/users/teams?id=${teamId}`);
     }
 
     private async _sendRequest(query: string, method: 'POST' | 'GET' | 'PUT' = 'GET', body?: any): Promise<any> {

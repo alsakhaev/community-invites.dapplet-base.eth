@@ -22,6 +22,9 @@ router.get('/users/attendance/:namespace/:username', user.getUserAttendance);
 router.post('/users/stat', user.getStat);
 router.put('/users', user.put);
 router.post('/users', user.post);
+router.get('/users/settings', user.getUserSettings);
+router.post('/users/settings', user.setUserSettings);
+router.get('/users/teams', user.getTeam);
 
 router.get('/posts', post.get);
 router.get('/posts/details', post.getDetailed);

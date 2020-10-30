@@ -1,12 +1,13 @@
 import React from 'react';
 import { Icon, Segment, Comment, Input, InputOnChangeData, Loader, Label, Select, Message, Dropdown } from 'semantic-ui-react';
-import { Api, PostWithTags, Tag } from '../api';
+import { Api, PostWithTags, Tag, UserSettings } from '../api';
 import { Profile, Settings } from '../dappletBus';
 
 interface IProps {
     defaultSearch: string;
     settings: Settings;
     profile?: Profile;
+    userSettings?: UserSettings;
 }
 
 interface IState {
@@ -68,11 +69,11 @@ export class Topics extends React.Component<IProps, IState> {
         try {
             const { profile } = this.props;
             if (profile) {
-                const posts = await this._api.getAllTopicsWithMyTags(profile.namespace, profile.username);
+                const posts = await this._api.getAllTopicsWithMyTags(profile.namespace, profile.username, this.props.userSettings?.teamId);
                 this.setState({ posts });
             }
 
-            const tags = await this._api.getTags();
+            const tags = await this._api.getTags(this.props.userSettings?.teamId);
             this.setState({ tags });
 
             this._setLoading('list', false);
@@ -182,8 +183,8 @@ export class Topics extends React.Component<IProps, IState> {
     async tag(item_id: string, tag_id: string) {
         if (!this.props.profile) throw Error('You are not logged in');
         this._setLoading(item_id, true);
-        await this._api.tag(item_id, tag_id, this.props.profile);
-        const posts = await this._api.getAllTopicsWithMyTags(this.props.profile.namespace, this.props.profile.username);
+        await this._api.tag(item_id, tag_id, this.props.profile, this.props.userSettings?.teamId);
+        const posts = await this._api.getAllTopicsWithMyTags(this.props.profile.namespace, this.props.profile.username, this.props.userSettings?.teamId);
         this._setLoading(item_id, false);
         this.setState({ posts });
     }
@@ -191,8 +192,8 @@ export class Topics extends React.Component<IProps, IState> {
     async untag(item_id: string, tag_id: string) {
         this._setLoading(item_id, true);
         if (!this.props.profile) throw Error('You are not logged in');
-        await this._api.untag(item_id, tag_id, this.props.profile);
-        const posts = await this._api.getAllTopicsWithMyTags(this.props.profile.namespace, this.props.profile.username);
+        await this._api.untag(item_id, tag_id, this.props.profile, this.props.userSettings?.teamId);
+        const posts = await this._api.getAllTopicsWithMyTags(this.props.profile.namespace, this.props.profile.username, this.props.userSettings?.teamId);
         this._setLoading(item_id, false);
         this.setState({ posts });
     }
@@ -202,7 +203,7 @@ export class Topics extends React.Component<IProps, IState> {
         const filteredPosts = this.state.posts.filter(this._postFilter);
 
         return (<div>
-            <div style={{ padding: '15px', position: 'fixed', top: '4em', left: '0', width: '100%', zIndex: 1000, backgroundColor: '#fff' }}>
+            <div style={{ padding: '15px', position: 'fixed', top: '90px', left: '0', width: '100%', zIndex: 1000, backgroundColor: '#fff' }}>
                 <Input
                     fluid
                     placeholder='Search...'
@@ -212,7 +213,7 @@ export class Topics extends React.Component<IProps, IState> {
                     onChange={this.inputChangeHandler}
                 />
             </div>
-            <div style={{ marginTop: '8em' }}>
+            <div style={{ marginTop: '145px' }}>
                 {this._getLoading('list') ? <Segment>
                     <Loader active inline='centered'>Loading</Loader>
                 </Segment> : <React.Fragment>

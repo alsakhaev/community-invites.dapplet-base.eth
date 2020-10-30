@@ -1,7 +1,7 @@
 import React from 'react';
 //import './App.css';
-import { List, Image, Table, Header, Feed, Comment, Button, Checkbox, Icon, Container, Segment } from 'semantic-ui-react';
-import { Api, PostStat, UserStat } from '../api';
+import { Table, Comment, Button, Segment } from 'semantic-ui-react';
+import { PostStat } from '../api';
 import sortBy from 'lodash.sortby';
 
 interface IProps {
@@ -58,9 +58,9 @@ export class Topics extends React.Component<IProps, IState> {
                                         </Comment>
                                     </Comment.Group>
                                 </Table.Cell>
-                                <Table.Cell style={{ width: '3em', overflow: 'hidden', textOverflow: 'clip' }} verticalAlign='top'>
+                                {/* <Table.Cell style={{ width: '3em', overflow: 'hidden', textOverflow: 'clip' }} verticalAlign='top'>
                                     <Checkbox onChange={(_, data) => this.props.onPostCheck(d, data.checked as boolean)} defaultChecked={d.checked} defaultIndeterminate={d.checked === undefined}/>
-                                </Table.Cell>
+                                </Table.Cell> */}
                             </Table.Row>
                         ))}
                     </Table.Body>

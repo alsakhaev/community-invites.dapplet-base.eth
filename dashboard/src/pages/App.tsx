@@ -1,6 +1,6 @@
 import React from 'react';
 //import './App.css';
-import { List, Image, Table, Container, Grid, Segment, Dimmer, Loader, Placeholder, Message, Input, Select } from 'semantic-ui-react';
+import { Container, Grid, Placeholder, Input, Select, Label } from 'semantic-ui-react';
 import { Api, PostStat, UserStat } from '../api';
 import { People } from '../components/People';
 import { Topics } from '../components/Topics';
@@ -21,6 +21,8 @@ interface IState {
   topicsFilter: string;
   isTopicsLoading: boolean;
   isPeopleLoading: boolean;
+  teamId: string | null;
+  teamName: string | null;
 }
 
 const peopleFilterOptions = [{
@@ -58,6 +60,8 @@ export class App extends React.Component<IProps, IState> {
   constructor(props: IProps) {
     super(props);
     this._api = new Api(process.env.REACT_APP_API_URL as string);
+    const url = new URL(window.location.href);
+    const teamId = (url.hash.indexOf('#') !== -1) ? new URLSearchParams(url.hash.substr(url.hash.indexOf('#') + 2)).get('teamId') : null;
     this.state = {
       posts: [],
       users: [],
@@ -67,7 +71,9 @@ export class App extends React.Component<IProps, IState> {
       peopleFilter: topicsFilterOptions[0].value,
       topicsFilter: topicsFilterOptions[0].value,
       isTopicsLoading: true,
-      isPeopleLoading: true
+      isPeopleLoading: true,
+      teamId: teamId,
+      teamName: null
     };
   }
 
@@ -79,7 +85,8 @@ export class App extends React.Component<IProps, IState> {
   async refreshData() {
     await Promise.all([
       this.refreshTopics(),
-      this.refreshPeople()
+      this.refreshPeople(),
+      this.refreshTeam()
     ]);
   }
 
@@ -88,6 +95,7 @@ export class App extends React.Component<IProps, IState> {
 
     const query = SearchString.parse(topicsFilter).getParsedQuery();
     const filters: any = {};
+    if (this.state.teamId) filters.teamId = this.state.teamId;
 
     if (query.top) try { filters.limit = parseInt(query.top); } catch (_) { }
     if (query.author) filters.username = Array.isArray(query.author) ? query.author[0] : query.author;
@@ -115,6 +123,7 @@ export class App extends React.Component<IProps, IState> {
 
     const query = SearchString.parse(peopleFilter).getParsedQuery();
     const filters: any = {};
+    if (this.state.teamId) filters.teamId = this.state.teamId;
 
     if (query.top) try { filters.limit = parseInt(query.top); } catch (_) { }
     if (query.exclude.posts) filters.excludePosts = query.exclude.posts;
@@ -130,6 +139,19 @@ export class App extends React.Component<IProps, IState> {
     })
 
     this.setState({ users, isPeopleLoading: false });
+  }
+
+  async refreshTeam() {
+    try {
+      const s = this.state;
+      if (s.teamId) {
+        const team = await this._api.getTeam(s.teamId);
+        this.setState({ teamName: team.name });
+      }
+    } catch (err) {
+      console.error(err);
+      this.setState({ teamId: null });
+    }
   }
 
   onUserSelectHandler = async (user: UserStat | null) => {
@@ -214,6 +236,11 @@ export class App extends React.Component<IProps, IState> {
       <div style={{ padding: '40px 40px 0 40px' }}>
         <Container >
           <h1 style={{ textAlign: 'center' }}>Most Wanted</h1>
+
+          {(s.teamId) ? <div style={{ textAlign: 'center', fontSize: '1.2em' }}>
+            {(s.teamName) ? <React.Fragment>Customized for <Label color='blue'>{s.teamName}</Label></React.Fragment> : 'Loading team...'}
+          </div> : null}
+
           <Grid divided='vertically' stackable >
             <Grid.Row columns={2} >
               <Grid.Column >
@@ -229,8 +256,8 @@ export class App extends React.Component<IProps, IState> {
                     onChange={(e, d) => this.setPeopleFilter(d.value as string)}
                   />
                 </div>
-                <Message warning style={{ textAlign: 'center' }}>Invite most wanted people to your conference</Message>
-                <People users={s.users} onUserSelect={this.onUserSelectHandler} loading={this.state.isPeopleLoading}/>
+                {/* <Message warning style={{ textAlign: 'center' }}>Invite most wanted people to your conference</Message> */}
+                <People users={s.users} onUserSelect={this.onUserSelectHandler} loading={this.state.isPeopleLoading} />
 
               </Grid.Column>
               <Grid.Column>
@@ -246,8 +273,8 @@ export class App extends React.Component<IProps, IState> {
                     onChange={(e, d) => this.setTopicsFilter(d.value as string)}
                   />
                 </div>
-                <Message warning style={{ textAlign: 'center' }}>Select topics relevant for your conference</Message>
-                <Topics posts={s.posts} onPostCheck={this.onPostCheckHandler} loading={this.state.isTopicsLoading}/>
+                {/* <Message warning style={{ textAlign: 'center' }}>Select topics relevant for your conference</Message> */}
+                <Topics posts={s.posts} onPostCheck={this.onPostCheckHandler} loading={this.state.isTopicsLoading} />
               </Grid.Column>
             </Grid.Row>
           </Grid>

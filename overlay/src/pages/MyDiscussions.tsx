@@ -129,14 +129,14 @@ export class MyDiscussions extends React.Component<IProps, IState> {
         const filteredPosts = this.state.posts.filter(this._postFilter);
 
         return (<div>
-            <div style={{ padding: '15px', position: 'fixed', top: '4em', left: '0', width: '100%', zIndex: 1000, backgroundColor: '#fff' }}>
+            <div style={{ padding: '15px', position: 'fixed', top: '90px', left: '0', width: '100%', zIndex: 1000, backgroundColor: '#fff' }}>
                 <Input fluid placeholder='Search...' value={this.state.search}
                     icon='search'
                     iconPosition='left'
                     onChange={this.inputChangeHandler}
                 />
             </div>
-            <div style={{ marginTop: '8em' }}>
+            <div style={{ marginTop: '145px' }}>
                 {this._getLoading('list') ? <Segment>
                     <Loader active inline='centered'>Loading</Loader>
                 </Segment> : <React.Fragment>

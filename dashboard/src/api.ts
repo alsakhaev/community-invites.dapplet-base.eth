@@ -24,15 +24,24 @@ export type UserStat = {
     posts_to_count: number;
 }
 
+export type Team = {
+    id: string;
+    name: string;
+}
+
 export class Api {
     constructor(private _url: string) { }
 
-    async getPostStat(filters?: { username?: string, limit?: number }): Promise<PostStat[]> {
+    async getPostStat(filters?: { username?: string, limit?: number, teamId?: string }): Promise<PostStat[]> {
         return this._sendRequest(`/posts/stat`, 'POST', filters);
     }
 
-    async getUserStat(filters?: { excludePosts?: string[], limit?: number }): Promise<UserStat[]> {
+    async getUserStat(filters?: { excludePosts?: string[], limit?: number, teamId?: string }): Promise<UserStat[]> {
         return this._sendRequest(`/users/stat`, 'POST', filters);
+    }
+
+    async getTeam(teamId: string): Promise<Team> {
+        return this._sendRequest(`/users/teams?id=${teamId}`);
     }
 
     private async _sendRequest(query: string, method: 'POST' | 'GET' | 'PUT' = 'GET', body?: any): Promise<any> {

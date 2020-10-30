@@ -1,8 +1,7 @@
 import React from 'react';
 //import './App.css';
-import { List, Image, Table, Header, Accordion, Icon, Container, Segment } from 'semantic-ui-react';
-import { Api, PostStat, UserStat } from '../api';
-import sortBy from 'lodash.sortby';
+import { Image, Table, Header, Accordion, Icon, Segment } from 'semantic-ui-react';
+import { UserStat } from '../api';
 
 interface IProps {
     users: UserStat[];
