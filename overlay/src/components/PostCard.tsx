@@ -5,6 +5,7 @@ import { Post } from '../dappletBus';
 interface IProps {
     post: Post;
     card?: boolean;
+    style?: any;
 }
 
 interface IState { }
@@ -12,7 +13,7 @@ interface IState { }
 export class PostCard extends React.Component<IProps, IState> {
     render() {
         const p = this.props.post;
-        if (this.props.card) return (<Card fluid>
+        if (this.props.card) return (<Card fluid style={this.props.style}>
             <Card.Content>
                 <Image
                     floated='left'
@@ -27,7 +28,7 @@ export class PostCard extends React.Component<IProps, IState> {
                 </Card.Description>
             </Card.Content>
         </Card>);
-        else return (<Segment>
+        else return (<Segment style={this.props.style}>
             <Comment.Group>
                 <Comment>
                     <Comment.Avatar src={p.authorImg} />

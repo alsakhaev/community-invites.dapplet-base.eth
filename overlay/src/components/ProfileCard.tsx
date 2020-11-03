@@ -7,6 +7,7 @@ interface IProps {
     card?: boolean;
     badge?: any;
     onBadgeClick?: Function;
+    style?: any;
 }
 
 interface IState { }
@@ -14,7 +15,7 @@ interface IState { }
 export class ProfileCard extends React.Component<IProps, IState> {
     render() {
         const p = this.props.profile;
-        if (this.props.card) return (<Card fluid>
+        if (this.props.card) return (<Card fluid style={this.props.style}>
             <Card.Content>
                 <Image
                     floated='left'
@@ -26,7 +27,7 @@ export class ProfileCard extends React.Component<IProps, IState> {
                 <Card.Meta>@{p.username}</Card.Meta>
             </Card.Content>
         </Card>);
-        else return (<Segment>
+        else return (<Segment style={this.props.style}>
             <Comment.Group>
                 <Comment>
                     <Comment.Avatar src={p.img} />

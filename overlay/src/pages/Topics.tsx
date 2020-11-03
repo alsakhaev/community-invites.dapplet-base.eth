@@ -203,7 +203,7 @@ export class Topics extends React.Component<IProps, IState> {
         const filteredPosts = this.state.posts.filter(this._postFilter);
 
         return (<div>
-            <div style={{ padding: '15px', position: 'fixed', top: '90px', left: '0', width: '100%', zIndex: 1000, backgroundColor: '#fff' }}>
+            <div style={{ padding: '15px', position: 'fixed', top: '95px', left: '0', width: '100%', zIndex: 1000, backgroundColor: '#fff' }}>
                 <Input
                     fluid
                     placeholder='Search...'
@@ -213,7 +213,7 @@ export class Topics extends React.Component<IProps, IState> {
                     onChange={this.inputChangeHandler}
                 />
             </div>
-            <div style={{ marginTop: '145px' }}>
+            <div style={{ marginTop: '150px' }}>
                 {this._getLoading('list') ? <Segment>
                     <Loader active inline='centered'>Loading</Loader>
                 </Segment> : <React.Fragment>

@@ -14,7 +14,8 @@ interface IProps {
 }
 
 interface IState {
-    
+    loading: any;
+    highlightedInvitationId: number;
 }
 
 export class AllInvites extends React.Component<IProps, IState> {
@@ -23,7 +24,16 @@ export class AllInvites extends React.Component<IProps, IState> {
         super(props);
 
         this.state = {
-            loading: {}
+            loading: {},
+            highlightedInvitationId: props.highlightedInvitationId
+        }
+    }
+
+    selectInvitation(id: number) {
+        if (id === this.state.highlightedInvitationId) {
+            this.setState({ highlightedInvitationId: -1 });
+        } else {
+            this.setState({ highlightedInvitationId: id });
         }
     }
 
@@ -44,10 +54,11 @@ export class AllInvites extends React.Component<IProps, IState> {
             {this.props.data.map((x, i) =>
                 <InvitationCard
                     key={i}
-                    highlight={x.id === this.props.highlightedInvitationId}
+                    highlight={x.id === this.state.highlightedInvitationId}
                     invitation={x}
                     onClose={() => this.props.onWithdraw(x)}
                     disabled={x.loading}
+                    onClick={() => this.selectInvitation(x.id)}
                 />
             )}
         </React.Fragment>

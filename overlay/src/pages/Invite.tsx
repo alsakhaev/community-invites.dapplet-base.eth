@@ -93,6 +93,30 @@ export class Invite extends React.Component<IProps, IState> {
     this.setState({ data: this.state.data.filter(x => x !== invitation) });
   }
 
+  async withdraw2(invitationId: number) {
+    const data = this.state.data;
+    const inv = data.find(x => x.id === invitationId)!;
+    inv.loading = true;
+    this.setState({ data });
+
+    const profileTo = {
+      username: inv.author_username.toLowerCase(),
+      fullname: inv.author_fullname,
+      img: inv.author_img,
+      namespace: 'twitter.com'
+    };
+    const post: Post = {
+      authorFullname: profileTo.fullname,
+      authorUsername: profileTo.username,
+      authorImg: profileTo.img,
+      id: inv.post_id,
+      text: inv.post_text
+    }
+    await this._api.withdraw(this.props.profile!, profileTo, inv.conference_id, post);
+
+    this.setState({ data: this.state.data.filter(x => x !== inv) });
+  }
+
   async onInvitedHandler(invId: number) {
     this.setState({ currentTab: Tabs.AllInvites, highlightedInvitationId: invId });
     await this.loadData();
@@ -121,13 +145,13 @@ export class Invite extends React.Component<IProps, IState> {
 
         {(s.currentTab !== Tabs.AllInvites) ? <React.Fragment>
           <Breadcrumb.Divider />
-          <Breadcrumb.Section active>New Invite</Breadcrumb.Section>
+          <Breadcrumb.Section active>Edit/Add Invite</Breadcrumb.Section>
         </React.Fragment> : null}
 
       </Breadcrumb>
 
       {(s.currentTab === Tabs.AllInvites) ? <AllInvites highlightedInvitationId={s.highlightedInvitationId} loading={s.loading} settings={p.settings} profile={p.profile} data={s.data} onWithdraw={(x) => this.withdraw(x)} /> : null}
-      {(s.currentTab === Tabs.NewInvite) ? <NewInvite loading={s.loading} settings={p.settings} profile={p.profile} post={p.post!} onInvited={(invId) => this.onInvitedHandler(invId)} onCancel={() => this.setState({ currentTab: Tabs.AllInvites })} /> : null}
+      {(s.currentTab === Tabs.NewInvite) ? <NewInvite loading={s.loading} settings={p.settings} profile={p.profile} post={p.post!} onInvited={(invId) => this.onInvitedHandler(invId)} onCancel={() => this.setState({ currentTab: Tabs.AllInvites })} onWithdraw={(x) => this.withdraw2(x)}/> : null}
 
     </React.Fragment>
   }

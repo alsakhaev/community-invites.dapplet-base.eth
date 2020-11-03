@@ -5,6 +5,7 @@ import { PostCard } from '../components/PostCard';
 import { Api, ConferenceWithInvitations } from '../api';
 import { ProfileCard } from '../components/ProfileCard'
 import Linkify from 'react-linkify';
+import { ConferencesDropdown } from '../components/ConferencesDropdown';
 
 interface IProps {
     post: Post;
@@ -13,6 +14,7 @@ interface IProps {
     onInvited: (id: number) => void;
     loading: boolean;
     onCancel: () => void;
+    onWithdraw: (id: number) => Promise<void>;
 }
 
 interface IState {
@@ -73,7 +75,13 @@ export class NewInvite extends React.Component<IProps, IState> {
 
     async loadConferences() {
         const data = await this._api.getConferencesWithInvitations(this.props.profile!, this.state.profileTo);
-        this.setState({ data, selectedConferenceId: data[0]?.conference.id ?? -1 });
+        const filteredByPosts: ConferenceWithInvitations[] = data.map(x => ({
+            conference: x.conference,
+            attendance_from: x.attendance_from,
+            attendance_to: x.attendance_to,
+            invitations: x.invitations.filter(y => y.post_id === this.props.post.id)
+        }))
+        this.setState({ data: filteredByPosts, selectedConferenceId: data[0]?.conference.id ?? -1 });
     }
 
     async invite() {
@@ -92,28 +100,65 @@ export class NewInvite extends React.Component<IProps, IState> {
         }
     }
 
+    async withdraw(id: number) {
+        try {
+            this.setState({ loading: true });
+            await this.props.onWithdraw(id);
+            await this.loadConferences();
+            this.setState({ loading: false });
+        } catch (err) {
+            if (err.name !== 'AbortError') console.error(err);
+        }
+    }
+
+    changeConference(selectedConferenceId: number ) {
+        const s = this.state;
+        const p = this.props;
+        this.setState({ selectedConferenceId });
+        const selectedConference = s.data.find(x => x.conference.id === selectedConferenceId);
+        const currentInvitation = selectedConference?.invitations.find(x => x.from.namespace === p.profile.namespace && x.from.username === p.profile.username && x.to.namespace === s.profileTo.namespace && x.to.username === s.profileTo.username);
+        this.setState({ isPrivate: currentInvitation?.is_private ?? false });
+    }
+
     render() {
         const s = this.state,
             p = this.props;
 
         const selectedConference = s.data.find(x => x.conference.id === s.selectedConferenceId);
 
+        const invitesTotal = selectedConference?.invitations.filter(x => x.from.namespace === this.props.profile.namespace && x.from.username === this.props.profile.username).length ?? 0;
+        const invitesAuthorTotal = selectedConference?.invitations.filter(x => x.from.namespace === this.props.profile.namespace && x.from.username === this.props.profile.username).filter(x => x.to.namespace === this.state.profileTo.namespace && x.to.username === this.state.profileTo.username).length ?? 0;
+
+        const currentInvitation = selectedConference?.invitations.find(x => x.from.namespace === p.profile.namespace && x.from.username === p.profile.username && x.to.namespace === s.profileTo.namespace && x.to.username === s.profileTo.username);
+
         return <React.Fragment>
 
-            <ProfileCard card profile={p.profile} />
-            <Divider horizontal>Invites for discussion</Divider>
-            <PostCard post={p.post} card />
+            <Divider horizontal>You invite</Divider>
+            <ProfileCard card profile={s.profileTo} style={{ boxShadow: '0 1px 2px 0 #21ba455e', border: '1px solid #21ba45' }} />
+
+            <Divider horizontal>For discussion this topic</Divider>
+            <PostCard post={p.post} card style={{ boxShadow: '0 1px 2px 0 #2185d05e', border: '1px solid #2185d0' }} />
 
             {(!s.loading && !p.loading) ? <React.Fragment>
-                <label style={{ fontWeight: 'bold', display: 'block', marginBottom: '6px' }}>On Conference</label>
-                <Dropdown
-                    placeholder='Select Conference'
-                    fluid
-                    search
-                    selection
-                    options={s.data.map(x => ({ text: x.conference.name, value: x.conference.id }))}
-                    onChange={(e, d) => this.setState({ selectedConferenceId: d.value as number })}
-                    value={s.selectedConferenceId}
+                <Divider horizontal>On conference</Divider>
+
+                {(currentInvitation) ? <Message warning>
+                    <div style={{ display: 'flex' }}>
+                        <div style={{ flex: 'auto' }}>
+                            You have already invited the @{s.profileTo.username} to discuss this topic.<br />
+                            You can withdraw the invitation or change its privacy.
+                    </div>
+                        <div>
+                            <Button size='mini' primary onClick={() => this.withdraw(currentInvitation.id)}>Withdraw</Button>
+                        </div>
+                    </div>
+                </Message> : null}
+
+                <ConferencesDropdown
+                    data={s.data}
+                    onChange={(value) => this.changeConference(value as number)}
+                    selectedConferenceId={s.selectedConferenceId}
+                    profileTo={s.profileTo}
                 />
 
                 {selectedConference ? <Segment>
@@ -121,10 +166,17 @@ export class NewInvite extends React.Component<IProps, IState> {
                         {selectedConference.conference.description ? <Linkify componentDecorator={(href: string, text: string, key: string) => <a href={href} key={key} target="_blank" rel="noopener noreferrer">{text}</a>}>{selectedConference.conference.description}<br /></Linkify> : null}
                         {selectedConference.conference.date_from.toLocaleDateString() + ' - ' + selectedConference.conference.date_to.toLocaleDateString()}
                     </p>
+
+                    {(invitesTotal > 0) ?
+                        ((invitesAuthorTotal > 0) ?
+                            <p>You have sent {invitesTotal} invite{(invitesTotal > 1) ? 's' : ''}, including {invitesAuthorTotal} invite{(invitesAuthorTotal > 1) ? 's' : ''} with @{this.state.profileTo.username} to the conference</p>
+                            : <p>You have sent {invitesTotal} invite{(invitesTotal > 1) ? 's' : ''} to the conference</p>)
+                        : <p>You have not sent any invites to the conference</p>}
+
                 </Segment> : null}
 
                 {!selectedConference!.attendance_from ? <Message warning>
-                    You will automatically participate in {selectedConference!.conference.name} when you invite a person there.
+                    Clicking on the INVITE button means that you also attending this conference
                 </Message> : null}
 
                 <p style={{ margin: '10px 4px', textAlign: 'end' }}>
@@ -140,7 +192,7 @@ export class NewInvite extends React.Component<IProps, IState> {
 
                 <div style={{ textAlign: 'end' }}>
                     <Checkbox style={{ margin: '0 20px 0 0' }} label='Private' disabled={s.isInvitingLoading} checked={s.isPrivate} onChange={(e, d) => this.setState({ isPrivate: d.checked as boolean })} />
-                    <Button primary onClick={() => this.invite()} loading={s.isInvitingLoading} disabled={s.isInvitingLoading}>{(!selectedConference!.attendance_from) ? 'Attend & Invite' : 'Invite'}</Button>
+                    <Button primary onClick={() => this.invite()} loading={s.isInvitingLoading} disabled={s.isInvitingLoading}>{(!currentInvitation) ? ((!selectedConference!.attendance_from) ? 'Attend & Invite' : 'Invite') : 'Save'}</Button>
                     <Button onClick={() => this.props.onCancel()} disabled={s.isInvitingLoading}>Cancel</Button>
                 </div>
 

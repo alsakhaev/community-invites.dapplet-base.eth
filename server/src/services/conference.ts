@@ -43,7 +43,9 @@ export async function getConferencesWithInvitations(namespace_from: string, user
                 COALESCE(json_agg(json_build_object(
                     'from', u_from.*,
                     'to', u_to.*,
-                    'post_id', i.post_id
+                    'post_id', i.post_id,
+                    'id', i.id,
+                    'is_private', i.is_private
                 )) FILTER (WHERE i.post_id IS NOT NULL), '[]') as invitations,
                 (CASE WHEN (SELECT TRUE FROM attendance as a where c.id = a.conference_id and a.namespace = $1 and a.username = $2 LIMIT 1) IS NULL THEN FALSE ELSE TRUE END) AS attendance_from
                 ${isWithSecondParty ? `,(CASE WHEN (SELECT TRUE FROM attendance as a where c.id = a.conference_id and a.namespace = $3 and a.username = $4 LIMIT 1) IS NULL THEN FALSE ELSE TRUE END) AS attendance_to` : ''}

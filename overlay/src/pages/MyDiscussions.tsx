@@ -1,12 +1,14 @@
 import React from 'react';
 import { Segment, Comment, Input, InputOnChangeData, Loader } from 'semantic-ui-react';
 import { Api, PostWithInvitations } from '../api';
-import { Profile, Settings } from '../dappletBus';
+import { Post, Profile, Settings } from '../dappletBus';
+import { AggInvitationCard } from '../components/AggInvitationCard';
 
 interface IProps {
     defaultSearch: string;
     settings: Settings;
-    profile?: Profile;
+    profile: Profile;
+    onEdit: (post: Post, user: Profile) => void;
 }
 
 interface IState {
@@ -15,6 +17,7 @@ interface IState {
     loading: { [key: string]: boolean };
     active1: string | null;
     active2: string | null;
+    highlightedId: string | null;
 }
 
 export class MyDiscussions extends React.Component<IProps, IState> {
@@ -31,7 +34,8 @@ export class MyDiscussions extends React.Component<IProps, IState> {
                 'list': true
             },
             active1: null,
-            active2: null
+            active2: null,
+            highlightedId: null
         };
     }
 
@@ -125,51 +129,55 @@ export class MyDiscussions extends React.Component<IProps, IState> {
         return this.state.loading[key] || false;
     }
 
+    _selectCard(id: string) {
+        this.setState({
+            highlightedId: (id === this.state.highlightedId) ? null : id
+        })
+    }
+
+    _onEdit(p: PostWithInvitations) {
+        const post: Post = {
+            id: p.post.id,
+            text: p.post.text,
+            authorUsername: p.post.username,
+            authorImg: p.post.img,
+            authorFullname: p.post.fullname
+        };
+
+        const user: Profile = {
+            namespace: p.post.namespace,
+            username: p.post.username,
+            img: p.post.img,
+            fullname: p.post.fullname
+        };
+
+        this.props.onEdit(post, user);
+    }
+
     render() {
         const filteredPosts = this.state.posts.filter(this._postFilter);
 
         return (<div>
-            <div style={{ padding: '15px', position: 'fixed', top: '90px', left: '0', width: '100%', zIndex: 1000, backgroundColor: '#fff' }}>
+            <div style={{ padding: '15px', position: 'fixed', top: '95px', left: '0', width: '100%', zIndex: 1000, backgroundColor: '#fff' }}>
                 <Input fluid placeholder='Search...' value={this.state.search}
                     icon='search'
                     iconPosition='left'
                     onChange={this.inputChangeHandler}
                 />
             </div>
-            <div style={{ marginTop: '145px' }}>
+            <div style={{ marginTop: '150px' }}>
                 {this._getLoading('list') ? <Segment>
                     <Loader active inline='centered'>Loading</Loader>
                 </Segment> : <React.Fragment>
                         {(filteredPosts.length > 0) ? filteredPosts.map((p, i) =>
-                            <Segment key={i}>
-                                <Comment.Group minimal>
-                                    <Comment >
-                                        <Comment.Avatar style={{ margin: 0 }} src={p.post.img} />
-                                        <Comment.Content style={{ marginLeft: '3.3em', padding: 0 }} >
-                                            <Comment.Author as='a' target='_blank' href={`https://twitter.com/${p.post.username}/status/${p.post.id}`}>{p.post.fullname}</Comment.Author>
-                                            <Comment.Metadata>
-                                                <div>@{p.post.username}</div>
-                                            </Comment.Metadata>
-                                            <Comment.Text>{p.post.text}</Comment.Text>
-                                        </Comment.Content>
-                                        <div>
-                                            {p.conferences.map(c => {
-                                                const exceptMe = c.users.filter(u => !(u.username === this.props.profile?.username && u.namespace === this.props.profile?.namespace));
-                                                const public_users = exceptMe.filter(x => x.is_private === false);
-                                                const private_users = exceptMe.filter(x => x.is_private === true);
-
-                                                return <React.Fragment key={c.id}>
-                                                    <b>{c.name}: </b>
-                                                    {c.users.find(u => u.username === this.props.profile?.username && u.namespace === this.props.profile?.namespace) ? 'me' : null}
-                                                    {public_users.map((u, i) => <React.Fragment key={i}><span title={u.fullname}>, @<span style={{ textDecoration: (u.username === p.post.username) ? 'underline' : undefined }}>{u.username}</span></span></React.Fragment>)}
-                                                    {(private_users.length > 0) ? <React.Fragment> and {private_users.length} private person{(private_users.length > 1 ? 's' : '')}</React.Fragment> : null}
-                                                    <br />
-                                                </React.Fragment>
-                                            })}
-                                        </div>
-                                    </Comment>
-                                </Comment.Group>
-                            </Segment>
+                            <AggInvitationCard 
+                                post={p} 
+                                key={p.post.id} 
+                                profile={this.props.profile}
+                                highlight={this.state.highlightedId === p.post.id}
+                                onClick={() => this._selectCard(p.post.id)}
+                                onEdit={() => this._onEdit(p)}
+                            />
                         ) : <Segment>No entries found</Segment>}
                     </React.Fragment>}
             </div>

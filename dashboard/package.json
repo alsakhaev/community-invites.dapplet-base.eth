@@ -20,7 +20,7 @@
     "typescript": "^3.7.5"
   },
   "scripts": {
-    "start": "REACT_APP_API_URL=http://localhost:3003 PORT=3004 react-scripts start",
+    "start": "REACT_APP_API_URL=http://localhost:3003 PORT=3004 BROWSER=none react-scripts start",
     "build": "REACT_APP_API_URL=https://community-invite.herokuapp.com react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"

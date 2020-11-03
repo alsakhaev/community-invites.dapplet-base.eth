@@ -42,7 +42,7 @@ export type PostWithInvitations = {
     }[];
 }
 
-export type ConferenceWithInvitations = { conference: Conference, invitations: { from: Profile, to: Profile, post_id: string }[], attendance_from: boolean, attendance_to?: boolean };
+export type ConferenceWithInvitations = { conference: Conference, invitations: { from: Profile, to: Profile, post_id: string, id: number, is_private: boolean }[], attendance_from: boolean, attendance_to?: boolean };
 
 export type DetailedPost = Post & {
     conference_id: number;
@@ -181,7 +181,7 @@ export class Api {
     }
 
     async untag(item_id: string, tag_id: string, user: Profile, teamId?: string) {
-        return this._sendRequest((teamId) ? `/tags/untag?teamId=${teamId}` : '/tags/tag', 'POST', { item_id, tag_id, user });
+        return this._sendRequest((teamId) ? `/tags/untag?teamId=${teamId}` : '/tags/untag', 'POST', { item_id, tag_id, user });
     }
 
     async getTags(teamId?: string): Promise<Tag[]> {

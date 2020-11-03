@@ -22,15 +22,17 @@ interface IState {
   userSettings?: UserSettings;
   teamLoading: boolean;
   teamInputVisible: boolean;
+  teamInputError: boolean;
 }
 
 export class App extends React.Component<IProps, IState> {
 
   private _api?: Api;
+  private _teamIdInputRef: any;
 
   constructor(props: IProps) {
     super(props);
-    this.state = { post: undefined, profile: undefined, settings: undefined, activeIndex: -1, postsDefaultSearch: '', key: 0, userSettings: undefined, teamLoading: false, teamInputVisible: false };
+    this.state = { post: undefined, profile: undefined, settings: undefined, activeIndex: -1, postsDefaultSearch: '', key: 0, userSettings: undefined, teamLoading: false, teamInputVisible: false, teamInputError: false };
 
     dappletInstance.onData(async ({ post, profile, settings }) => {
       this._api = new Api(settings.serverUrl);
@@ -42,6 +44,8 @@ export class App extends React.Component<IProps, IState> {
 
       this.setState({ post, profile, settings, activeIndex: profile ? 0 : 1, key: Math.random() });
     });
+
+    this._teamIdInputRef = React.createRef();
   }
 
   componentDidMount() {
@@ -69,6 +73,7 @@ export class App extends React.Component<IProps, IState> {
       }
     } catch (err) {
       console.error(err);
+      this.setState({ teamInputError: true })
     } finally {
       this.setState({ teamLoading: false });
     }
@@ -85,6 +90,22 @@ export class App extends React.Component<IProps, IState> {
     } finally {
       this.setState({ teamLoading: false });
     }
+  }
+
+  onKeyDownHandler(e: any) {
+    if (e.keyCode === 13) {
+      this.onTeamIdChange(e, { value: e.target.value });
+    }
+  }
+
+  onEnterClickHandler() {
+    const value = this._teamIdInputRef.current.inputRef.current.value;
+    const _: any = null;
+    this.onTeamIdChange(_, { value });
+  }
+
+  onEdit(post: Post, profile: Profile) {
+    this.setState({ post, activeIndex: 0, key: Math.random() });
   }
 
   render() {
@@ -116,9 +137,27 @@ export class App extends React.Component<IProps, IState> {
             <span>Your Team: </span>
             {(s.userSettings?.teamId && s.teamInputVisible === false) ?
               <Label color='blue' as='a' onClick={() => this.setState({ teamInputVisible: true })}>{s.userSettings?.teamName}<Icon loading={s.teamLoading} name='close' onClick={(e: any) => (e.stopPropagation(), this.removeTeam())} /></Label> :
-              <Input defaultValue={s.userSettings?.teamId} style={{ width: '25em' }} loading={s.teamLoading} size='mini' placeholder='Team ID' onChange={this.onTeamIdChange} />}
+              <Input
+                defaultValue={s.userSettings?.teamId}
+                style={{ width: '25em' }}
+                loading={s.teamLoading}
+                size='mini'
+                placeholder='Team ID'
+                onChange={() => this.setState({ teamInputError: false })}
+                onKeyDown={this.onKeyDownHandler.bind(this)}
+                ref={this._teamIdInputRef}
+                error={this.state.teamInputError}
+                action={{
+                  icon: {
+                    name: 'level down',
+                    rotated: 'clockwise',
+                    size: 'small'
+                  },
+                  onClick: () => this.onEnterClickHandler()
+                }}
+              />}
           </div>
-          <Menu pointing secondary style={{ margin: '0.5em 0 0 0'}}>
+          <Menu pointing secondary style={{ margin: '0.5em 0 0 0' }}>
             {s.profile ? <Menu.Item
               name='Invite'
               active={s.activeIndex === 0}
@@ -148,7 +187,7 @@ export class App extends React.Component<IProps, IState> {
           </Menu>
         </div>
 
-        <div style={{ margin: '90px 0 0 0' }}>
+        <div style={{ margin: '95px 0 0 0' }}>
 
           {s.profile ? <div style={{ display: (s.activeIndex === 0) ? 'block' : 'none', paddingBottom: '10px' }}>
             <Invite profile={s.profile} post={s.post} onPostsClick={this.postsClickHandler} settings={s.settings!} key={s.key} />
@@ -159,7 +198,7 @@ export class App extends React.Component<IProps, IState> {
           </div>
 
           <div style={{ display: (s.activeIndex === 2) ? 'block' : 'none', paddingBottom: '10px' }}>
-            <MyDiscussions profile={s.profile} defaultSearch={s.postsDefaultSearch} settings={s.settings!} key={s.key} />
+            <MyDiscussions profile={s.profile} defaultSearch={s.postsDefaultSearch} settings={s.settings!} key={s.key} onEdit={this.onEdit.bind(this)} />
           </div>
 
           <div style={{ display: (s.activeIndex === 3) ? 'block' : 'none', paddingBottom: '10px' }}>

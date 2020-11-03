@@ -3,6 +3,7 @@ import { Conference, Post, Profile } from '../types';
 import * as userService from './user';
 import * as postService from './post';
 import * as conferenceService from './conference';
+import e from 'express';
 
 type MyInvitation = {
     to_namespace: string;
@@ -75,6 +76,8 @@ export async function invite(userFrom: Profile, userTo: Profile, conferenceId: n
             await conferenceService.attend(userFrom, conferenceId);
         }
 
+        let existingId = null;
+
         // existance checking
         {
             const values = [userFrom.namespace, userTo.namespace, userFrom.username, userTo.username, conferenceId, post.id]
@@ -90,16 +93,30 @@ export async function invite(userFrom: Profile, userTo: Profile, conferenceId: n
             `;
 
             const result = await client.query(query, values);
-            if (result.rowCount > 0) throw Error('Such invite already exists');
+            if (result.rowCount > 0) existingId = result.rows[0].id;
         }
 
-        const values = [userFrom.namespace, userTo.namespace, userFrom.username, userTo.username, conferenceId, post.id, is_private, new Date().toISOString(), new Date().toISOString()]
-        const query = `INSERT INTO invitations(
-            id, namespace_from, namespace_to, username_from, username_to, conference_id, post_id, is_private, created, modified
-        ) VALUES (DEFAULT, $1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *;`;
+        if (existingId) {
+            const values = [existingId, is_private, new Date().toISOString()]
+            const query = `
+                UPDATE invitations
+                SET id = DEFAULT, 
+                    is_private = $2, 
+                    modified = $3
+                WHERE id = $1
+                RETURNING *;`;
 
-        const result = await client.query(query, values);
-        return result.rows[0].id;
+            const result = await client.query(query, values);
+            return result.rows[0].id;
+        } else {
+            const values = [userFrom.namespace, userTo.namespace, userFrom.username, userTo.username, conferenceId, post.id, is_private, new Date().toISOString(), new Date().toISOString()]
+            const query = `INSERT INTO invitations(
+                id, namespace_from, namespace_to, username_from, username_to, conference_id, post_id, is_private, created, modified
+            ) VALUES (DEFAULT, $1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *;`;
+
+            const result = await client.query(query, values);
+            return result.rows[0].id;
+        }
     });
 }
 
