@@ -111,7 +111,7 @@ export class NewInvite extends React.Component<IProps, IState> {
         }
     }
 
-    changeConference(selectedConferenceId: number ) {
+    changeConference(selectedConferenceId: number) {
         const s = this.state;
         const p = this.props;
         this.setState({ selectedConferenceId });
@@ -133,21 +133,22 @@ export class NewInvite extends React.Component<IProps, IState> {
 
         return <React.Fragment>
 
-            <Divider horizontal>You invite</Divider>
-            <ProfileCard card profile={s.profileTo} style={{ boxShadow: '0 1px 2px 0 #21ba455e', border: '1px solid #21ba45' }} />
+            {/* {(currentInvitation) ? <h4>Edit invite</h4> : <h4>New invite</h4>} */}
 
-            <Divider horizontal>For discussion this topic</Divider>
+            {(currentInvitation) ? <Divider horizontal>You invited</Divider> : <Divider horizontal>You invite</Divider>}
+            <ProfileCard card profile={s.profileTo} />
+
+            <Divider horizontal>To discuss the topic</Divider>
             <PostCard post={p.post} card style={{ boxShadow: '0 1px 2px 0 #2185d05e', border: '1px solid #2185d0' }} />
 
             {(!s.loading && !p.loading) ? <React.Fragment>
-                <Divider horizontal>On conference</Divider>
+                <Divider horizontal>To conference</Divider>
 
                 {(currentInvitation) ? <Message warning>
                     <div style={{ display: 'flex' }}>
                         <div style={{ flex: 'auto' }}>
-                            You have already invited the @{s.profileTo.username} to discuss this topic.<br />
-                            You can withdraw the invitation or change its privacy.
-                    </div>
+                            @{s.profileTo.username} is already invited
+                        </div>
                         <div>
                             <Button size='mini' primary onClick={() => this.withdraw(currentInvitation.id)}>Withdraw</Button>
                         </div>
@@ -161,7 +162,7 @@ export class NewInvite extends React.Component<IProps, IState> {
                     profileTo={s.profileTo}
                 />
 
-                {selectedConference ? <Segment>
+                {selectedConference ? <Segment style={{ boxShadow: 'none', borderRadius: '0 0 .28571429rem .28571429rem', borderTop: 'none', marginTop: '0'}}>
                     <p>
                         {selectedConference.conference.description ? <Linkify componentDecorator={(href: string, text: string, key: string) => <a href={href} key={key} target="_blank" rel="noopener noreferrer">{text}</a>}>{selectedConference.conference.description}<br /></Linkify> : null}
                         {selectedConference.conference.date_from.toLocaleDateString() + ' - ' + selectedConference.conference.date_to.toLocaleDateString()}
@@ -176,7 +177,7 @@ export class NewInvite extends React.Component<IProps, IState> {
                 </Segment> : null}
 
                 {!selectedConference!.attendance_from ? <Message warning>
-                    Clicking on the INVITE button means that you also attending this conference
+                    Your Invite implies your attendance at the conference
                 </Message> : null}
 
                 <p style={{ margin: '10px 4px', textAlign: 'end' }}>
@@ -188,7 +189,6 @@ export class NewInvite extends React.Component<IProps, IState> {
                 </p>
 
                 {s.error ? <div style={{ textAlign: 'end', marginBottom: '10px' }}><Label basic color='red'>{s.error}</Label></div> : null}
-
 
                 <div style={{ textAlign: 'end' }}>
                     <Checkbox style={{ margin: '0 20px 0 0' }} label='Private' disabled={s.isInvitingLoading} checked={s.isPrivate} onChange={(e, d) => this.setState({ isPrivate: d.checked as boolean })} />

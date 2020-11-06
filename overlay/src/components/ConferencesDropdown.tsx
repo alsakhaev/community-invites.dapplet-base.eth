@@ -50,26 +50,29 @@ export class ConferencesDropdown extends React.Component<IProps, IState> {
         const invited = p.data.filter(x => x.invitations.find(y => y.to.namespace === p.profileTo.namespace && y.to.username === p.profileTo.username));
         const notInvited = p.data.filter(x => !x.invitations.find(y => y.to.namespace === p.profileTo.namespace && y.to.username === p.profileTo.username));
 
-        return <Dropdown
-                placeholder='Choose Conference'
-                fluid
-                className='selection'
-                value={p.selectedConferenceId}
-                text={p.data.find(x => x.conference.id === p.selectedConferenceId)?.conference.name}
-            >
-                <Dropdown.Menu style={{ maxHeight: '32em' }} >
-                    {(invited.length > 0) ? <React.Fragment>
-                        <Dropdown.Header content={`You already invited @${p.profileTo.username}`} />
-                        <Dropdown.Divider />
-                        {invited.map(x => this.dropdownItem(x))}
-                    </React.Fragment> : null}
+        const headerStyle = { borderTop: '1px solid #dadada', borderBottom: '1px solid #dadada', backgroundColor: 'rgba(0,0,0,.05)', margin: '0', padding: '1rem 1.14285714rem' };
 
-                    {(notInvited.length > 0) ? <React.Fragment>
-                        <Dropdown.Header content={`You haven't invited @${p.profileTo.username} yet`} />
-                        <Dropdown.Divider />
-                        {notInvited.map(x => this.dropdownItem(x))}
-                    </React.Fragment> : null}
-                </Dropdown.Menu>
-            </Dropdown>;
+        return <Dropdown
+            placeholder='Choose Conference'
+            fluid
+            className='selection'
+            value={p.selectedConferenceId}
+            text={p.data.find(x => x.conference.id === p.selectedConferenceId)?.conference.name}
+            style={{ fontWeight: 'bold', borderRadius: '.28571429rem .28571429rem 0 0' }}
+        >
+            <Dropdown.Menu style={{ maxHeight: '24em' }} >
+                {(invited.length > 0) ? <React.Fragment>
+                    <Dropdown.Header style={headerStyle} content={`You already invited @${p.profileTo.username}`} />
+                    {/* <Dropdown.Divider /> */}
+                    {invited.map(x => this.dropdownItem(x))}
+                </React.Fragment> : null}
+
+                {(notInvited.length > 0) ? <React.Fragment>
+                    <Dropdown.Header style={headerStyle} content={`You haven't invited @${p.profileTo.username} yet`} />
+                    {/* <Dropdown.Divider /> */}
+                    {notInvited.map(x => this.dropdownItem(x))}
+                </React.Fragment> : null}
+            </Dropdown.Menu>
+        </Dropdown>;
     }
 }

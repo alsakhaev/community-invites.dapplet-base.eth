@@ -38,19 +38,23 @@ export class AllInvites extends React.Component<IProps, IState> {
     }
 
     render() {
-        if (this.props.loading) return <Placeholder>
-            <Placeholder.Line />
-            <Placeholder.Line />
-            <Placeholder.Line />
-            <Placeholder.Line />
-            <Placeholder.Line />
-        </Placeholder>;
+        if (this.props.loading) return <React.Fragment>
+            {/* <h4>All Invites</h4> */}
+            <Placeholder>
+                <Placeholder.Line />
+                <Placeholder.Line />
+                <Placeholder.Line />
+                <Placeholder.Line />
+                <Placeholder.Line />
+            </Placeholder>
+        </React.Fragment>;
 
         if (this.props.data.length === 0) {
             return <Segment>No Invitations</Segment>
         }
 
         return <React.Fragment>
+            {/* <h4>All Invites</h4> */}
             {this.props.data.map((x, i) =>
                 <InvitationCard
                     key={i}
