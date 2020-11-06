@@ -232,7 +232,7 @@ export class Topics extends React.Component<IProps, IState> {
                                             <Comment.Author>{p.fullname}</Comment.Author>
                                             <Comment.Metadata style={{ margin: '0' }}>@{p.username}</Comment.Metadata>
                                         </Comment.Content>
-                                        <Comment.Text style={{ margin: '1em 0 0.5em 0' }}>{p.text} <Button icon='external' title='Open the post in Twitter' basic size='mini' style={{ boxShadow: 'none', padding: '2px', margin: '0', position: 'relative', top: '-1px' }} onClick={(e) => (e.stopPropagation(), window.open(`https://twitter.com/${p.username}/status/${p.id}`, '_blank'))} /></Comment.Text>
+                                        <Comment.Text style={{ margin: '0.5em 0px 0.5em 46px' }}>{p.text} <Button icon='external' title='Open the post in Twitter' basic size='mini' style={{ boxShadow: 'none', padding: '2px', margin: '0', position: 'relative', top: '-1px' }} onClick={(e) => (e.stopPropagation(), window.open(`https://twitter.com/${p.username}/status/${p.id}`, '_blank'))} /></Comment.Text>
 
                                         <div>
                                             {p.tags.filter(x => x.value === true).map(x => <Label onClick={() => this._tagFilter(x.name)} style={{ marginTop: '.14285714em' }} as='a' color='green' key={x.id} disabled={this._getLoading(p.id)}>{x.name}<Icon name='delete' disabled={this._getLoading(p.id)} link onClick={(e: any) => (e.stopPropagation(), this.untag(p.id, x.id))} /></Label>)}

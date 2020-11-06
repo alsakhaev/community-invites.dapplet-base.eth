@@ -28,7 +28,7 @@ export class InvitationCard extends React.Component<IProps, IState> {
                         <Label>{invitation.conference_short_name}</Label>
                         {(invitation.is_private) ? <Label title='This invitation is private'>Private</Label> : null}
                     </Header>
-                    <p style={{ margin: '10px 0', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                    <p style={{ margin: '0.5em 0 0 38px', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                         {invitation.post_text}
                         <Button icon='external' title='Open the post in Twitter' basic size='mini' style={{ boxShadow: 'none', padding: '2px', margin: '0 0 0 4px', position: 'relative', top: '-1px' }} onClick={(e) => (e.stopPropagation(), window.open(`https://twitter.com/${invitation.author_username}/status/${invitation.post_id}`, '_blank'))} />
                     </p>

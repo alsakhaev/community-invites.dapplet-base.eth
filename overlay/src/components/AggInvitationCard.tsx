@@ -41,7 +41,7 @@ export class AggInvitationCard extends React.Component<IProps, IState> {
                             {(p.highlight) ? <Button primary onClick={(e) => (e.stopPropagation(), this.props.onEdit())} size='mini'>Edit Invites</Button> : null}
                         </div>
                     </Comment.Content>
-                    <Comment.Text style={{ margin: '1em 0' }}>{p.post.post.text} <Button icon='external' title='Open the post in Twitter' basic size='mini' style={{ boxShadow: 'none', padding: '2px', margin: '0', position: 'relative', top: '-1px' }} onClick={(e) => (e.stopPropagation(), window.open(`https://twitter.com/${p.post.post.username}/status/${p.post.post.id}`, '_blank'))} /></Comment.Text>
+                    <Comment.Text style={{ margin: '0.5em 0 0.5em 47px' }}>{p.post.post.text} <Button icon='external' title='Open the post in Twitter' basic size='mini' style={{ boxShadow: 'none', padding: '2px', margin: '0', position: 'relative', top: '-1px' }} onClick={(e) => (e.stopPropagation(), window.open(`https://twitter.com/${p.post.post.username}/status/${p.post.post.id}`, '_blank'))} /></Comment.Text>
                     <div>
                         {p.post.conferences.map(c => {
                             const exceptMe = c.users.filter(u => !(u.username === this.props.profile?.username && u.namespace === this.props.profile?.namespace));
