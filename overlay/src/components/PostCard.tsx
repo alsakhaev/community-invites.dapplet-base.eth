@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, Segment, Image, Comment } from 'semantic-ui-react';
+import { Card, Segment, Image, Comment, Button } from 'semantic-ui-react';
 import { Post } from '../dappletBus';
 
 interface IProps {
@@ -33,9 +33,9 @@ export class PostCard extends React.Component<IProps, IState> {
                 <Comment>
                     <Comment.Avatar src={p.authorImg} />
                     <Comment.Content>
-                        <Comment.Author as='a'>{p.authorFullname}</Comment.Author>
+                        <Comment.Author>{p.authorFullname}</Comment.Author>
                         <Comment.Metadata>
-                            <div>@{p.authorUsername}</div>
+                            @{p.authorUsername} <Button icon='external' title='Open the post in Twitter' basic size='mini' style={{ boxShadow: 'none', padding: '2px', margin: '0', position: 'relative', top: '-1px' }} onClick={() => window.open(`https://twitter.com/${p.authorUsername}/status/${p.id}`, '_blank')} />
                         </Comment.Metadata>
                         <Comment.Text>{p.text}</Comment.Text>
                     </Comment.Content>

@@ -3,8 +3,8 @@ import { Button, ButtonProps } from 'semantic-ui-react';
 import { SemanticCOLORS } from 'semantic-ui-react/dist/commonjs/generic';
 
 interface HoverButtonProps extends ButtonProps {
-    hoverColor?: SemanticCOLORS;
-    hoverText?: string;
+    hoverColor: SemanticCOLORS;
+    hoverText: string;
 }
 
 interface HoverButtonState {
@@ -34,6 +34,7 @@ export class HoverButton extends React.Component<HoverButtonProps, HoverButtonSt
         const text = (s.isHover) ? (p.hoverText ?? p.children) : p.children;
 
         return <Button 
+            //{...p}
             onMouseOver={this.mouseOverHandler} 
             onMouseOut={this.mouseOutHandler} 
             color={color} 

@@ -175,8 +175,10 @@ export class MyDiscussions extends React.Component<IProps, IState> {
                                 key={p.post.id} 
                                 profile={this.props.profile}
                                 highlight={this.state.highlightedId === p.post.id}
-                                onClick={() => this._selectCard(p.post.id)}
+                                //onClick={() => this._selectCard(p.post.id)}
                                 onEdit={() => this._onEdit(p)}
+                                onMouseEnter={() => this._selectCard(p.post.id)}
+                                onMouseLeave={() => this._selectCard(p.post.id)}
                             />
                         ) : <Segment>No entries found</Segment>}
                     </React.Fragment>}

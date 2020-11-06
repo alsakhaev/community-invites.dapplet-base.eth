@@ -240,6 +240,10 @@ export async function getPostsWithInvitations(namespace: string, username: strin
                     select i.conference_id 
                     from invitations as i 
                     where i.post_id = p.id
+                        and (
+                            (i.namespace_from = $1 and i.username_from = $2)
+                            or (i.namespace_to = $1 and i.username_to = $2)
+                        )
                 ) and c.date_to >= DATE(NOW() - INTERVAL '3 DAY')
             ) as conferences
         from posts as p
@@ -274,7 +278,7 @@ export async function getPostsWithInvitations(namespace: string, username: strin
                         is_private: invitation.is_private
                     });
                 }
-                if (!users.find(x => x.namespace === invitation.namespace_to && x.username === invitation.username_to && x.is_private === invitation.is_private)) {
+                if (!users.find(x => x.namespace === invitation.namespace_to && x.username === invitation.username_to && x.is_private === false)) {
                     users.push({
                         namespace: invitation.namespace_to,
                         username: invitation.username_to,

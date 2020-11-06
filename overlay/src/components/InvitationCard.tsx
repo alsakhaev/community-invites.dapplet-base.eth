@@ -1,5 +1,5 @@
 import React from 'react';
-import { Icon, Segment, Image, Label, Header } from 'semantic-ui-react';
+import { Icon, Segment, Image, Label, Header, Button } from 'semantic-ui-react';
 import { MyInvitation } from '../api';
 
 interface IProps {
@@ -28,7 +28,10 @@ export class InvitationCard extends React.Component<IProps, IState> {
                         <Label>{invitation.conference_short_name}</Label>
                         {(invitation.is_private) ? <Label title='This invitation is private'>Private</Label> : null}
                     </Header>
-                    <p style={{ margin: '10px 0', overflow: 'hidden', textOverflow: 'ellipsis' }}>{invitation.post_text}</p>
+                    <p style={{ margin: '10px 0', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        {invitation.post_text}
+                        <Button icon='external' title='Open the post in Twitter' basic size='mini' style={{ boxShadow: 'none', padding: '2px', margin: '0 0 0 4px', position: 'relative', top: '-1px' }} onClick={(e) => (e.stopPropagation(), window.open(`https://twitter.com/${invitation.author_username}/status/${invitation.post_id}`, '_blank'))} />
+                    </p>
                 </div>
             </Segment>;
     }

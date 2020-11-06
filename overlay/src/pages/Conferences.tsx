@@ -4,6 +4,7 @@ import { Profile, Settings } from '../dappletBus';
 import { Api, Conference, ConferenceWithInvitations } from '../api';
 import { ProfileCard } from '../components/ProfileCard'
 import Linkify from 'react-linkify';
+import { HoverButton } from '../components/HoverButton';
 
 interface IProps {
   profile?: Profile;
@@ -120,52 +121,55 @@ export class Conferences extends React.Component<IProps, IState> {
             <div style={{ margin: '0 auto 0 0', maxWidth: '250px', padding: '7px 0 0 0', lineHeight: '1.4em' }}>{c.name}</div>
 
             {isAttended(c) ? (
-              (this.state.data.find(x => x.conference.id === c.id)!.invitations.filter(x => x.from.username === this.props.profile?.username && x.from.namespace === this.props.profile?.namespace).length > 0) ? <Modal
-                closeIcon
-                open={this.state.absending !== null}
-                trigger={
-                  <Button
-                    basic
-                    index={c.id}
-                    style={{ width: '75px', paddingLeft: '0', paddingRight: '0', height: '30px' }}
-                    loading={this._getLoading('attend-' + c.id)}
-                    disabled={this._getLoading('attend-' + c.id)}
-                    color='green'
-                    size='mini'
-                  >Attending</Button>
-                }
-                onClose={() => this.setState({ absending: null })}
-                onOpen={() => this.setState({ absending: c.id })}
-                dimmer='inverted'
-              >
-                <Header content='Cancel your Attendance?' />
-                <Modal.Content>
-                  <p>
-                    All you not going to attend the conference any more?<br />
-                    All of your {absendingInvitations.length} invites to this conference will be revoked.
-                  </p>
-                  <p>
-                  {(this.state.absending) ? this.renderParticipants(this.state.absending, true) : null}
-                  </p>
-                </Modal.Content>
-                <Modal.Actions>
-                  <Button color='red' onClick={() => this.setState({ absending: null })}>
-                    <Icon name='remove' /> No
-                </Button>
-                  <Button color='green' onClick={() => this.attendButtonClickHandler(null, { index: this.state.absending })}>
-                    <Icon name='checkmark' /> Yes
-                </Button>
-                </Modal.Actions>
-              </Modal> : <Button
-                basic
-                index={c.id}
-                style={{ width: '75px', paddingLeft: '0', paddingRight: '0', height: '30px' }}
-                loading={this._getLoading('attend-' + c.id)}
-                disabled={this._getLoading('attend-' + c.id)}
-                color='green'
-                size='mini'
-                onClick={this.attendButtonClickHandler}
-              >Attending</Button>
+              (this.state.data.find(x => x.conference.id === c.id)!.invitations.filter(x => x.from.username === this.props.profile?.username && x.from.namespace === this.props.profile?.namespace).length > 0) ?
+                <Modal
+                  closeIcon
+                  open={c.id === this.state.absending}
+                  trigger={
+                    <HoverButton
+                      hoverColor='red'
+                      hoverText='Cancel'
+                      index={c.id}
+                      style={{ width: '75px', paddingLeft: '0', paddingRight: '0', height: '30px' }}
+                      loading={this._getLoading('attend-' + c.id)}
+                      disabled={this._getLoading('attend-' + c.id)}
+                      color='green'
+                      size='mini'
+                    >Attending</HoverButton>
+                  }
+                  onClose={() => this.setState({ absending: null })}
+                  onOpen={() => this.setState({ absending: c.id })}
+                  dimmer='inverted'
+                >
+                  <React.Fragment>
+                    <Header content='Cancel your Attendance?' />
+                    <Modal.Content>
+                      <div>
+                        All you not going to attend the conference any more?<br />
+                        All of your {absendingInvitations.length} invites to this conference will be revoked.
+                      </div>
+                      {(this.state.absending) ? this.renderParticipants(this.state.absending, true) : null}
+                    </Modal.Content>
+                    <Modal.Actions>
+                      <Button color='red' onClick={() => this.setState({ absending: null })}>
+                        <Icon name='remove' /> No
+                      </Button>
+                      <Button color='green' onClick={() => this.attendButtonClickHandler(null, { index: this.state.absending })}>
+                        <Icon name='checkmark' /> Yes
+                      </Button>
+                    </Modal.Actions>
+                  </React.Fragment>
+                </Modal> : <HoverButton
+                  hoverColor='red'
+                  hoverText='Cancel'
+                  index={c.id}
+                  style={{ width: '75px', paddingLeft: '0', paddingRight: '0', height: '30px' }}
+                  loading={this._getLoading('attend-' + c.id)}
+                  disabled={this._getLoading('attend-' + c.id)}
+                  color='green'
+                  size='mini'
+                  onClick={this.attendButtonClickHandler}
+                >Attending</HoverButton>
 
             ) : <Button
               basic
@@ -176,6 +180,7 @@ export class Conferences extends React.Component<IProps, IState> {
               color='blue'
               size='mini'
               onClick={this.attendButtonClickHandler}
+              className="hoverable"
             >Attend</Button>}
 
 
@@ -222,21 +227,19 @@ export class Conferences extends React.Component<IProps, IState> {
       }
     }
 
-    return (<div>
-      <br />
-      <Grid columns='equal'>
+    return (
+      <Grid columns='equal' style={{ marginTop: '1em', marginBottom: '0' }}>
         {data.filter(x => (forModal) ? x.isWant === true : true).map((r, i) => <Grid.Row style={{ padding: 0 }} key={i}>
           <Grid.Column width={1}>
             {this.getIcon(r)}
           </Grid.Column>
           <Grid.Column >
-            {r.fullname} @{r.username} {(forModal) ? 
-              <span>by {r.count} topic{(r.count > 1) ? 's' : ''}</span> : 
+            {r.fullname} @{r.username} {(forModal) ?
+              <span>by {r.count} topic{(r.count > 1) ? 's' : ''}</span> :
               <a style={{ cursor: 'pointer' }} onClick={() => this.props.onPostsClick?.(conference.short_name, r.username)}>by {r.count} topic{(r.count > 1) ? 's' : ''}</a>}
           </Grid.Column>
         </Grid.Row>)}
-      </Grid>
-    </div>);
+      </Grid>);
   }
 
   getIcon(r: any) {

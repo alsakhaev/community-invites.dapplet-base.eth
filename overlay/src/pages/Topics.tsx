@@ -1,5 +1,5 @@
 import React from 'react';
-import { Icon, Segment, Comment, Input, InputOnChangeData, Loader, Label, Select, Message, Dropdown } from 'semantic-ui-react';
+import { Icon, Segment, Comment, Input, InputOnChangeData, Loader, Label, Select, Message, Dropdown, Button } from 'semantic-ui-react';
 import { Api, PostWithTags, Tag, UserSettings } from '../api';
 import { Profile, Settings } from '../dappletBus';
 
@@ -99,9 +99,9 @@ export class Topics extends React.Component<IProps, IState> {
             }
 
             result.search = result.search.replace(m[0], '');
-            
+
             if (!result[m[1]]) result[m[1]] = [];
-            
+
             result[m[1]].push(m[2]);
         }
 
@@ -128,7 +128,7 @@ export class Topics extends React.Component<IProps, IState> {
             parsed.tag.forEach((t: string) => {
                 const found = !!data.tags.find(x => x.name === t && x.value === true);
                 isFound = isFound && found;
-            })            
+            })
         }
 
         switch (filter) {
@@ -229,26 +229,23 @@ export class Topics extends React.Component<IProps, IState> {
                                     <Comment >
                                         <Comment.Avatar style={{ margin: 0 }} src={p.img} />
                                         <Comment.Content style={{ marginLeft: '3.3em', padding: 0 }} >
-                                            <Comment.Author as='a' target='_blank' href={`https://twitter.com/${p.username}/status/${p.id}`}>
-                                                {p.fullname}
-                                            </Comment.Author>
-                                            <Comment.Metadata>
-                                                <div>@{p.username}</div>
-                                            </Comment.Metadata>
-                                            <Comment.Text>{p.text}</Comment.Text>
-                                            <div>
-                                                {p.tags.filter(x => x.value === true).map(x => <Label onClick={() => this._tagFilter(x.name)} style={{ marginTop: '.14285714em' }} as='a' color='green' key={x.id} disabled={this._getLoading(p.id)}>{x.name}<Icon name='delete' disabled={this._getLoading(p.id)} link onClick={(e: any) => (e.stopPropagation(), this.untag(p.id, x.id))} /></Label>)}
-                                                {(s.tags.filter(x => !p.tags.find(y => y.id === x.id && y.value === true)).length > 0) ? <Dropdown
-                                                    trigger={<Label style={{ marginTop: '.14285714em' }} color='blue' disabled={this._getLoading(p.id)}><Icon name='plus' /> Add conference</Label>}
-                                                    pointing='top right'
-                                                    icon={null}
-                                                >
-                                                    <Dropdown.Menu>
-                                                        {s.tags.filter(x => !p.tags.find(y => y.id === x.id && y.value === true)).map(x => <Dropdown.Item key={x.id} onClick={() => this.tag(p.id, x.id)}>{x.name}</Dropdown.Item>)}
-                                                    </Dropdown.Menu>
-                                                </Dropdown> : null}
-                                            </div>
+                                            <Comment.Author>{p.fullname}</Comment.Author>
+                                            <Comment.Metadata style={{ margin: '0' }}>@{p.username}</Comment.Metadata>
                                         </Comment.Content>
+                                        <Comment.Text style={{ margin: '1em 0 0.5em 0' }}>{p.text} <Button icon='external' title='Open the post in Twitter' basic size='mini' style={{ boxShadow: 'none', padding: '2px', margin: '0', position: 'relative', top: '-1px' }} onClick={(e) => (e.stopPropagation(), window.open(`https://twitter.com/${p.username}/status/${p.id}`, '_blank'))} /></Comment.Text>
+
+                                        <div>
+                                            {p.tags.filter(x => x.value === true).map(x => <Label onClick={() => this._tagFilter(x.name)} style={{ marginTop: '.14285714em' }} as='a' color='green' key={x.id} disabled={this._getLoading(p.id)}>{x.name}<Icon name='delete' disabled={this._getLoading(p.id)} link onClick={(e: any) => (e.stopPropagation(), this.untag(p.id, x.id))} /></Label>)}
+                                            {(s.tags.filter(x => !p.tags.find(y => y.id === x.id && y.value === true)).length > 0) ? <Dropdown
+                                                trigger={<Label style={{ marginTop: '.14285714em' }} color='blue' disabled={this._getLoading(p.id)}><Icon name='plus' /> Add conference</Label>}
+                                                pointing='top right'
+                                                icon={null}
+                                            >
+                                                <Dropdown.Menu>
+                                                    {s.tags.filter(x => !p.tags.find(y => y.id === x.id && y.value === true)).map(x => <Dropdown.Item key={x.id} onClick={() => this.tag(p.id, x.id)}>{x.name}</Dropdown.Item>)}
+                                                </Dropdown.Menu>
+                                            </Dropdown> : null}
+                                        </div>
                                     </Comment>
                                 </Comment.Group>
                             </Segment>
@@ -256,7 +253,7 @@ export class Topics extends React.Component<IProps, IState> {
 
                         {(filteredPosts.length === 0) ? <Segment>No entries found</Segment> : null}
                     </React.Fragment>}
-            </div>
-        </div>);
+        </div>
+        </div >);
     }
 }
