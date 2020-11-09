@@ -8,7 +8,7 @@ interface IProps {
     profile: Profile;
     //onClose: () => void;
     //onClick: () => void;
-    onEdit: () => void;
+    onEdit?: () => void;
     highlight?: boolean;
     disabled?: boolean;
     onMouseEnter: () => void;
@@ -38,7 +38,7 @@ export class AggInvitationCard extends React.Component<IProps, IState> {
                             <Comment.Metadata style={{ margin: '0' }}>@{p.post.post.username}</Comment.Metadata>
                         </div>
                         <div>
-                            {(p.highlight) ? <Button primary onClick={(e) => (e.stopPropagation(), this.props.onEdit())} size='mini'>Edit Invites</Button> : null}
+                            {(p.highlight && this.props.onEdit !== undefined) ? <Button primary onClick={(e) => (e.stopPropagation(), this.props.onEdit!())} size='mini'>Edit Invites</Button> : null}
                         </div>
                     </Comment.Content>
                     <Comment.Text style={{ margin: '0.5em 0 0.5em 47px' }}>{p.post.post.text} <Button icon='external' title='Open the post in Twitter' basic size='mini' style={{ boxShadow: 'none', padding: '2px', margin: '0', position: 'relative', top: '-1px' }} onClick={(e) => (e.stopPropagation(), window.open(`https://twitter.com/${p.post.post.username}/status/${p.post.post.id}`, '_blank'))} /></Comment.Text>
@@ -49,13 +49,13 @@ export class AggInvitationCard extends React.Component<IProps, IState> {
                             const public_users = exceptMe.filter(x => x.is_private === false);
                             const private_users = exceptMe.filter(x => x.is_private === true);
 
-                            return <React.Fragment key={c.id}>
+                            return <div key={c.id} style={{ paddingBottom: '4px'}}>
                                 <b style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '20ch', display: 'block', float: 'left'}} title={c.name}>{c.name}</b><b>: </b>
                                 {(isMe) ? 'me, ' : null}
                                 {public_users.map((u, i) => <React.Fragment key={i}><span title={u.fullname}>{(i !== 0) ? ', ' : ''}@<span style={{ textDecoration: (u.username === p.post.post.username) ? 'underline' : undefined }}>{u.username}</span></span></React.Fragment>)}
                                 {(private_users.length > 0) ? <React.Fragment> and {private_users.length} private person{(private_users.length > 1 ? 's' : '')}</React.Fragment> : null}
                                 <br />
-                            </React.Fragment>
+                            </div>
                         })}
                     </div>
                 </Comment>

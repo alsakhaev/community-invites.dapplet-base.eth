@@ -28,6 +28,14 @@ export class ConferencesDropdown extends React.Component<IProps, IState> {
         }
     }
 
+    sortConferences(a: ConferenceWithInvitations, b: ConferenceWithInvitations) {
+        const weight = (x: ConferenceWithInvitations) => (x.attendance_from && x.attendance_to) ? 2 : (x.attendance_from || x.attendance_to) ? 1 : 0;
+        const aWeight = weight(a);
+        const bWeight = weight(b);
+        
+        return (aWeight === bWeight) ? 0 : (aWeight > bWeight) ? -1 : 1;
+    }
+
     dropdownItem(x: ConferenceWithInvitations) {
         const p = this.props;
         return <Dropdown.Item
@@ -64,13 +72,13 @@ export class ConferencesDropdown extends React.Component<IProps, IState> {
                 {(invited.length > 0) ? <React.Fragment>
                     <Dropdown.Header style={headerStyle} content={`You already invited @${p.profileTo.username}`} />
                     {/* <Dropdown.Divider /> */}
-                    {invited.map(x => this.dropdownItem(x))}
+                    {invited.sort(this.sortConferences).map(x => this.dropdownItem(x))}
                 </React.Fragment> : null}
 
                 {(notInvited.length > 0) ? <React.Fragment>
                     <Dropdown.Header style={headerStyle} content={`You haven't invited @${p.profileTo.username} yet`} />
                     {/* <Dropdown.Divider /> */}
-                    {notInvited.map(x => this.dropdownItem(x))}
+                    {notInvited.sort(this.sortConferences).map(x => this.dropdownItem(x))}
                 </React.Fragment> : null}
             </Dropdown.Menu>
         </Dropdown>;

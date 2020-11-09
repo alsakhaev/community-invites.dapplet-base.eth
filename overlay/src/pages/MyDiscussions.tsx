@@ -176,7 +176,7 @@ export class MyDiscussions extends React.Component<IProps, IState> {
                                 profile={this.props.profile}
                                 highlight={this.state.highlightedId === p.post.id}
                                 //onClick={() => this._selectCard(p.post.id)}
-                                onEdit={() => this._onEdit(p)}
+                                onEdit={(p.post.namespace === this.props.profile.namespace && p.post.username === this.props.profile.username) ? undefined : () => this._onEdit(p)}
                                 onMouseEnter={() => this._selectCard(p.post.id)}
                                 onMouseLeave={() => this._selectCard(p.post.id)}
                             />

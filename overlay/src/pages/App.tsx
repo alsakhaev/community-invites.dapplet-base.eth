@@ -132,7 +132,7 @@ export class App extends React.Component<IProps, IState> {
 
     return (
       <div className="App-container">
-        <div style={{ padding: '15px 15px', position: 'fixed', top: '0', left: '0', width: '100%', zIndex: 1000, backgroundColor: '#fff' }}>
+        <div style={{ padding: '15px', position: 'absolute', top: '0', left: '0', right: '0', height: '95px', overflow: 'hidden', zIndex: 1000, backgroundColor: '#fff' }}>
           <div>
             <span>Your Team: </span>
             {(s.userSettings?.teamId && s.teamInputVisible === false) ?
@@ -187,7 +187,7 @@ export class App extends React.Component<IProps, IState> {
           </Menu>
         </div>
 
-        <div style={{ margin: '95px 0 0 0' }}>
+        <div style={{ padding: '15px', position: 'absolute', top: '95px', bottom: '0', left: '0', right: '0', overflow: 'auto' }}>
 
           {s.profile ? <div style={{ display: (s.activeIndex === 0) ? 'block' : 'none', paddingBottom: '10px' }}>
             <Invite profile={s.profile} post={s.post} onPostsClick={this.postsClickHandler} settings={s.settings!} key={s.key} />

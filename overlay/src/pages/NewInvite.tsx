@@ -25,6 +25,7 @@ interface IState {
     isInvitingLoading: boolean;
     isPrivate: boolean;
     error: string | null;
+    isModified: boolean;
 }
 
 export class NewInvite extends React.Component<IProps, IState> {
@@ -48,7 +49,8 @@ export class NewInvite extends React.Component<IProps, IState> {
             loading: true,
             isInvitingLoading: false,
             isPrivate: false,
-            error: null
+            error: null,
+            isModified: false
         }
     }
 
@@ -117,7 +119,7 @@ export class NewInvite extends React.Component<IProps, IState> {
         this.setState({ selectedConferenceId });
         const selectedConference = s.data.find(x => x.conference.id === selectedConferenceId);
         const currentInvitation = selectedConference?.invitations.find(x => x.from.namespace === p.profile.namespace && x.from.username === p.profile.username && x.to.namespace === s.profileTo.namespace && x.to.username === s.profileTo.username);
-        this.setState({ isPrivate: currentInvitation?.is_private ?? false });
+        this.setState({ isPrivate: currentInvitation?.is_private ?? false, isModified: false });
     }
 
     render() {
@@ -142,11 +144,11 @@ export class NewInvite extends React.Component<IProps, IState> {
             <PostCard post={p.post} card style={{ boxShadow: '0 1px 2px 0 #2185d05e', border: '1px solid #2185d0' }} />
 
             {(!s.loading && !p.loading) ? <React.Fragment>
-                <Divider horizontal>To conference</Divider>
+                <Divider horizontal>At conference</Divider>
 
                 {(currentInvitation) ? <Message warning>
                     <div style={{ display: 'flex' }}>
-                        <div style={{ flex: 'auto' }}>
+                        <div style={{ flex: 'auto', lineHeight: '28px', marginRight: '1.5em', textAlign: 'center' }}>
                             @{s.profileTo.username} is already invited
                         </div>
                         <div>
@@ -162,7 +164,7 @@ export class NewInvite extends React.Component<IProps, IState> {
                     profileTo={s.profileTo}
                 />
 
-                {selectedConference ? <Segment style={{ boxShadow: 'none', borderRadius: '0 0 .28571429rem .28571429rem', borderTop: 'none', marginTop: '0'}}>
+                {selectedConference ? <Segment style={{ boxShadow: 'none', borderRadius: '0 0 .28571429rem .28571429rem', borderTop: 'none', marginTop: '0' }}>
                     <p>
                         {selectedConference.conference.description ? <Linkify componentDecorator={(href: string, text: string, key: string) => <a href={href} key={key} target="_blank" rel="noopener noreferrer">{text}</a>}>{selectedConference.conference.description}<br /></Linkify> : null}
                         {selectedConference.conference.date_from.toLocaleDateString() + ' - ' + selectedConference.conference.date_to.toLocaleDateString()}
@@ -177,7 +179,7 @@ export class NewInvite extends React.Component<IProps, IState> {
                 </Segment> : null}
 
                 {!selectedConference!.attendance_from ? <Message warning>
-                    Your Invite implies your attendance at the conference
+                    Your invite implies your attendance at the conference
                 </Message> : null}
 
                 <p style={{ margin: '10px 4px', textAlign: 'end' }}>
@@ -191,8 +193,13 @@ export class NewInvite extends React.Component<IProps, IState> {
                 {s.error ? <div style={{ textAlign: 'end', marginBottom: '10px' }}><Label basic color='red'>{s.error}</Label></div> : null}
 
                 <div style={{ textAlign: 'end' }}>
-                    <Checkbox style={{ margin: '0 20px 0 0' }} label='Private' disabled={s.isInvitingLoading} checked={s.isPrivate} onChange={(e, d) => this.setState({ isPrivate: d.checked as boolean })} />
-                    <Button primary onClick={() => this.invite()} loading={s.isInvitingLoading} disabled={s.isInvitingLoading}>{(!currentInvitation) ? ((!selectedConference!.attendance_from) ? 'Attend & Invite' : 'Invite') : 'Save'}</Button>
+                    <Checkbox style={{ margin: '0 20px 0 0' }} label='Private' disabled={s.isInvitingLoading} checked={s.isPrivate} onChange={(e, d) => this.setState({ isPrivate: d.checked as boolean, isModified: true })} />
+
+                    {(!currentInvitation) ? ((!selectedConference!.attendance_from) ?
+                        <Button primary onClick={() => this.invite()} loading={s.isInvitingLoading} disabled={s.isInvitingLoading}>{'Attend & Invite'}</Button>
+                        : <Button primary onClick={() => this.invite()} loading={s.isInvitingLoading} disabled={s.isInvitingLoading}>Invite</Button>)
+                        : <Button primary onClick={() => this.invite()} loading={s.isInvitingLoading} disabled={s.isInvitingLoading || !s.isModified}>Save</Button>}
+
                     <Button onClick={() => this.props.onCancel()} disabled={s.isInvitingLoading}>Cancel</Button>
                 </div>
 
