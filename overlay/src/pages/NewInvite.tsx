@@ -84,7 +84,8 @@ export class NewInvite extends React.Component<IProps, IState> {
             invitations: x.invitations.filter(y => y.post_id === this.props.post.id),
             attendies: x.attendies
         }))
-        this.setState({ data: filteredByPosts, selectedConferenceId: data[0]?.conference.id ?? -1 });
+        this.setState({ data: filteredByPosts });
+        this.changeConference(data[0]?.conference.id ?? -1);
     }
 
     async invite() {
