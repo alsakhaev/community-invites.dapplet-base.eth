@@ -114,7 +114,7 @@ export class App extends React.Component<IProps, IState> {
 
     if (!s.settings) {
       return (
-        <div className="App-container">
+        <div className="App-container" style={{ padding: '15px' }}>
           <Segment>
             <Loader active inline='centered'>Context waiting</Loader>
           </Segment>
@@ -123,7 +123,7 @@ export class App extends React.Component<IProps, IState> {
     }
 
     if (!s.profile) {
-      return (<div className="App-container">
+      return (<div className="App-container" style={{ padding: '15px' }}>
         <Segment>
           You are not logged in
       </Segment>
@@ -132,7 +132,7 @@ export class App extends React.Component<IProps, IState> {
 
     return (
       <div className="App-container">
-        <div style={{ padding: '15px', position: 'absolute', top: '0', left: '0', right: '0', height: '95px', overflow: 'hidden', zIndex: 1000, backgroundColor: '#fff' }}>
+        <div style={{ padding: '15px 15px 0 15px' }}>
           <div>
             <span>Your Team: </span>
             {(s.userSettings?.teamId && s.teamInputVisible === false) ?
@@ -187,23 +187,28 @@ export class App extends React.Component<IProps, IState> {
           </Menu>
         </div>
 
-        <div style={{ padding: '15px', position: 'absolute', top: '95px', bottom: '0', left: '0', right: '0', overflow: 'auto' }}>
+        <div style={{ flex: '1', overflow: 'auto', padding: '15px' }}>
 
-          {s.profile ? <div style={{ display: (s.activeIndex === 0) ? 'block' : 'none', paddingBottom: '10px' }}>
+          {(s.activeIndex === 0) ? <Invite profile={s.profile} post={s.post} onPostsClick={this.postsClickHandler} settings={s.settings!} key={s.key} /> : null}
+          {(s.activeIndex === 1) ? <Conferences profile={s.profile} onPostsClick={this.postsClickHandler} settings={s.settings!} key={s.key} /> : null}
+          {(s.activeIndex === 2) ? <MyDiscussions profile={s.profile} defaultSearch={s.postsDefaultSearch} settings={s.settings!} key={s.key} onEdit={this.onEdit.bind(this)} /> : null}
+          {(s.activeIndex === 3) ? <Topics profile={s.profile} defaultSearch={s.postsDefaultSearch} settings={s.settings!} key={s.key} userSettings={s.userSettings} /> : null}
+
+          {/* {s.profile ? <div style={{ display: (s.activeIndex === 0) ? 'block' : 'none' }}>
             <Invite profile={s.profile} post={s.post} onPostsClick={this.postsClickHandler} settings={s.settings!} key={s.key} />
           </div> : null}
 
-          <div style={{ display: (s.activeIndex === 1) ? 'block' : 'none', paddingBottom: '10px' }}>
+          <div style={{ display: (s.activeIndex === 1) ? 'block' : 'none' }}>
             <Conferences profile={s.profile} onPostsClick={this.postsClickHandler} settings={s.settings!} key={s.key} />
           </div>
 
-          <div style={{ display: (s.activeIndex === 2) ? 'block' : 'none', paddingBottom: '10px' }}>
+          <div style={{ display: (s.activeIndex === 2) ? 'block' : 'none' }}>
             <MyDiscussions profile={s.profile} defaultSearch={s.postsDefaultSearch} settings={s.settings!} key={s.key} onEdit={this.onEdit.bind(this)} />
           </div>
 
-          <div style={{ display: (s.activeIndex === 3) ? 'block' : 'none', paddingBottom: '10px' }}>
+          <div style={{ display: (s.activeIndex === 3) ? 'block' : 'none' }}>
             <Topics profile={s.profile} defaultSearch={s.postsDefaultSearch} settings={s.settings!} key={s.key} userSettings={s.userSettings} />
-          </div>
+          </div> */}
 
         </div>
       </div>
