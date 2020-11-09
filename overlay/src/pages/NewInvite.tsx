@@ -81,7 +81,8 @@ export class NewInvite extends React.Component<IProps, IState> {
             conference: x.conference,
             attendance_from: x.attendance_from,
             attendance_to: x.attendance_to,
-            invitations: x.invitations.filter(y => y.post_id === this.props.post.id)
+            invitations: x.invitations.filter(y => y.post_id === this.props.post.id),
+            attendies: x.attendies
         }))
         this.setState({ data: filteredByPosts, selectedConferenceId: data[0]?.conference.id ?? -1 });
     }
@@ -168,6 +169,10 @@ export class NewInvite extends React.Component<IProps, IState> {
                     <p>
                         {selectedConference.conference.description ? <Linkify componentDecorator={(href: string, text: string, key: string) => <a href={href} key={key} target="_blank" rel="noopener noreferrer">{text}</a>}>{selectedConference.conference.description}<br /></Linkify> : null}
                         {selectedConference.conference.date_from.toLocaleDateString() + ' - ' + selectedConference.conference.date_to.toLocaleDateString()}
+                    </p>
+
+                    <p>
+                        {selectedConference.attendies} people are ready for discussions
                     </p>
 
                     {(invitesTotal > 0) ?

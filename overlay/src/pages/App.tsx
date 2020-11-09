@@ -58,6 +58,9 @@ export class App extends React.Component<IProps, IState> {
 
   changeTab(activeIndex: number) {
     this.setState({ activeIndex, key: Math.random(), postsDefaultSearch: '' });
+    if (activeIndex === 1 || activeIndex === 2 || activeIndex === 3) {
+      this.setState({ post: undefined });
+    }
   }
 
   onTeamIdChange = async (event: React.ChangeEvent<HTMLInputElement>, data: InputOnChangeData) => {
@@ -193,22 +196,6 @@ export class App extends React.Component<IProps, IState> {
           {(s.activeIndex === 1) ? <Conferences profile={s.profile} onPostsClick={this.postsClickHandler} settings={s.settings!} key={s.key} /> : null}
           {(s.activeIndex === 2) ? <MyDiscussions profile={s.profile} defaultSearch={s.postsDefaultSearch} settings={s.settings!} key={s.key} onEdit={this.onEdit.bind(this)} /> : null}
           {(s.activeIndex === 3) ? <Topics profile={s.profile} defaultSearch={s.postsDefaultSearch} settings={s.settings!} key={s.key} userSettings={s.userSettings} /> : null}
-
-          {/* {s.profile ? <div style={{ display: (s.activeIndex === 0) ? 'block' : 'none' }}>
-            <Invite profile={s.profile} post={s.post} onPostsClick={this.postsClickHandler} settings={s.settings!} key={s.key} />
-          </div> : null}
-
-          <div style={{ display: (s.activeIndex === 1) ? 'block' : 'none' }}>
-            <Conferences profile={s.profile} onPostsClick={this.postsClickHandler} settings={s.settings!} key={s.key} />
-          </div>
-
-          <div style={{ display: (s.activeIndex === 2) ? 'block' : 'none' }}>
-            <MyDiscussions profile={s.profile} defaultSearch={s.postsDefaultSearch} settings={s.settings!} key={s.key} onEdit={this.onEdit.bind(this)} />
-          </div>
-
-          <div style={{ display: (s.activeIndex === 3) ? 'block' : 'none' }}>
-            <Topics profile={s.profile} defaultSearch={s.postsDefaultSearch} settings={s.settings!} key={s.key} userSettings={s.userSettings} />
-          </div> */}
 
         </div>
       </div>

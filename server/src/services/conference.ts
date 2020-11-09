@@ -31,7 +31,7 @@ export async function createConference(c: Conference): Promise<Conference> {
     });
 }
 
-export async function getConferencesWithInvitations(namespace_from: string, username_from: string, namespace_to?: string, username_to?: string): Promise<{ conference: Conference, invitations: { from: Profile, to: Profile, post_id: string }[], attendance_from: boolean, attendance_to: boolean }[]> {
+export async function getConferencesWithInvitations(namespace_from: string, username_from: string, namespace_to?: string, username_to?: string): Promise<{ conference: Conference, invitations: { from: Profile, to: Profile, post_id: string }[], attendance_from: boolean, attendance_to: boolean, attendies: number }[]> {
     const isWithSecondParty = namespace_to && username_to;
     const params = isWithSecondParty ? [namespace_from, username_from, namespace_to, username_to] : [namespace_from, username_from];
     
@@ -47,7 +47,8 @@ export async function getConferencesWithInvitations(namespace_from: string, user
                     'id', i.id,
                     'is_private', i.is_private
                 )) FILTER (WHERE i.post_id IS NOT NULL), '[]') as invitations,
-                (CASE WHEN (SELECT TRUE FROM attendance as a where c.id = a.conference_id and a.namespace = $1 and a.username = $2 LIMIT 1) IS NULL THEN FALSE ELSE TRUE END) AS attendance_from
+                (CASE WHEN (SELECT TRUE FROM attendance as a where c.id = a.conference_id and a.namespace = $1 and a.username = $2 LIMIT 1) IS NULL THEN FALSE ELSE TRUE END) AS attendance_from,
+                (SELECT COUNT(*) FROM attendance as a where c.id = a.conference_id) as attendies
                 ${isWithSecondParty ? `,(CASE WHEN (SELECT TRUE FROM attendance as a where c.id = a.conference_id and a.namespace = $3 and a.username = $4 LIMIT 1) IS NULL THEN FALSE ELSE TRUE END) AS attendance_to` : ''}
             FROM conferences as c
             LEFT JOIN (

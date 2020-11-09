@@ -42,7 +42,19 @@ export type PostWithInvitations = {
     }[];
 }
 
-export type ConferenceWithInvitations = { conference: Conference, invitations: { from: Profile, to: Profile, post_id: string, id: number, is_private: boolean }[], attendance_from: boolean, attendance_to?: boolean };
+export type ConferenceWithInvitations = {
+    conference: Conference,
+    invitations: {
+        from: Profile,
+        to: Profile,
+        post_id: string,
+        id: number,
+        is_private: boolean
+    }[],
+    attendance_from: boolean,
+    attendance_to?: boolean,
+    attendies: number
+};
 
 export type DetailedPost = Post & {
     conference_id: number;
