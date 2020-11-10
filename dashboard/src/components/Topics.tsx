@@ -40,7 +40,7 @@ export class Topics extends React.Component<IProps, IState> {
         }
 
         return (
-            <Segment loading={this.props.loading} style={{ padding: '0', boxShadow: 'initial', border: 'initial'}}>
+            <Segment loading={this.props.loading} style={{ padding: '0', boxShadow: 'initial', border: 'initial' }}>
                 <Table sortable celled fixed unstackable >
                     <Table.Body>
                         {data.map((d, i) => (
@@ -50,10 +50,16 @@ export class Topics extends React.Component<IProps, IState> {
                                     <Comment.Group minimal>
                                         <Comment>
                                             <Comment.Avatar as='a' src={d.img} />
-                                            <Comment.Content>
-                                                <Comment.Author style={{ display: 'inline' }}>{d.fullname}</Comment.Author>
-                                                <Comment.Metadata>@{d.username} <Button icon='external' title='Open the post in Twitter' basic size='mini' style={{ boxShadow: 'none', padding: '2px', margin: '0', position: 'relative', top: '-1px' }} onClick={() => window.open(`https://twitter.com/${d.username}/status/${d.id}`, '_blank')} /></Comment.Metadata>
-                                                <Comment.Text>{d.text}</Comment.Text>
+                                            <Comment.Content style={{ display: 'flex' }}>
+                                                <div style={{ flex: 'auto'}}>
+                                                    <Comment.Author style={{ display: 'inline' }}>{d.fullname}</Comment.Author>
+                                                    <Comment.Metadata>@{d.username} <Button icon='external' title='Open the post in Twitter' basic size='mini' style={{ boxShadow: 'none', padding: '2px', margin: '0', position: 'relative', top: '-1px' }} onClick={() => window.open(`https://twitter.com/${d.username}/status/${d.id}`, '_blank')} /></Comment.Metadata>
+                                                    <Comment.Text>{d.text}</Comment.Text>
+                                                </div>
+                                                <div style={{ minWidth: '8em', marginLeft: '10px' }} >
+                                                    {/* <div>Team Rating: 10</div> */}
+                                                    <div>Discussed by: {d.discussed_by}</div>
+                                                </div>
                                             </Comment.Content>
                                         </Comment>
                                     </Comment.Group>

@@ -166,7 +166,28 @@ export async function getStat(filters?: { username?: string, limit?: number }): 
                                 AND c.date_to >= DATE(NOW() - INTERVAL '3 DAY')
                             GROUP BY i.conference_id
                         ) AS x
-                    ) AS conferences_count
+                    ) AS conferences_count,
+
+                    (
+                        SELECT COUNT(*) 
+                        FROM (
+                            (
+                                SELECT i.namespace_to, i.username_to 
+                                FROM invitations AS i 
+                                JOIN conferences AS c ON c.id = i.conference_id
+                                WHERE i.post_id = p.id
+                                    AND c.date_to >= DATE(NOW() - INTERVAL '3 DAY')
+                                GROUP BY i.namespace_to, i.username_to
+                            ) UNION ALL (
+                                SELECT i.namespace_from, i.username_from
+                                FROM invitations AS i 
+                                JOIN conferences AS c ON c.id = i.conference_id
+                                WHERE i.post_id = p.id
+                                    AND c.date_to >= DATE(NOW() - INTERVAL '3 DAY')
+                                GROUP BY i.namespace_from, i.username_from
+                            )
+                        ) AS x
+                    ) AS discussed_by
 
                 FROM posts AS p
                 LEFT JOIN users AS u ON u.namespace = p.namespace

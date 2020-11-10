@@ -65,7 +65,7 @@ export class People extends React.Component<IProps, IState> {
                                                     <Header.Subheader>@{d.username}</Header.Subheader>
                                                 </Header.Content>
                                             </Header>
-                                            <div style={{ width: '10em' }} >
+                                            <div style={{ minWidth: '10em' }} >
                                                 <div>Rating: {d.agg_invitations_to_count}</div>
                                                 <div>Wanted by: {d.users_to_count}</div>
                                             </div>

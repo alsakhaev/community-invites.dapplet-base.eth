@@ -7,6 +7,7 @@ export type PostStat = {
     img: string;
     invitations_count: number;
     conferences_count: number;
+    discussed_by: number;
 }
 
 export type UserStat = {
