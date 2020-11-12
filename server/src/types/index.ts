@@ -32,3 +32,14 @@ export type Attendance = {
     conference_id: string;
     username: string;
 }
+
+export type Team = {
+    id?: string;
+    name: string;
+    tags: Tag[];
+}
+
+export type Tag = {
+    id?: string;
+    name: string;
+}

@@ -1,10 +1,12 @@
 import React from 'react';
 //import './App.css';
-import { Container, Grid, Placeholder, Input, Select, Label } from 'semantic-ui-react';
+import { Container, Grid, Placeholder, Input, Select, Label, Button, Modal, Header, Icon } from 'semantic-ui-react';
 import { Api, PostStat, UserStat } from '../api';
 import { People } from '../components/People';
 import { Topics } from '../components/Topics';
 import SearchString from 'search-string';
+import { TeamForm } from '../components/TeamForm';
+import { ConferenceForm } from '../components/ConferenceForm';
 
 
 interface IProps {
@@ -23,6 +25,8 @@ interface IState {
   isPeopleLoading: boolean;
   teamId: string | null;
   teamName: string | null;
+  createTeamModal: boolean;
+  createConferenceModal: boolean;
 }
 
 const peopleFilterOptions = [{
@@ -44,13 +48,17 @@ const topicsFilterOptions = [{
   text: 'All',
   value: 'top:100'
 }, {
-  key: 'last-changed',
-  text: 'Last Changed',
-  value: 'top:100 -checked:undefined'
+  key: 'top-team-rating',
+  text: 'Top Team Rating',
+  value: 'top:100 -teamrating:0 sort:teamrating-desc'
 }, {
-  key: 'ignored',
-  text: 'Ignored',
-  value: 'top:100 checked:false'
+  key: 'top-team-discussions',
+  text: 'Top Discussions',
+  value: 'top:100 -teamrating:0 sort:discussedby-desc'
+}, {
+  key: 'top-discussions',
+  text: 'Top Discussions',
+  value: 'top:100 sort:discussedby-desc'
 }];
 
 export class App extends React.Component<IProps, IState> {
@@ -69,11 +77,13 @@ export class App extends React.Component<IProps, IState> {
       selectedUser: null,
       postFilter: {},
       peopleFilter: topicsFilterOptions[0].value,
-      topicsFilter: topicsFilterOptions[0].value,
+      topicsFilter: (teamId) ? topicsFilterOptions[1].value : topicsFilterOptions[0].value,
       isTopicsLoading: true,
       isPeopleLoading: true,
       teamId: teamId,
-      teamName: null
+      teamName: null,
+      createTeamModal: false,
+      createConferenceModal: false
     };
   }
 
@@ -114,6 +124,28 @@ export class App extends React.Component<IProps, IState> {
       const value = mapping[query.checked[0]];
       return x.checked === value;
     });
+
+    if (query.exclude?.teamrating?.[0]) {
+      try {
+        const value = parseInt(query.exclude.teamrating[0]);
+        posts = posts.filter(x => x.team_rating !== value);
+      } catch (_) { }
+    }
+
+    if (query?.teamrating?.[0]) {
+      try {
+        const value = parseInt(query.teamrating[0]);
+        posts = posts.filter(x => x.team_rating === value);
+      } catch (_) { }
+    }
+
+    if (query.sort) posts = posts.sort((a, b) => {
+      if (query.sort[0] === 'teamrating-asc') return (a.team_rating === b.team_rating || a.team_rating === undefined || b.team_rating === undefined) ? 0 : a.team_rating > b.team_rating ? 1 : -1;
+      if (query.sort[0] === 'teamrating-desc') return (a.team_rating === b.team_rating || a.team_rating === undefined || b.team_rating === undefined) ? 0 : a.team_rating < b.team_rating ? 1 : -1;
+      if (query.sort[0] === 'discussedby-asc') return a.discussed_by > b.discussed_by ? 1 : -1;
+      if (query.sort[0] === 'discussedby-desc') return a.discussed_by < b.discussed_by ? 1 : -1;
+      return 0;
+    })
 
     this.setState({ posts, isTopicsLoading: false });
   }
@@ -251,7 +283,14 @@ export class App extends React.Component<IProps, IState> {
                     placeholder='Search...'
                     value={this.state.peopleFilter}
                     style={{ marginBottom: '0.5em' }}
-                    label={<Select style={{ width: '10em' }} compact options={peopleFilterOptions} defaultValue={peopleFilterOptions[0].value} onChange={(e, d) => this.setPeopleFilter(d.value as string)} />}
+                    label={
+                      <Select
+                        style={{ width: '11em' }}
+                        compact
+                        options={peopleFilterOptions}
+                        defaultValue={peopleFilterOptions[0].value}
+                        onChange={(e, d) => this.setPeopleFilter(d.value as string)}
+                      />}
                     labelPosition='left'
                     onChange={(e, d) => this.setPeopleFilter(d.value as string)}
                   />
@@ -268,7 +307,14 @@ export class App extends React.Component<IProps, IState> {
                     placeholder='Search...'
                     value={this.state.topicsFilter}
                     style={{ marginBottom: '0.5em' }}
-                    label={<Select style={{ width: '10em' }} compact options={topicsFilterOptions} defaultValue={topicsFilterOptions[0].value} onChange={(e, d) => this.setTopicsFilter(d.value as string)} />}
+                    label={
+                      <Select
+                        style={{ width: '11em' }}
+                        compact
+                        options={s.teamId ? topicsFilterOptions.filter((_, i) => i !== 3) : topicsFilterOptions.filter((_, i) => i === 0 || i === 3)}
+                        defaultValue={s.teamId ? topicsFilterOptions[1].value : topicsFilterOptions[0].value}
+                        onChange={(e, d) => this.setTopicsFilter(d.value as string)}
+                      />}
                     labelPosition='left'
                     onChange={(e, d) => this.setTopicsFilter(d.value as string)}
                   />
@@ -278,6 +324,20 @@ export class App extends React.Component<IProps, IState> {
               </Grid.Column>
             </Grid.Row>
           </Grid>
+
+          <div style={{ marginBottom: '30px' }}>
+            <TeamForm
+              open={s.createTeamModal}
+              onOpen={() => this.setState({ createTeamModal: true })}
+              onClose={() => this.setState({ createTeamModal: false })}
+            />
+            <ConferenceForm
+              open={s.createConferenceModal}
+              onOpen={() => this.setState({ createConferenceModal: true })}
+              onClose={() => this.setState({ createConferenceModal: false })}
+            />
+          </div>
+
         </Container>
       </div>
     );

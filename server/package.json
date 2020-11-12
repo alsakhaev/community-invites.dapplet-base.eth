@@ -25,6 +25,7 @@
   },
   "homepage": "https://github.com/dapplets/dapplet-registry#readme",
   "dependencies": {
+    "@types/yesql": "^4.1.0",
     "cors": "^2.8.5",
     "ethers": "^5.0.13",
     "express": "^4.17.1",
@@ -32,7 +33,8 @@
     "multer": "^1.4.2",
     "node-fetch": "^2.6.1",
     "pg": "^8.3.3",
-    "typescript": "^3.9.7"
+    "typescript": "^3.9.7",
+    "yesql": "^4.1.3"
   },
   "devDependencies": {
     "@types/body-parser": "^1.19.0",

@@ -5,6 +5,7 @@ import * as user from "../controllers/user";
 import * as post from "../controllers/post";
 import * as invitation from "../controllers/invitation";
 import * as tag from "../controllers/tag";
+import * as teams from "../controllers/team";
 
 const router = Router();
 
@@ -40,5 +41,7 @@ router.post('/invitations/set-private', invitation.setPrivate);
 router.get('/tags', tag.get);
 router.post('/tags/tag', tag.tag);
 router.post('/tags/untag', tag.untag);
+
+router.post('/teams/create', teams.create);
 
 export default router;

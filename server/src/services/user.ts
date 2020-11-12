@@ -228,9 +228,7 @@ export async function setUserSettings(namespace: string, username: string, s: Us
 }
 
 export async function getTeam(id: string) {
-    if (id !== '41168223-824b-42df-847b-7f339c47622a') throw Error('Team doesn\'t exist');
-    return Promise.resolve({
-        id: '41168223-824b-42df-847b-7f339c47622a',
-        name: 'Devcon6'
-    });
+    const query = `SELECT * FROM teams WHERE id = $1;`;
+    const params = [id];
+    return execute(c => c.query(query, params).then(x => x.rows[0]));
 }

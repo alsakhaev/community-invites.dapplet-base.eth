@@ -8,6 +8,7 @@ export type PostStat = {
     invitations_count: number;
     conferences_count: number;
     discussed_by: number;
+    team_rating: number | undefined;
 }
 
 export type UserStat = {
@@ -30,6 +31,15 @@ export type Team = {
     name: string;
 }
 
+export type Conference = {
+    id?: number;
+    short_name: string;
+    name: string;
+    description: string;
+    date_from: string;
+    date_to: string;
+}
+
 export class Api {
     constructor(private _url: string) { }
 
@@ -43,6 +53,14 @@ export class Api {
 
     async getTeam(teamId: string): Promise<Team> {
         return this._sendRequest(`/users/teams?id=${teamId}`);
+    }
+
+    async createTeam(data: { name: string, tags: { name: string }[] }): Promise<Team> {
+        return this._sendRequest(`/teams/create`, 'POST', data);
+    }
+
+    async createConference(c: Conference): Promise<Conference> {
+        return this._sendRequest(`/conferences`, 'POST', c);
     }
 
     private async _sendRequest(query: string, method: 'POST' | 'GET' | 'PUT' = 'GET', body?: any): Promise<any> {

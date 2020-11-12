@@ -227,6 +227,8 @@ export class Conferences extends React.Component<IProps, IState> {
       }
     }
 
+    if (data.length === 0) return null;
+
     return (
       <Grid columns='equal' style={{ marginTop: '1em', marginBottom: '0' }}>
         {data.filter(x => (forModal) ? x.isWant === true : true).map((r, i) => <Grid.Row style={{ padding: 0 }} key={i}>

@@ -51,7 +51,7 @@ export class Filter extends React.Component<IProps, IState> {
             onChange={(e, d) => this.setFilter(d.value)}
             label={
                 <Select
-                    style={{ width: '10em' }}
+                    style={{ width: '11em' }}
                     compact
                     options={this.props.options.map((x, i) => ({ ...x, key: i, value: toQueryString(x.filter) }))}
                     defaultValue={toQueryString(this.props.options.find(x => x.default === true)!.filter)}

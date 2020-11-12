@@ -1,5 +1,6 @@
 import { execute } from '../connection';
 import { Post } from '../types';
+import { pg as named } from 'yesql';
 
 type DetailedPost = {
     id: string;
@@ -137,81 +138,100 @@ export async function getMyDetailedPosts(namespace: string, username: string): P
     return execute(c => c.query(query, params).then(r => r.rows));
 }
 
-export async function getStat(filters?: { username?: string, limit?: number }): Promise<any[]> {
+export async function getStat(filters?: { username?: string, limit?: number, teamId?: string }): Promise<any[]> {
 
-    const query = {
-        text: `
-            SELECT *
-            FROM (
-                SELECT
-                    p.*,
-                    u.fullname,
-                    u.img,
+    const query = `
+        SELECT *
+        FROM (
+            SELECT
+                p.*,
+                u.fullname,
+                u.img,
 
-                    (
-                        SELECT COUNT(*) 
+                (
+                    SELECT COUNT(*) 
+                    FROM invitations AS i 
+                    JOIN conferences AS c on c.id = i.conference_id 
+                    WHERE i.post_id = p.id 
+                        AND c.date_to >= DATE(NOW() - INTERVAL '3 DAY')
+                ) AS invitations_count,
+
+                (
+                    SELECT COUNT(*) 
+                    FROM (
+                        SELECT conference_id 
                         FROM invitations AS i 
-                        JOIN conferences AS c on c.id = i.conference_id 
-                        WHERE i.post_id = p.id 
+                        JOIN conferences AS c ON c.id = i.conference_id
+                        WHERE i.post_id = p.id
                             AND c.date_to >= DATE(NOW() - INTERVAL '3 DAY')
-                    ) AS invitations_count,
+                        GROUP BY i.conference_id
+                    ) AS x
+                ) AS conferences_count,
 
-                    (
-                        SELECT COUNT(*) 
-                        FROM (
-                            SELECT conference_id 
+                (
+                    SELECT COUNT(*) 
+                    FROM (
+                        (
+                            SELECT i.namespace_to, i.username_to 
                             FROM invitations AS i 
                             JOIN conferences AS c ON c.id = i.conference_id
                             WHERE i.post_id = p.id
                                 AND c.date_to >= DATE(NOW() - INTERVAL '3 DAY')
-                            GROUP BY i.conference_id
-                        ) AS x
-                    ) AS conferences_count,
+                            GROUP BY i.namespace_to, i.username_to
+                        ) UNION ALL (
+                            SELECT i.namespace_from, i.username_from
+                            FROM invitations AS i 
+                            JOIN conferences AS c ON c.id = i.conference_id
+                            WHERE i.post_id = p.id
+                                AND c.date_to >= DATE(NOW() - INTERVAL '3 DAY')
+                            GROUP BY i.namespace_from, i.username_from
+                        )
+                    ) AS x
+                ) AS discussed_by
 
-                    (
-                        SELECT COUNT(*) 
+                ${(filters?.teamId) ? `
+                    ,(
+                        SELECT COUNT(*)
                         FROM (
-                            (
-                                SELECT i.namespace_to, i.username_to 
-                                FROM invitations AS i 
-                                JOIN conferences AS c ON c.id = i.conference_id
-                                WHERE i.post_id = p.id
-                                    AND c.date_to >= DATE(NOW() - INTERVAL '3 DAY')
-                                GROUP BY i.namespace_to, i.username_to
-                            ) UNION ALL (
-                                SELECT i.namespace_from, i.username_from
-                                FROM invitations AS i 
-                                JOIN conferences AS c ON c.id = i.conference_id
-                                WHERE i.post_id = p.id
-                                    AND c.date_to >= DATE(NOW() - INTERVAL '3 DAY')
-                                GROUP BY i.namespace_from, i.username_from
-                            )
+                            SELECT it.namespace, it.username
+                            FROM itemtags as it
+                            JOIN tags as t on t.id = it.tag_id
+                            WHERE t.team_id = :teamId
+                                AND it.item_id = p.id
+                                AND it.value IS TRUE
+                            GROUP BY it.namespace, it.username
                         ) AS x
-                    ) AS discussed_by
+                    ) AS team_rating
+                `: ''}
 
-                FROM posts AS p
-                LEFT JOIN users AS u ON u.namespace = p.namespace
-                    AND u.username = p.username
-                WHERE p.id IN (
-                    select i.post_id
-                    from invitations as i
-                    join conferences as c on c.id = i.conference_id
-                    where c.date_to >= DATE(NOW() - INTERVAL '3 DAY')
-                )
-                ${filters?.username ? 'AND p.username = $2' : ''}
-            ) AS main
-            ORDER BY main.invitations_count DESC
-            LIMIT $1
-        `,
-        values: filters?.username ? [filters?.limit ?? 100, filters.username] : [filters?.limit ?? 100]
+            FROM posts AS p
+            LEFT JOIN users AS u ON u.namespace = p.namespace
+                AND u.username = p.username
+            WHERE p.id IN (
+                select i.post_id
+                from invitations as i
+                join conferences as c on c.id = i.conference_id
+                where c.date_to >= DATE(NOW() - INTERVAL '3 DAY')
+            )
+            ${filters?.username ? 'AND p.username = :username' : ''}
+        ) AS main
+        ${(filters?.teamId) ? `ORDER BY main.team_rating DESC` : `ORDER BY main.discussed_by DESC`}
+        LIMIT :limit
+    `;
+
+    const params = {
+        limit: filters?.limit ?? 100,
+        username: filters?.username,
+        teamId: filters?.teamId
     };
 
-
-    const data = await execute(c => c.query(query).then(r => r.rows));
+    const data = await execute(c => c.query(named(query)(params)).then(r => r.rows));
 
     data.forEach(d => {
         d.invitations_count = parseInt(d.invitations_count);
         d.conferences_count = parseInt(d.conferences_count);
+        d.discussed_by = parseInt(d.discussed_by);
+        if (d.team_rating !== undefined) d.team_rating = parseInt(d.team_rating);
     });
 
     return data;
@@ -331,9 +351,9 @@ export async function getPostsWithInvitations(namespace: string, username: strin
     return data;
 }
 
-export async function getAllWithMyTags(namespace: string, username: string): Promise<PostWithTags[]> {
+export async function getAllWithMyTags(namespace: string, username: string, teamId?: string): Promise<PostWithTags[]> {
 
-    const params = [namespace, username];
+    const params = [namespace, username, teamId ?? null];
     const query = `
         SELECT
             p.id,
@@ -342,15 +362,22 @@ export async function getAllWithMyTags(namespace: string, username: string): Pro
             u.username,
             u.fullname,
             u.img,
-            COALESCE(json_agg(json_build_object(
-            	'id', t.id,
-              	'name', t.name,
-              	'value', it.value
-            )) FILTER (WHERE t.id IS NOT NULL), '[]') as tags
+            (
+                SELECT
+                    COALESCE(json_agg(json_build_object(
+                        'id', t.id,
+                        'name', t.name,
+                        'value', it.value
+                    )) FILTER (WHERE t.id IS NOT NULL), '[]') 
+                FROM itemtags as it
+                JOIN tags as t on t.id = it.tag_id
+                WHERE it.item_id = p.id
+                    AND it.namespace = $1 
+                    AND it.username = $2
+                    AND (t.team_id IS NULL OR t.team_id = $3)
+            ) as tags
         FROM posts as p 
         JOIN users as u on u.namespace = p.namespace and u.username = p.username
-        LEFT JOIN itemtags as it on it.item_id = p.id and it.namespace = $1 and it.username = $2
-        LEFT JOIN tags as t on t.id = it.tag_id
         WHERE (
             SELECT COUNT(*)
             FROM invitations as i 

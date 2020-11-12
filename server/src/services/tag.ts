@@ -7,9 +7,10 @@ export type Tag = {
     name: string;
 }
 
-export async function getTags(): Promise<Tag[]> {
-    const query = 'SELECT * FROM tags;';
-    return execute(c => c.query(query).then(r => r.rows));
+export async function getTags(teamId?: string): Promise<Tag[]> {
+    const query = (teamId) ?  'SELECT * FROM tags WHERE team_id = $1 OR team_id IS NULL;' : 'SELECT * FROM tags WHERE team_id IS NULL;';
+    const params = (teamId) ? [teamId] : undefined;
+    return execute(c => c.query(query, params).then(r => r.rows));
 }
 
 export async function tag(item_id: string, tag_id: string, user: Profile): Promise<void> {

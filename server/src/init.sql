@@ -53,6 +53,7 @@ CREATE TABLE attendance (
 CREATE TABLE tags (
   id UUID DEFAULT uuid_generate_v4(),
   name VARCHAR,
+  team_id UUID NULL,
   PRIMARY KEY (id)
 );
 
@@ -62,6 +63,12 @@ CREATE TABLE itemtags (
   namespace VARCHAR NOT NULL,
   username VARCHAR NOT NULL,
   value BOOLEAN NOT NULL
+);
+
+CREATE TABLE teams (
+  id UUID DEFAULT uuid_generate_v4(),
+  name VARCHAR,
+  PRIMARY KEY (id)
 );
 
 INSERT INTO conferences (short_name, name, description, date_from, date_to) 

@@ -2,7 +2,8 @@ import * as tagService from "../services/tag";
 import { asyncHandler } from "../common/helpers";
 
 export const get = asyncHandler(async function (req: any, res: any) {
-    const tags = await tagService.getTags();
+    const { teamId } = req.query;
+    const tags = await tagService.getTags(teamId);
     return res.json({ success: true, data: tags });
 })
 

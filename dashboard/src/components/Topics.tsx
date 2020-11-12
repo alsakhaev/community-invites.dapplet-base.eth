@@ -11,7 +11,7 @@ interface IProps {
 }
 
 interface IState {
-    column: string;
+    column: string | null;
     direction: 'ascending' | 'descending';
 }
 
@@ -20,7 +20,7 @@ export class Topics extends React.Component<IProps, IState> {
     constructor(props: IProps) {
         super(props);
         this.state = {
-            column: 'invitations_count',
+            column: null,
             direction: 'descending'
         };
     }
@@ -33,7 +33,7 @@ export class Topics extends React.Component<IProps, IState> {
     render() {
         const { posts: users } = this.props;
         const { column, direction } = this.state;
-        const data = (direction === 'ascending') ? sortBy(users, [column]) : sortBy(users, [column]).reverse();
+        const data = (column) ? ((direction === 'ascending') ? sortBy(users, [column]) : sortBy(users, [column]).reverse()) : users;
 
         if (data.length === 0) {
             return <Segment textAlign='center'>No matching entries found</Segment>
@@ -51,13 +51,13 @@ export class Topics extends React.Component<IProps, IState> {
                                         <Comment>
                                             <Comment.Avatar as='a' src={d.img} />
                                             <Comment.Content style={{ display: 'flex' }}>
-                                                <div style={{ flex: 'auto'}}>
+                                                <div style={{ flex: 'auto' }}>
                                                     <Comment.Author style={{ display: 'inline' }}>{d.fullname}</Comment.Author>
                                                     <Comment.Metadata>@{d.username} <Button icon='external' title='Open the post in Twitter' basic size='mini' style={{ boxShadow: 'none', padding: '2px', margin: '0', position: 'relative', top: '-1px' }} onClick={() => window.open(`https://twitter.com/${d.username}/status/${d.id}`, '_blank')} /></Comment.Metadata>
-                                                    <Comment.Text>{d.text}</Comment.Text>
+                                                    <Comment.Text style={{ wordBreak: 'break-word' }}>{d.text}</Comment.Text>
                                                 </div>
-                                                <div style={{ minWidth: '8em', marginLeft: '10px' }} >
-                                                    {/* <div>Team Rating: 10</div> */}
+                                                <div style={{ minWidth: '8em', marginLeft: '10px', lineHeight: '19px' }} >
+                                                    {d.team_rating !== undefined ? <div>Team Rating: {d.team_rating}</div> : null}
                                                     <div>Discussed by: {d.discussed_by}</div>
                                                 </div>
                                             </Comment.Content>
