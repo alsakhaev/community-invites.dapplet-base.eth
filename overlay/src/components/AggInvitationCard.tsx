@@ -22,14 +22,14 @@ export class AggInvitationCard extends React.Component<IProps, IState> {
     render() {
         const p = this.props;
 
-        return <Segment 
-                className="invitation-card" 
-                disabled={p.disabled ?? false} 
-                style={(p.highlight) ? { boxShadow: '0 1px 2px 0 #2185d05e', borderColor: '#2185d0', cursor: 'default' } : {  cursor: 'default' }} 
-                //onClick={() => p.onClick()} 
-                onMouseEnter={this.props.onMouseEnter}
-                onMouseLeave={this.props.onMouseLeave}
-            >
+        return <Segment
+            className="invitation-card"
+            disabled={p.disabled ?? false}
+            style={(p.highlight) ? { boxShadow: '0 1px 2px 0 #2185d05e', borderColor: '#2185d0', cursor: 'default' } : { cursor: 'default' }}
+            //onClick={() => p.onClick()} 
+            onMouseEnter={this.props.onMouseEnter}
+            onMouseLeave={this.props.onMouseLeave}
+        >
             <Comment.Group minimal>
                 <Comment >
                     <Comment.Avatar style={{ margin: 0 }} src={p.post.post.img} />
@@ -50,9 +50,10 @@ export class AggInvitationCard extends React.Component<IProps, IState> {
                             const public_users = exceptMe.filter(x => x.is_private === false);
                             const private_users = exceptMe.filter(x => x.is_private === true);
 
-                            return <div key={c.id} style={{ paddingBottom: '4px'}}>
-                                <b style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '20ch', display: 'block', float: 'left'}} title={c.name}>{c.name}</b><b>: </b>
-                                {(isMe) ? 'me, ' : null}
+                            return <div key={c.id} style={{ paddingBottom: '4px' }}>
+                                <b style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '20ch', display: 'block', float: 'left' }} title={c.name}>{c.name}</b><b>: </b>
+                                {(isMe) ? 'me' : null}
+                                {(isMe && (public_users.length > 0 || private_users.length > 0)) ? ', ' : null}
                                 {public_users.map((u, i) => <React.Fragment key={i}><span title={u.fullname}>{(i !== 0) ? ', ' : ''}@<span style={{ textDecoration: (u.username === p.post.post.username) ? 'underline' : undefined }}>{u.username}</span></span></React.Fragment>)}
                                 {(private_users.length > 0) ? <React.Fragment> and {private_users.length} private person{(private_users.length > 1 ? 's' : '')}</React.Fragment> : null}
                                 <br />

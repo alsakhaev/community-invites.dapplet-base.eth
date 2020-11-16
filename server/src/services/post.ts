@@ -281,10 +281,6 @@ export async function getPostsWithInvitations(namespace: string, username: strin
                     select i.conference_id 
                     from invitations as i 
                     where i.post_id = p.id
-                        and (
-                            (i.namespace_from = $1 and i.username_from = $2)
-                            or (i.namespace_to = $1 and i.username_to = $2)
-                        )
                 ) and c.date_to >= DATE(NOW() - INTERVAL '3 DAY')
             ) as conferences
         from posts as p
