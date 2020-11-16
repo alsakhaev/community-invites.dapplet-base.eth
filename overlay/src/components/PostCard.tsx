@@ -1,6 +1,7 @@
 import React from 'react';
 import { Card, Segment, Image, Comment, Button } from 'semantic-ui-react';
 import { Post } from '../dappletBus';
+import Twemoji from 'react-twemoji';
 
 interface IProps {
     post: Post;
@@ -21,7 +22,7 @@ export class PostCard extends React.Component<IProps, IState> {
                     style={{ borderRadius: 34 }}
                     src={p.authorImg}
                 />
-                <Card.Header style={{ fontSize: '1.15em'}}>{p.authorFullname}</Card.Header>
+                <Card.Header style={{ fontSize: '1.15em'}}><Twemoji>{p.authorFullname}</Twemoji></Card.Header>
                 <Card.Meta>@{p.authorUsername}</Card.Meta>
                 <Card.Description style={{ textOverflow: 'ellipsis', overflow: 'hidden'}}>
                     {p.text}

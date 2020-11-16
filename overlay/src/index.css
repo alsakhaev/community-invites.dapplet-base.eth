@@ -21,3 +21,9 @@ html, body, #root {
   height: 100%;
   margin: 0;
 }
+
+.emoji {
+  height: 1em !important;
+  margin-left: 0.2em;
+  display: inline !important;
+}

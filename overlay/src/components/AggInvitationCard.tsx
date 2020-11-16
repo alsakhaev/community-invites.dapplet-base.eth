@@ -2,6 +2,7 @@ import React from 'react';
 import { Icon, Segment, Image, Label, Header, Comment, Button } from 'semantic-ui-react';
 import { MyInvitation, PostWithInvitations } from '../api';
 import { Profile } from '../dappletBus';
+import Twemoji from 'react-twemoji';
 
 interface IProps {
     post: PostWithInvitations;
@@ -34,7 +35,7 @@ export class AggInvitationCard extends React.Component<IProps, IState> {
                     <Comment.Avatar style={{ margin: 0 }} src={p.post.post.img} />
                     <Comment.Content style={{ marginLeft: '3.3em', padding: 0, display: 'flex' }} >
                         <div style={{ flex: '1' }}>
-                            <Comment.Author>{p.post.post.fullname}</Comment.Author>
+                            <Comment.Author><Twemoji>{p.post.post.fullname}</Twemoji></Comment.Author>
                             <Comment.Metadata style={{ margin: '0' }}>@{p.post.post.username}</Comment.Metadata>
                         </div>
                         <div>

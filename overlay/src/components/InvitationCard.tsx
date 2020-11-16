@@ -1,6 +1,7 @@
 import React from 'react';
 import { Icon, Segment, Image, Label, Header, Button } from 'semantic-ui-react';
 import { MyInvitation } from '../api';
+import Twemoji from 'react-twemoji';
 
 interface IProps {
     invitation: MyInvitation;
@@ -22,7 +23,7 @@ export class InvitationCard extends React.Component<IProps, IState> {
                     <Header as='h4' image style={{ margin: '0 auto 0 0', whiteSpace: 'nowrap' }}>
                         <Image src={invitation.author_img} rounded size='mini' style={{ display: 'inline-block' }} />
                         <Header.Content style={{ padding: '0 0 0 .75rem', display: 'inline-block' }}>
-                            {invitation.author_fullname}
+                            <Twemoji>{invitation.author_fullname}</Twemoji>
                             <Header.Subheader>@{invitation.author_username}</Header.Subheader>
                         </Header.Content>
                         <Label>{invitation.conference_short_name}</Label>

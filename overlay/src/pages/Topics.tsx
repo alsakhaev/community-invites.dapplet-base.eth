@@ -2,6 +2,7 @@ import React from 'react';
 import { Icon, Segment, Comment, Input, InputOnChangeData, Loader, Label, Select, Message, Dropdown, Button } from 'semantic-ui-react';
 import { Api, PostWithTags, Tag, UserSettings } from '../api';
 import { Profile, Settings } from '../dappletBus';
+import Twemoji from 'react-twemoji';
 
 interface IProps {
     defaultSearch: string;
@@ -202,7 +203,7 @@ export class Topics extends React.Component<IProps, IState> {
         const s = this.state;
         const filteredPosts = this.state.posts.filter(this._postFilter);
 
-        return (<div  style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
+        return (<div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
             <div style={{ marginBottom: '15px' }}>
                 <Input
                     fluid
@@ -229,7 +230,7 @@ export class Topics extends React.Component<IProps, IState> {
                                     <Comment >
                                         <Comment.Avatar style={{ margin: 0 }} src={p.img} />
                                         <Comment.Content style={{ marginLeft: '3.3em', padding: 0 }} >
-                                            <Comment.Author>{p.fullname}</Comment.Author>
+                                            <Comment.Author><Twemoji>{p.fullname}</Twemoji></Comment.Author>
                                             <Comment.Metadata style={{ margin: '0' }}>@{p.username}</Comment.Metadata>
                                         </Comment.Content>
                                         <Comment.Text style={{ margin: '0.5em 0px 0.5em 46px' }}>{p.text} <Button icon='external' title='Open the post in Twitter' basic size='mini' style={{ boxShadow: 'none', padding: '2px', margin: '0', position: 'relative', top: '-1px' }} onClick={(e) => (e.stopPropagation(), window.open(`https://twitter.com/${p.username}/status/${p.id}`, '_blank'))} /></Comment.Text>
@@ -253,7 +254,7 @@ export class Topics extends React.Component<IProps, IState> {
 
                         {(filteredPosts.length === 0) ? <Segment>No entries found</Segment> : null}
                     </React.Fragment>}
-        </div>
+            </div>
         </div >);
     }
 }

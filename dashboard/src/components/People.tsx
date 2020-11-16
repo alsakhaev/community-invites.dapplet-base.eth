@@ -2,6 +2,7 @@ import React from 'react';
 //import './App.css';
 import { Image, Table, Header, Accordion, Icon, Segment } from 'semantic-ui-react';
 import { UserStat } from '../api';
+import Twemoji from 'react-twemoji';
 
 interface IProps {
     users: UserStat[];
@@ -61,7 +62,7 @@ export class People extends React.Component<IProps, IState> {
                                             <Header as='h4' image style={{ margin: '0 auto 0 0', whiteSpace: 'nowrap' }}>
                                                 <Image src={d.img} rounded size='mini' style={{ display: 'inline-block' }} />
                                                 <Header.Content style={{ padding: '0 0 0 .75rem', display: 'inline-block' }}>
-                                                    {d.fullname}
+                                                    <Twemoji>{d.fullname}</Twemoji>
                                                     <Header.Subheader>@{d.username}</Header.Subheader>
                                                 </Header.Content>
                                             </Header>

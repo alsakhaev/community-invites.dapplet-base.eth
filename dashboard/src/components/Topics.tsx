@@ -3,6 +3,7 @@ import React from 'react';
 import { Table, Comment, Button, Segment } from 'semantic-ui-react';
 import { PostStat } from '../api';
 import sortBy from 'lodash.sortby';
+import Twemoji from 'react-twemoji';
 
 interface IProps {
     posts: (PostStat & { checked?: boolean })[];
@@ -52,7 +53,7 @@ export class Topics extends React.Component<IProps, IState> {
                                             <Comment.Avatar as='a' src={d.img} />
                                             <Comment.Content style={{ display: 'flex' }}>
                                                 <div style={{ flex: 'auto' }}>
-                                                    <Comment.Author style={{ display: 'inline' }}>{d.fullname}</Comment.Author>
+                                                    <Comment.Author style={{ display: 'inline' }}><Twemoji style={{ display: 'inline' }}>{d.fullname}</Twemoji></Comment.Author>
                                                     <Comment.Metadata>@{d.username} <Button icon='external' title='Open the post in Twitter' basic size='mini' style={{ boxShadow: 'none', padding: '2px', margin: '0', position: 'relative', top: '-1px' }} onClick={() => window.open(`https://twitter.com/${d.username}/status/${d.id}`, '_blank')} /></Comment.Metadata>
                                                     <Comment.Text style={{ wordBreak: 'break-word' }}>{d.text}</Comment.Text>
                                                 </div>
