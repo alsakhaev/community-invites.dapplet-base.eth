@@ -1,6 +1,6 @@
 import React from 'react';
 //import './App.css';
-import { Image, Table, Header, Accordion, Icon, Segment, Form, Checkbox, Modal, Button, InputOnChangeData, Message } from 'semantic-ui-react';
+import { Image, Table, Header, Accordion, Icon, Segment, Form, Checkbox, Modal, Button, InputOnChangeData, Message, Dropdown } from 'semantic-ui-react';
 import { Api, UserStat } from '../api';
 
 interface IProps {
@@ -51,7 +51,7 @@ export class TeamForm extends React.Component<IProps, IState> {
             <Modal
                 closeIcon
                 open={p.open}
-                trigger={<Button>Create Team</Button>}
+                trigger={<Dropdown.Item>Create Team</Dropdown.Item>}
                 onClose={p.onClose}
                 onOpen={p.onOpen}
             >

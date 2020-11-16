@@ -1,12 +1,16 @@
 import React from 'react';
 //import './App.css';
-import { Container, Grid, Placeholder, Input, Select, Label, Button, Modal, Header, Icon } from 'semantic-ui-react';
+import { Container, Grid, Placeholder, Input, Select, Label, Button, Modal, Header, Icon, Dropdown } from 'semantic-ui-react';
 import { Api, PostStat, UserStat } from '../api';
 import { People } from '../components/People';
 import { Topics } from '../components/Topics';
 import SearchString from 'search-string';
 import { TeamForm } from '../components/TeamForm';
 import { ConferenceForm } from '../components/ConferenceForm';
+import { ExportToCsv } from '../helpers/exportToCsv';
+import JSZip from 'jszip';
+import { saveBlob } from '../helpers/fileSaver';
+import { exportToJson } from '../helpers/exportToJson';
 
 
 interface IProps {
@@ -228,6 +232,54 @@ export class App extends React.Component<IProps, IState> {
     this.refreshTopics(topicsFilter);
   }
 
+  async exportData() {
+
+    const people = this.state.users.map(x => ({
+      namespace: x.namespace,
+      username: x.username,
+      fullname: x.fullname,
+      img: x.img,
+      rating: x.agg_invitations_to_count,
+      wanted_by: x.users_to_count
+    }));
+
+    const topics = this.state.posts.map(x => ({
+      namespace: x.namespace,
+      username: x.username,
+      fullname: x.fullname,
+      img: x.img,
+      text: x.text,
+      team_rating: x.team_rating,
+      discussed_by: x.discussed_by
+    }));
+
+    const options = {
+      fieldSeparator: ',',
+      quoteStrings: '"',
+      decimalSeparator: '.',
+      showLabels: true,
+      useTextFile: false,
+      useBom: true,
+      useKeysAsHeaders: true
+    };
+    const csvExporter = new ExportToCsv(options);
+
+    const zip = new JSZip();
+
+    const peopleCsv = csvExporter.generateBlob(people);
+    const topicsCsv = csvExporter.generateBlob(topics);
+    const peopleJson = exportToJson(people);
+    const topicsJson = exportToJson(topics);
+
+    zip.file('people.csv', peopleCsv);
+    zip.file('topics.csv', topicsCsv);
+    zip.file('people.json', peopleJson);
+    zip.file('topics.json', topicsJson);
+
+    const zipBlob = await zip.generateAsync({ type: "blob" });
+    saveBlob(zipBlob, 'data.zip');
+  }
+
   render() {
     const s = this.state;
 
@@ -267,7 +319,36 @@ export class App extends React.Component<IProps, IState> {
     return (
       <div style={{ padding: '40px 40px 0 40px' }}>
         <Container >
-          <h1 style={{ textAlign: 'center' }}>Most Wanted</h1>
+
+          <div style={{ display: 'flex' }}>
+            <h1 style={{ textAlign: 'center', flex: 'auto' }}>Most Wanted</h1>
+            <div>
+              <Dropdown
+                icon='bars'
+                button
+                className='icon'
+                basic
+                direction='left'
+              >
+                <Dropdown.Menu>
+                  <Dropdown.Header content='Advanced' />
+                  <Dropdown.Item content='Export Data' onClick={() => this.exportData()} />
+                  <Dropdown.Divider />
+                  <Dropdown.Header content='For organizers' />
+                  <TeamForm
+                    open={s.createTeamModal}
+                    onOpen={() => this.setState({ createTeamModal: true })}
+                    onClose={() => this.setState({ createTeamModal: false })}
+                  />
+                  <ConferenceForm
+                    open={s.createConferenceModal}
+                    onOpen={() => this.setState({ createConferenceModal: true })}
+                    onClose={() => this.setState({ createConferenceModal: false })}
+                  />
+                </Dropdown.Menu>
+              </Dropdown>
+            </div>
+          </div>
 
           {(s.teamId) ? <div style={{ textAlign: 'center', fontSize: '1.2em' }}>
             {(s.teamName) ? <React.Fragment>Customized for <Label color='blue'>{s.teamName}</Label></React.Fragment> : 'Loading team...'}
@@ -324,19 +405,6 @@ export class App extends React.Component<IProps, IState> {
               </Grid.Column>
             </Grid.Row>
           </Grid>
-
-          <div style={{ marginBottom: '30px' }}>
-            <TeamForm
-              open={s.createTeamModal}
-              onOpen={() => this.setState({ createTeamModal: true })}
-              onClose={() => this.setState({ createTeamModal: false })}
-            />
-            <ConferenceForm
-              open={s.createConferenceModal}
-              onOpen={() => this.setState({ createConferenceModal: true })}
-              onClose={() => this.setState({ createConferenceModal: false })}
-            />
-          </div>
 
         </Container>
       </div>
