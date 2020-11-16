@@ -2,6 +2,7 @@
   "name": "dashboard.community-invites.dapplet-base.eth",
   "version": "0.1.0",
   "private": true,
+  "homepage": "./",
   "dependencies": {
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.5.0",
@@ -19,13 +20,17 @@
     "search-string": "^3.1.0",
     "semantic-ui-css": "^2.4.1",
     "semantic-ui-react": "^2.0.0",
-    "typescript": "^3.7.5"
+    "typescript": "^3.7.5",
+    "erebos": "^0.3.0"
   },
   "scripts": {
     "start": "REACT_APP_API_URL=http://localhost:3003 PORT=3004 BROWSER=none react-scripts start",
     "build": "REACT_APP_API_URL=https://community-invite.herokuapp.com react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "swarm:setup": "erebos website:setup --name=\"dashboard.community-invites.dapplet-base.eth\" --http-gateway=https://swarm-gateways.net",
+    "swarm:upload": "SWARM_KEY=$(grep SWARM_KEY .env | cut -d '=' -f2) erebos website:publish --hash=$(grep SWARM_ADDRESS .env | cut -d '=' -f2) --key-env=SWARM_KEY ./build --http-gateway=https://swarm-gateways.net",
+    "deploy": "npm run build && npm run swarm:upload"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -43,6 +48,7 @@
     ]
   },
   "devDependencies": {
+    "@erebos/cli": "^0.13.1",
     "@types/lodash.sortby": "^4.7.6"
   }
 }

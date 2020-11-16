@@ -185,7 +185,7 @@ export class App extends React.Component<IProps, IState> {
               icon='dashboard'
               title='Open Dashboard in new tab'
               style={{ cursor: 'pointer' }}
-              onClick={() => window.open(`https://community-invite-dashboard.herokuapp.com${(s.userSettings?.teamId) ? '#/?teamId=' + s.userSettings?.teamId : ''}`, '_blank')}
+              onClick={() => window.open(`https://swarm-gateways.net/bzz:/4c6869f3c8c0202b1d5bfdb7c71d5b79ba0f3066a6a5017ce98810dd469e1e9c/${(s.userSettings?.teamId) ? '#/?teamId=' + s.userSettings?.teamId : ''}`, '_blank')}
             />
           </Menu>
         </div>
