@@ -242,57 +242,68 @@ export async function getPostsWithInvitations(namespace: string, username: strin
 
     const params = [namespace, username];
     const query = `
-        select 
-            json_build_object(
-                'id', p.id,
-                'namespace', p.namespace,
-                'username', p.username,
-                'fullname', u.fullname,
-                'img', u.img,
-                'text', p.text
-            ) as post,
-            (
-                select json_agg(json_build_object(
-                    'id', c.id,
-                    'name', c.name,
-                    'short_name', c.short_name,
-                    'invitations', (              
-                        select 
-                            json_agg(json_build_object(
-                                'id', ii.id,
-                                'namespace_from', ii.namespace_from,
-                                'username_from', ii.username_from,
-                                'fullname_from', uu_from.fullname,
-                                'namespace_to', ii.namespace_to,
-                                'username_to', ii.username_to,
-                                'fullname_to', uu_to.fullname,
-                                'is_private', ii.is_private
-                            ))
-                        from invitations as ii 
-                        join users as uu_from on uu_from.namespace = ii.namespace_from and uu_from.username = ii.username_from
-                        join users as uu_to on uu_to.namespace = ii.namespace_to and uu_to.username = ii.username_to
-                        join conferences as cc on cc.id = ii.conference_id
-                        WHERE ii.post_id = p.id
-                            and cc.id = c.id
-                    )
-                ))
-                from conferences as c 
-                where c.id in (
-                    select i.conference_id 
-                    from invitations as i 
-                    where i.post_id = p.id
-                ) and c.date_to >= DATE(NOW() - INTERVAL '3 DAY')
-            ) as conferences
-        from posts as p
-        join users as u on u.namespace = p.namespace and u.username = p.username
-        where p.id in (
-            select iiiii.post_id
-            from invitations as iiiii
-            join conferences as ccccc on ccccc.id = iiiii.conference_id
-            where ccccc.date_to >= DATE(NOW() - INTERVAL '3 DAY')
-                and ((iiiii.namespace_from = $1 and iiiii.username_from = $2)
-                or (iiiii.namespace_to = $1 and iiiii.username_to = $2))
-        )
+        select post, conferences
+        from (
+            select 
+                json_build_object(
+                    'id', p.id,
+                    'namespace', p.namespace,
+                    'username', p.username,
+                    'fullname', u.fullname,
+                    'img', u.img,
+                    'text', p.text
+                ) as post,
+                (
+                    select json_agg(json_build_object(
+                        'id', c.id,
+                        'name', c.name,
+                        'short_name', c.short_name,
+                        'invitations', (              
+                            select 
+                                json_agg(json_build_object(
+                                    'id', ii.id,
+                                    'namespace_from', ii.namespace_from,
+                                    'username_from', ii.username_from,
+                                    'fullname_from', uu_from.fullname,
+                                    'namespace_to', ii.namespace_to,
+                                    'username_to', ii.username_to,
+                                    'fullname_to', uu_to.fullname,
+                                    'is_private', ii.is_private
+                                ))
+                            from invitations as ii 
+                            join users as uu_from on uu_from.namespace = ii.namespace_from and uu_from.username = ii.username_from
+                            join users as uu_to on uu_to.namespace = ii.namespace_to and uu_to.username = ii.username_to
+                            join conferences as cc on cc.id = ii.conference_id
+                            WHERE ii.post_id = p.id
+                                and cc.id = c.id
+                        )
+                    ))
+                    from conferences as c 
+                    where c.id in (
+                        select i.conference_id 
+                        from invitations as i 
+                        where i.post_id = p.id
+                    ) and c.date_to >= DATE(NOW() - INTERVAL '3 DAY')
+                ) as conferences,
+                (
+                    select max(modified)
+                    from invitations as iii
+                    WHERE iii.post_id = p.id
+                        and ((iii.namespace_from = $1 and iii.username_from = $2)
+                        or (iii.namespace_to = $1 and iii.username_to = $2))
+                ) as last_invitation_date
+            from posts as p
+            join users as u on u.namespace = p.namespace and u.username = p.username
+            where p.id in (
+                select iiiii.post_id
+                from invitations as iiiii
+                join conferences as ccccc on ccccc.id = iiiii.conference_id
+                where ccccc.date_to >= DATE(NOW() - INTERVAL '3 DAY')
+                    and ((iiiii.namespace_from = $1 and iiiii.username_from = $2)
+                    or (iiiii.namespace_to = $1 and iiiii.username_to = $2))
+            )
+        ) as main
+        order by main.last_invitation_date desc        
     `;
 
     const data = await execute(c => c.query(query, params).then(r => r.rows));
