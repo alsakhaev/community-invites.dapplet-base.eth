@@ -81,7 +81,7 @@ export class NewInvite extends React.Component<IProps, IState> {
             conference: x.conference,
             attendance_from: x.attendance_from,
             attendance_to: x.attendance_to,
-            invitations: x.invitations.filter(y => y.post_id === this.props.post.id),
+            invitations: x.invitations,
             attendies: x.attendies
         }))
         this.setState({ data: filteredByPosts });
@@ -120,7 +120,7 @@ export class NewInvite extends React.Component<IProps, IState> {
         const p = this.props;
         this.setState({ selectedConferenceId });
         const selectedConference = s.data.find(x => x.conference.id === selectedConferenceId);
-        const currentInvitation = selectedConference?.invitations.find(x => x.from.namespace === p.profile.namespace && x.from.username === p.profile.username && x.to.namespace === s.profileTo.namespace && x.to.username === s.profileTo.username);
+        const currentInvitation = selectedConference?.invitations.find(x => x.from.namespace === p.profile.namespace && x.from.username === p.profile.username && x.to.namespace === s.profileTo.namespace && x.to.username === s.profileTo.username && x.post_id === p.post.id);
         this.setState({ isPrivate: currentInvitation?.is_private ?? false, isModified: false });
     }
 
@@ -133,7 +133,7 @@ export class NewInvite extends React.Component<IProps, IState> {
         const invitesTotal = selectedConference?.invitations.filter(x => x.from.namespace === this.props.profile.namespace && x.from.username === this.props.profile.username).length ?? 0;
         const invitesAuthorTotal = selectedConference?.invitations.filter(x => x.from.namespace === this.props.profile.namespace && x.from.username === this.props.profile.username).filter(x => x.to.namespace === this.state.profileTo.namespace && x.to.username === this.state.profileTo.username).length ?? 0;
 
-        const currentInvitation = selectedConference?.invitations.find(x => x.from.namespace === p.profile.namespace && x.from.username === p.profile.username && x.to.namespace === s.profileTo.namespace && x.to.username === s.profileTo.username);
+        const currentInvitation = selectedConference?.invitations.find(x => x.from.namespace === p.profile.namespace && x.from.username === p.profile.username && x.to.namespace === s.profileTo.namespace && x.to.username === s.profileTo.username && x.post_id === p.post.id);
 
         return <React.Fragment>
 
