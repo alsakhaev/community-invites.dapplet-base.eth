@@ -87,7 +87,7 @@ export class App extends React.Component<IProps, IState> {
       const s = this.state;
       await this._api!.setUserSettings(s.profile!.namespace, s.profile!.username, {});
       const userSettings = await this._api!.getUserSettings(s.profile!.namespace, s.profile!.username);
-      this.setState({ userSettings });
+      this.setState({ userSettings, activeIndex: (this.state.activeIndex === 3) ? 1 : this.state.activeIndex });
     } catch (err) {
       console.error(err);
     } finally {
@@ -129,7 +129,7 @@ export class App extends React.Component<IProps, IState> {
       return (<div className="App-container" style={{ padding: '15px' }}>
         <Segment>
           You are not logged in
-      </Segment>
+        </Segment>
       </div>)
     }
 
@@ -176,11 +176,11 @@ export class App extends React.Component<IProps, IState> {
               active={s.activeIndex === 2}
               onClick={() => this.changeTab(2)}
             />
-            <Menu.Item
+            {(s.userSettings?.teamId) ? <Menu.Item
               name='Topics'
               active={s.activeIndex === 3}
               onClick={() => this.changeTab(3)}
-            />
+            /> : null}
             <Menu.Item
               icon='dashboard'
               title='Open Dashboard in new tab'
