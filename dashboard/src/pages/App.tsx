@@ -249,7 +249,7 @@ export class App extends React.Component<IProps, IState> {
       fullname: x.fullname,
       img: x.img,
       text: x.text,
-      team_rating: x.team_rating,
+      team_rating: (x.team_rating !== undefined) ? x.team_rating : '',
       discussed_by: x.discussed_by
     }));
 
@@ -277,7 +277,9 @@ export class App extends React.Component<IProps, IState> {
     zip.file('topics.json', topicsJson);
 
     const zipBlob = await zip.generateAsync({ type: "blob" });
-    saveBlob(zipBlob, 'data.zip');
+    const prefix = this.state.teamName?.trim()?.split(' ')?.join('_')?.toLowerCase() ?? 'global';
+    const name = `${prefix}-data.zip`;
+    saveBlob(zipBlob, name);
   }
 
   render() {
