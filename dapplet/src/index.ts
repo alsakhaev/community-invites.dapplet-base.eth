@@ -18,7 +18,8 @@ export default class Feature {
         public viewportAdapter: any
     ) {
         Core.onAction(() => this._openOverlay(this.identityAdapter.getCurrentUser()));
-
+        Core.onHome(() => window.open('https://swarm-gateways.net/bzz:/74542ebed38ec5b80e819256c7f5c3c2a42dd69b867f7ce3ca8b074ba44f8f77', '_blank'));
+ 
         const { button, caption } = this.identityAdapter.exports;
 
         this.identityAdapter.attachConfig({
