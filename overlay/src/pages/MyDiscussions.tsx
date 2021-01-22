@@ -1,6 +1,6 @@
 import React from 'react';
 import { Segment, Comment, Input, InputOnChangeData, Loader } from 'semantic-ui-react';
-import { Api, PostWithInvitations } from '../api';
+import { Api, PostWithInvitations, PostWithTags, Tag, UserSettings } from '../api';
 import { Post, Profile, Settings } from '../dappletBus';
 import { AggInvitationCard } from '../components/AggInvitationCard';
 
@@ -10,6 +10,7 @@ interface IProps {
     profile: Profile;
     onEdit: (post: Post, user: Profile, conferenceId: number) => void;
     highlightedPostId: string | null;
+    userSettings?: UserSettings;
 }
 
 interface IState {
@@ -19,6 +20,8 @@ interface IState {
     active1: string | null;
     active2: string | null;
     highlightedId: string | null;
+    postsWithTags: PostWithTags[];
+    tags: Tag[];
 }
 
 export class MyDiscussions extends React.Component<IProps, IState> {
@@ -36,7 +39,9 @@ export class MyDiscussions extends React.Component<IProps, IState> {
             },
             active1: null,
             active2: null,
-            highlightedId: null
+            highlightedId: null,
+            tags: [],
+            postsWithTags: []
         };
     }
 
@@ -45,13 +50,23 @@ export class MyDiscussions extends React.Component<IProps, IState> {
             const { profile } = this.props;
             if (profile) {
                 const posts = await this._api.getInvitationPosts(profile.namespace, profile.username);
-                this.setState({ posts });
+                const postsWithTags = await this._api.getAllTopicsWithMyTags(profile.namespace, profile.username, this.props.userSettings?.teamId);
+                this.setState({ posts, postsWithTags });
             }
+
+            const tags = await this._api.getTags(this.props.userSettings?.teamId);
+            this.setState({ tags });
 
             this._setLoading('list', false);
         } catch (err) {
             if (err.name !== 'AbortError') console.error(err);
         }
+    }
+
+    _getTagsForPost(p: PostWithInvitations) {
+        const tagged = this.state.postsWithTags;
+        const post = tagged.find(x => x.id === p.post.id);
+        return post?.tags || [];
     }
 
     async componentWillUnmount() {
@@ -165,6 +180,24 @@ export class MyDiscussions extends React.Component<IProps, IState> {
         this.props.onEdit(post, user, c.id);
     }
 
+    async tag(item_id: string, tag_id: string) {
+        if (!this.props.profile) throw Error('You are not logged in');
+        this._setLoading(item_id, true);
+        await this._api.tag(item_id, tag_id, this.props.profile, this.props.userSettings?.teamId);
+        const postsWithTags = await this._api.getAllTopicsWithMyTags(this.props.profile.namespace, this.props.profile.username, this.props.userSettings?.teamId);
+        this._setLoading(item_id, false);
+        this.setState({ postsWithTags });
+    }
+
+    async untag(item_id: string, tag_id: string) {
+        this._setLoading(item_id, true);
+        if (!this.props.profile) throw Error('You are not logged in');
+        await this._api.untag(item_id, tag_id, this.props.profile, this.props.userSettings?.teamId);
+        const postsWithTags = await this._api.getAllTopicsWithMyTags(this.props.profile.namespace, this.props.profile.username, this.props.userSettings?.teamId);
+        this._setLoading(item_id, false);
+        this.setState({ postsWithTags });
+    }
+
     render() {
         const filteredPosts = this.state.posts.filter(this._postFilter);
 
@@ -186,11 +219,18 @@ export class MyDiscussions extends React.Component<IProps, IState> {
                                 key={p.post.id} 
                                 profile={this.props.profile}
                                 highlight={this.props.highlightedPostId === p.post.id}
+                                tags={this._getTagsForPost(p)}
+                                availableTags={this.state.tags}
                                 //onClick={() => this._selectCard(p.post.id)}
                                 //onEdit={(p.post.namespace === this.props.profile.namespace && p.post.username === this.props.profile.username) ? undefined : () => this._onEdit(p)}
                                 // onMouseEnter={() => this._selectCard(p.post.id)}
                                 // onMouseLeave={() => this._selectCard(p.post.id)}
                                 onUserClick={(c, u) => this._onEdit(p, c, u)}
+                                onTag={this.tag.bind(this)}
+                                onUntag={this.untag.bind(this)}
+                                onTagFilter={console.log}
+                                loading={this._getLoading(p.post.id)}
+                                tagging={!!this.props.userSettings?.teamId}
                             />
                         ) : <Segment>No entries found</Segment>}
                     </React.Fragment>}

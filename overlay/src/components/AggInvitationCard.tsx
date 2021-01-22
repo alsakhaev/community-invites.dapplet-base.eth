@@ -1,6 +1,6 @@
 import React from 'react';
-import { Icon, Segment, Image, Label, Header, Comment, Button } from 'semantic-ui-react';
-import { MyInvitation, PostWithInvitations } from '../api';
+import { Icon, Segment, Image, Label, Header, Comment, Button, Dropdown } from 'semantic-ui-react';
+import { MyInvitation, PostWithInvitations, Tag } from '../api';
 import { Profile } from '../dappletBus';
 import Twemoji from 'react-twemoji';
 
@@ -25,6 +25,21 @@ interface IProps {
         is_private: boolean;
         is_from_me: boolean;
     }) => void;
+    tags: {
+        id: string;
+        name: string;
+        value: boolean;
+    }[];
+    availableTags: Tag[];
+    onTag: (item_id: string, tag_id: string) => void;
+    onUntag: (item_id: string, tag_id: string) => void;
+    onTagFilter: (tag: {
+        id: string;
+        name: string;
+        value: boolean;
+    }) => void;
+    loading: boolean;
+    tagging: boolean;
 }
 
 interface IState { }
@@ -79,6 +94,19 @@ export class AggInvitationCard extends React.Component<IProps, IState> {
                             </div>
                         })}
                     </div>
+
+                    {(p.tagging) ? <div>
+                        {p.tags.filter(x => x.value === true).map(x => <Label onClick={() => this.props.onTagFilter(x)} style={{ marginTop: '.14285714em' }} as='a' color='green' key={x.id} disabled={this.props.loading}>{x.name}<Icon name='delete' disabled={this.props.loading} link onClick={(e: any) => (e.stopPropagation(), this.props.onUntag(p.post.post.id, x.id))} /></Label>)}
+                        {(p.availableTags.filter(x => !p.tags.find(y => y.id === x.id && y.value === true)).length > 0) ? <Dropdown
+                            trigger={<Label style={{ marginTop: '.14285714em' }} color='blue' disabled={this.props.loading}><Icon name='plus' /> Add tag</Label>}
+                            pointing='top right'
+                            icon={null}
+                        >
+                            <Dropdown.Menu>
+                                {p.availableTags.filter(x => !p.tags.find(y => y.id === x.id && y.value === true)).map(x => <Dropdown.Item key={x.id} onClick={() => this.props.onTag(p.post.post.id, x.id)}>{x.name}</Dropdown.Item>)}
+                            </Dropdown.Menu>
+                        </Dropdown> : null}
+                    </div> : null}
                 </Comment>
             </Comment.Group>
         </Segment>

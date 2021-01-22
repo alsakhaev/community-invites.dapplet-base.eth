@@ -1,6 +1,6 @@
 import React from 'react';
 import { Segment, Comment, Input, InputOnChangeData, Loader, Placeholder } from 'semantic-ui-react';
-import { Api, MyInvitation, PostWithInvitations } from '../api';
+import { Api, MyInvitation, PostWithInvitations, UserSettings } from '../api';
 import { Post, Profile, Settings } from '../dappletBus';
 import { AggInvitationCard } from '../components/AggInvitationCard';
 import { MyDiscussions } from './MyDiscussions';
@@ -11,6 +11,7 @@ interface IProps {
     settings: Settings;
     profile: Profile;
     post?: Post;
+    userSettings?: UserSettings;
 }
 
 interface IState {
@@ -54,6 +55,10 @@ export class DiscussionTab extends React.Component<IProps, IState> {
         } catch (err) {
             if (err.name !== 'AbortError') console.error(err);
         }
+    }
+
+    async componentWillUnmount() {
+        this._api.controller.abort();
     }
 
     async loadData(firstLoading: boolean = false) {
@@ -120,7 +125,7 @@ export class DiscussionTab extends React.Component<IProps, IState> {
         </Placeholder>;
 
         if (s.currentTab === Tabs.AllInvites) {
-            return <MyDiscussions highlightedPostId={s.highlightedPostId} profile={p.profile} defaultSearch={p.defaultSearch} settings={p.settings!} onEdit={this._onEdit.bind(this)} />;
+            return <MyDiscussions userSettings={p.userSettings} highlightedPostId={s.highlightedPostId} profile={p.profile} defaultSearch={p.defaultSearch} settings={p.settings!} onEdit={this._onEdit.bind(this)} />;
         }
 
         if (s.currentTab === Tabs.NewInvite) {

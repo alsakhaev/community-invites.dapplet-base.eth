@@ -4,7 +4,7 @@ import { dappletInstance, Post, Profile, Settings } from '../dappletBus';
 import { Segment, Loader, Menu, Input, InputOnChangeData, Label, Icon } from 'semantic-ui-react';
 import { Conferences } from './Conferences';
 import { DiscussionTab } from './DiscussionTab';
-import { Topics } from '../pages/Topics';
+// import { Topics } from '../pages/Topics';
 import { Api, UserSettings } from '../api';
 
 interface IProps {
@@ -71,7 +71,7 @@ export class App extends React.Component<IProps, IState> {
       if (team && team.name) {
         await this._api!.setUserSettings(s.profile!.namespace, s.profile!.username, { teamId: teamId });
         const userSettings = await this._api!.getUserSettings(s.profile!.namespace, s.profile!.username);
-        this.setState({ userSettings, teamInputVisible: false });
+        this.setState({ userSettings, teamInputVisible: false, key: Math.random() });
       }
     } catch (err) {
       console.error(err);
@@ -86,7 +86,7 @@ export class App extends React.Component<IProps, IState> {
       const s = this.state;
       await this._api!.setUserSettings(s.profile!.namespace, s.profile!.username, {});
       const userSettings = await this._api!.getUserSettings(s.profile!.namespace, s.profile!.username);
-      this.setState({ userSettings, activeIndex: (this.state.activeIndex === 3) ? 1 : this.state.activeIndex });
+      this.setState({ userSettings, activeIndex: (this.state.activeIndex === 3) ? 1 : this.state.activeIndex, key: Math.random() });
     } catch (err) {
       console.error(err);
     } finally {
@@ -175,11 +175,11 @@ export class App extends React.Component<IProps, IState> {
               active={s.activeIndex === 2}
               onClick={() => this.changeTab(2)}
             />
-            {(s.userSettings?.teamId) ? <Menu.Item
+            {/* {(s.userSettings?.teamId) ? <Menu.Item
               name='Topics'
               active={s.activeIndex === 3}
               onClick={() => this.changeTab(3)}
-            /> : null}
+            /> : null} */}
             <Menu.Item
               icon='dashboard'
               title='Open Dashboard in new tab'
@@ -193,8 +193,8 @@ export class App extends React.Component<IProps, IState> {
 
           {/* {(s.activeIndex === 0) ? <Invite profile={s.profile} post={s.post} onPostsClick={this.postsClickHandler} settings={s.settings!} key={s.key} /> : null} */}
           {(s.activeIndex === 1) ? <Conferences profile={s.profile} onPostsClick={this.postsClickHandler} settings={s.settings!} key={s.key} /> : null}
-          {(s.activeIndex === 2) ? <DiscussionTab post={s.post} profile={s.profile} defaultSearch={s.postsDefaultSearch} settings={s.settings!} key={s.key} /> : null}
-          {(s.activeIndex === 3) ? <Topics profile={s.profile} defaultSearch={s.postsDefaultSearch} settings={s.settings!} key={s.key} userSettings={s.userSettings} /> : null}
+          {(s.activeIndex === 2) ? <DiscussionTab post={s.post} profile={s.profile} defaultSearch={s.postsDefaultSearch} settings={s.settings!} key={s.key} userSettings={s.userSettings} /> : null}
+          {/* {(s.activeIndex === 3) ? <Topics profile={s.profile} defaultSearch={s.postsDefaultSearch} settings={s.settings!} key={s.key} userSettings={s.userSettings} /> : null} */}
 
         </div>
       </div>
