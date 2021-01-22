@@ -350,6 +350,9 @@ export async function getPostsWithInvitations(namespace: string, username: strin
                 x.fullname = '';
             })
 
+            // fill is_from_me property
+            conference.users.forEach((u: any) => u.is_from_me = !!conference.invitations.find((i: any) => i.namespace_to === u.namespace && i.username_to === u.username && i.namespace_from === namespace && i.username_from === username));
+            
             delete conference.invitations;
         }
     }

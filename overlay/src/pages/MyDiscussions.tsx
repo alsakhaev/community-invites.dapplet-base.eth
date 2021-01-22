@@ -8,7 +8,8 @@ interface IProps {
     defaultSearch: string;
     settings: Settings;
     profile: Profile;
-    onEdit: (post: Post, user: Profile) => void;
+    onEdit: (post: Post, user: Profile, conferenceId: number) => void;
+    highlightedPostId: string | null;
 }
 
 interface IState {
@@ -135,7 +136,17 @@ export class MyDiscussions extends React.Component<IProps, IState> {
         })
     }
 
-    _onEdit(p: PostWithInvitations) {
+    _onEdit(p: PostWithInvitations, c: {
+        id: number;
+        name: string;
+        short_name: string
+    }, u: {
+        namespace: string;
+        username: string;
+        fullname: string;
+        is_private: boolean;
+        is_from_me: boolean;
+    }) {
         const post: Post = {
             id: p.post.id,
             text: p.post.text,
@@ -151,7 +162,7 @@ export class MyDiscussions extends React.Component<IProps, IState> {
             fullname: p.post.fullname
         };
 
-        this.props.onEdit(post, user);
+        this.props.onEdit(post, user, c.id);
     }
 
     render() {
@@ -174,11 +185,12 @@ export class MyDiscussions extends React.Component<IProps, IState> {
                                 post={p} 
                                 key={p.post.id} 
                                 profile={this.props.profile}
-                                highlight={this.state.highlightedId === p.post.id}
+                                highlight={this.props.highlightedPostId === p.post.id}
                                 //onClick={() => this._selectCard(p.post.id)}
-                                onEdit={(p.post.namespace === this.props.profile.namespace && p.post.username === this.props.profile.username) ? undefined : () => this._onEdit(p)}
-                                onMouseEnter={() => this._selectCard(p.post.id)}
-                                onMouseLeave={() => this._selectCard(p.post.id)}
+                                //onEdit={(p.post.namespace === this.props.profile.namespace && p.post.username === this.props.profile.username) ? undefined : () => this._onEdit(p)}
+                                // onMouseEnter={() => this._selectCard(p.post.id)}
+                                // onMouseLeave={() => this._selectCard(p.post.id)}
+                                onUserClick={(c, u) => this._onEdit(p, c, u)}
                             />
                         ) : <Segment>No entries found</Segment>}
                     </React.Fragment>}

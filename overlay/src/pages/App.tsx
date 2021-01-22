@@ -4,7 +4,7 @@ import { dappletInstance, Post, Profile, Settings } from '../dappletBus';
 import { Segment, Loader, Menu, Input, InputOnChangeData, Label, Icon } from 'semantic-ui-react';
 import { Conferences } from './Conferences';
 import { Invite } from './Invite';
-import { MyDiscussions } from './MyDiscussions';
+import { DiscussionTab } from './DiscussionTab';
 import { Topics } from '../pages/Topics';
 import { Api, UserSettings } from '../api';
 
@@ -42,7 +42,7 @@ export class App extends React.Component<IProps, IState> {
         this.setState({ userSettings });
       }
 
-      this.setState({ post, profile, settings, activeIndex: profile ? 0 : 1, key: Math.random() });
+      this.setState({ post, profile, settings, activeIndex: profile ? 2 : 1, key: Math.random() });
     });
 
     this._teamIdInputRef = React.createRef();
@@ -107,9 +107,9 @@ export class App extends React.Component<IProps, IState> {
     this.onTeamIdChange(_, { value });
   }
 
-  onEdit(post: Post, profile: Profile) {
-    this.setState({ post, activeIndex: 0, key: Math.random() });
-  }
+  // onEdit(post: Post, profile: Profile, conferenceId: number) {
+  //   this.setState({ post, activeIndex: 0, key: Math.random() });
+  // }
 
   render() {
 
@@ -161,11 +161,11 @@ export class App extends React.Component<IProps, IState> {
               />}
           </div>
           <Menu pointing secondary style={{ margin: '0.5em 0 0 0' }}>
-            {s.profile ? <Menu.Item
+            {/* {s.profile ? <Menu.Item
               name='Invite'
               active={s.activeIndex === 0}
               onClick={() => this.changeTab(0)}
-            /> : null}
+            /> : null} */}
             <Menu.Item
               name='Conferences'
               active={s.activeIndex === 1}
@@ -192,9 +192,9 @@ export class App extends React.Component<IProps, IState> {
 
         <div style={{ flex: '1', overflow: 'auto', padding: '15px' }}>
 
-          {(s.activeIndex === 0) ? <Invite profile={s.profile} post={s.post} onPostsClick={this.postsClickHandler} settings={s.settings!} key={s.key} /> : null}
+          {/* {(s.activeIndex === 0) ? <Invite profile={s.profile} post={s.post} onPostsClick={this.postsClickHandler} settings={s.settings!} key={s.key} /> : null} */}
           {(s.activeIndex === 1) ? <Conferences profile={s.profile} onPostsClick={this.postsClickHandler} settings={s.settings!} key={s.key} /> : null}
-          {(s.activeIndex === 2) ? <MyDiscussions profile={s.profile} defaultSearch={s.postsDefaultSearch} settings={s.settings!} key={s.key} onEdit={this.onEdit.bind(this)} /> : null}
+          {(s.activeIndex === 2) ? <DiscussionTab post={s.post} profile={s.profile} defaultSearch={s.postsDefaultSearch} settings={s.settings!} key={s.key} /> : null}
           {(s.activeIndex === 3) ? <Topics profile={s.profile} defaultSearch={s.postsDefaultSearch} settings={s.settings!} key={s.key} userSettings={s.userSettings} /> : null}
 
         </div>

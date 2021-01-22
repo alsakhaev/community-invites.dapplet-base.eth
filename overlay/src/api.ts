@@ -38,6 +38,7 @@ export type PostWithInvitations = {
             username: string;
             fullname: string;
             is_private: boolean;
+            is_from_me: boolean;
         }[];
     }[];
 }

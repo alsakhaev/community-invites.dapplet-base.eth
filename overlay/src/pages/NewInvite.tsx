@@ -11,10 +11,11 @@ interface IProps {
     post: Post;
     profile: Profile;
     settings: Settings;
-    onInvited: (id: number) => void;
+    onInvited: (id: string) => void;
     loading: boolean;
     onCancel: () => void;
     onWithdraw: (id: number) => Promise<void>;
+    defaultConferenceId: number | null;
 }
 
 interface IState {
@@ -45,7 +46,7 @@ export class NewInvite extends React.Component<IProps, IState> {
                 img: post.authorImg,
                 namespace: 'twitter.com'
             },
-            selectedConferenceId: -1,
+            selectedConferenceId: props.defaultConferenceId ?? -1,
             loading: true,
             isInvitingLoading: false,
             isPrivate: false,
@@ -85,7 +86,7 @@ export class NewInvite extends React.Component<IProps, IState> {
             attendies: x.attendies
         }))
         this.setState({ data: filteredByPosts });
-        this.changeConference(data[0]?.conference.id ?? -1);
+        if (this.state.selectedConferenceId === -1) this.changeConference(data[0]?.conference.id ?? -1);
     }
 
     async invite() {

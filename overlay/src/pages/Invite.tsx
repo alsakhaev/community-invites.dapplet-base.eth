@@ -155,7 +155,7 @@ export class Invite extends React.Component<IProps, IState> {
       </Breadcrumb> */}
 
       {(s.currentTab === Tabs.AllInvites) ? <AllInvites highlightedInvitationId={s.highlightedInvitationId} loading={s.loading} settings={p.settings} profile={p.profile} data={s.data} onWithdraw={(x) => this.withdraw(x)} /> : null}
-      {(s.currentTab === Tabs.NewInvite) ? <NewInvite loading={s.loading} settings={p.settings} profile={p.profile} post={p.post!} onInvited={(invId) => this.onInvitedHandler(invId)} onCancel={() => this.setState({ currentTab: Tabs.AllInvites })} onWithdraw={(x) => this.withdraw2(x)} /> : null}
+      {/* {(s.currentTab === Tabs.NewInvite) ? <NewInvite loading={s.loading} settings={p.settings} profile={p.profile} post={p.post!} onInvited={(invId) => this.onInvitedHandler(invId)} onCancel={() => this.setState({ currentTab: Tabs.AllInvites })} onWithdraw={(x) => this.withdraw2(x)} /> : null} */}
 
     </React.Fragment>
   }
