@@ -1,10 +1,10 @@
 {
     "main": {
-        "overlayUrl": "https://gateway.ethswarm.org/bzz/872000c6f687663d2229997968705a758d65c9907872479cc459a702c56ed37f/",
+        "overlayUrl": "https://gateway.ethswarm.org/bzz/73c8de9d9f36c79978cdecd01a6b6d02fdd6705cabc5eaed0d110f0573a9fd9c/",
         "serverUrl": "https://community-invite.herokuapp.com"
     },
     "test": {
-        "overlayUrl": "https://gateway.ethswarm.org/bzz/872000c6f687663d2229997968705a758d65c9907872479cc459a702c56ed37f/",
+        "overlayUrl": "https://gateway.ethswarm.org/bzz/73c8de9d9f36c79978cdecd01a6b6d02fdd6705cabc5eaed0d110f0573a9fd9c/",
         "serverUrl": "https://community-invite.herokuapp.com"
     },
     "dev": {
