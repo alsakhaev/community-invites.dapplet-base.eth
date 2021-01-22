@@ -3,7 +3,6 @@ import './App.css';
 import { dappletInstance, Post, Profile, Settings } from '../dappletBus';
 import { Segment, Loader, Menu, Input, InputOnChangeData, Label, Icon } from 'semantic-ui-react';
 import { Conferences } from './Conferences';
-import { Invite } from './Invite';
 import { DiscussionTab } from './DiscussionTab';
 import { Topics } from '../pages/Topics';
 import { Api, UserSettings } from '../api';
