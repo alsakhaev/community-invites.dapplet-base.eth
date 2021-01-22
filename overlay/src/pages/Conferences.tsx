@@ -259,7 +259,7 @@ export class Conferences extends React.Component<IProps, IState> {
   render() {
     if (!this.props.profile) {
       return <Container text style={{ textAlign: 'center' }}>
-        You are not logged in
+        Please login to Twitter to continue
       </Container>;
     }
 

@@ -127,7 +127,7 @@ export class App extends React.Component<IProps, IState> {
     if (!s.profile) {
       return (<div className="App-container" style={{ padding: '15px' }}>
         <Segment>
-          You are not logged in
+          Please login to Twitter to continue
         </Segment>
       </div>)
     }
