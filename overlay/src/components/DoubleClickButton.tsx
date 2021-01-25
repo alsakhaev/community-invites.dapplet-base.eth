@@ -5,12 +5,13 @@ import { SemanticCOLORS } from 'semantic-ui-react/dist/commonjs/generic';
 interface IProps {
     icon: string;
     primary: boolean;
-    toggle: boolean;
-    active: boolean;
+    // toggle: boolean;
+    // active: boolean;
     onClick: () => void;
     onDoubleClick: () => void;
     loading: boolean;
     disabled: boolean;
+    basic: boolean;
 }
 
 interface IState {
@@ -46,8 +47,9 @@ export class DoubleClickButton extends React.Component<IProps, IState> {
         return <Button
             icon={this.props.icon}
             primary={this.props.primary}
-            toggle={this.props.toggle}
-            active={this.props.active}
+            // toggle={this.props.toggle}
+            // active={this.props.active}
+            basic={this.props.basic}
             loading={this.props.loading}
             disabled={this.props.disabled}
             onClick={this._handleClick.bind(this)}

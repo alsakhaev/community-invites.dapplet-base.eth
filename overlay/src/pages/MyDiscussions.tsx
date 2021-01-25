@@ -228,6 +228,7 @@ export class MyDiscussions extends React.Component<IProps, IState> {
         const postsWithTags = await this._api.getAllTopicsWithMyTags(this.props.profile.namespace, this.props.profile.username, this.props.userSettings?.teamId);
         this._setLoading(item_id, false);
         this.setState({ postsWithTags });
+        this._filterChanged();
     }
 
     async untag(item_id: string, tag_id: string) {
@@ -237,6 +238,7 @@ export class MyDiscussions extends React.Component<IProps, IState> {
         const postsWithTags = await this._api.getAllTopicsWithMyTags(this.props.profile.namespace, this.props.profile.username, this.props.userSettings?.teamId);
         this._setLoading(item_id, false);
         this.setState({ postsWithTags });
+        this._filterChanged();
     }
 
     private _filterChanged() {
@@ -310,7 +312,7 @@ export class MyDiscussions extends React.Component<IProps, IState> {
                         style={{ color: 'rgb(33, 133, 208)' }}
                         options={s.filterOptions.map((x, i) => ({ text: x, value: x }))}
                         defaultValue={s.filterValue}
-                        onChange={(_, d) => (this._filterChanged(), this.setState({ filterValue: d.value as FilterValues, isFilterChanged: true }))}
+                        onChange={(_, d) => (this._update(), this.setState({ filterValue: d.value as FilterValues, isFilterChanged: true }))}
                     />
                 </div>
                 <div style={{ flex: '1' }}>
@@ -319,8 +321,8 @@ export class MyDiscussions extends React.Component<IProps, IState> {
                         options={s.sortingOptions}
                         value={s.sortingValue}
                         direction={s.sortingDirection}
-                        onDirectionChange={(x) => (this._filterChanged(), this.setState({ sortingDirection: x, isFilterChanged: true }))}
-                        onValueChange={(x) => (this._filterChanged(), this.setState({ sortingValue: x as SortingValues, isFilterChanged: true, sortingDirection: SortingDirection.Desc }))}
+                        onDirectionChange={(x) => (this._update(), this.setState({ sortingDirection: x, isFilterChanged: true }))}
+                        onValueChange={(x) => (this._update(), this.setState({ sortingValue: x as SortingValues, isFilterChanged: true, sortingDirection: SortingDirection.Desc }))}
                     />
                 </div>
             </div>
@@ -337,8 +339,9 @@ export class MyDiscussions extends React.Component<IProps, IState> {
                 <DoubleClickButton
                     icon='filter'
                     primary
-                    toggle
-                    active={this.state.autoupdate}
+                    //toggle
+                    //active={this.state.autoupdate}
+                    basic={!this.state.autoupdate}
                     onClick={() => this._update()}
                     onDoubleClick={() => (this.setState({ autoupdate: !this.state.autoupdate }), this._update())}
                     loading={s.isFilterLoading}

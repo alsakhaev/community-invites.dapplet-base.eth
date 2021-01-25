@@ -166,14 +166,14 @@ export class App extends React.Component<IProps, IState> {
               onClick={() => this.changeTab(0)}
             /> : null} */}
             <Menu.Item
-              name='Conferences'
-              active={s.activeIndex === 1}
-              onClick={() => this.changeTab(1)}
-            />
-            <Menu.Item
               name='Discussions'
               active={s.activeIndex === 2}
               onClick={() => this.changeTab(2)}
+            />
+            <Menu.Item
+              name='Conferences'
+              active={s.activeIndex === 1}
+              onClick={() => this.changeTab(1)}
             />
             {/* {(s.userSettings?.teamId) ? <Menu.Item
               name='Topics'
@@ -181,8 +181,10 @@ export class App extends React.Component<IProps, IState> {
               onClick={() => this.changeTab(3)}
             /> : null} */}
             <Menu.Item
-              name='Dashboard'
-              icon='external'
+              content={<>
+                Dashboard
+                <Icon name='external' style={{ marginLeft: '8px' }} />
+              </>}
               title='Open Dashboard in new tab'
               style={{ cursor: 'pointer' }}
               onClick={() => window.open(`http://gateway.ethswarm.org/bzz/9ce8d56a3aa638f43766ac908342a65e4396c93f32d7d636d5a9f7cd4ce97f64/${(s.userSettings?.teamId) ? '#/?teamId=' + s.userSettings?.teamId : ''}`, '_blank')}
