@@ -62,7 +62,9 @@ CREATE TABLE itemtags (
   tag_id UUID NOT NULL,
   namespace VARCHAR NOT NULL,
   username VARCHAR NOT NULL,
-  value BOOLEAN NOT NULL
+  value BOOLEAN NOT NULL,
+  created TIMESTAMPTZ NOT NULL,
+  modified TIMESTAMPTZ NOT NULL
 );
 
 CREATE TABLE teams (
