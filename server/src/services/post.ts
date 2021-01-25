@@ -48,7 +48,7 @@ type PostWithTags = {
     fullname: string;
     img: string;
     text: string;
-    tags: { id: string, name: string, value: boolean }[];
+    tags: { id: string, name: string, value: boolean, created: string, modified: string }[];
 }
 
 export async function getPosts(namespace?: string, username?: string): Promise<Post[]> {
@@ -377,7 +377,9 @@ export async function getAllWithMyTags(namespace: string, username: string, team
                     COALESCE(json_agg(json_build_object(
                         'id', t.id,
                         'name', t.name,
-                        'value', it.value
+                        'value', it.value,
+                        'created', it.created,
+                        'modified', it.modified
                     )) FILTER (WHERE t.id IS NOT NULL), '[]') 
                 FROM itemtags as it
                 JOIN tags as t on t.id = it.tag_id

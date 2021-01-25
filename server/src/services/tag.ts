@@ -43,17 +43,18 @@ async function _makeItemTag(item_id: string, tag_id: string, user: Profile, valu
             return result.rowCount > 0;
         })();
 
-        const values = [item_id, tag_id, user.namespace, user.username, value];
+        const values = [item_id, tag_id, user.namespace, user.username, value, new Date().toISOString()];
         const query = (isExist) ? `
             UPDATE itemtags
-            SET value = $5
+            SET value = $5,
+                modified = $6
             WHERE item_id = $1
                 AND tag_id = $2
                 AND namespace = $3
                 AND username = $4
         ` : `
-            INSERT INTO itemtags(item_id, tag_id, namespace, username, value) 
-            VALUES ($1, $2, $3, $4, $5);
+            INSERT INTO itemtags(item_id, tag_id, namespace, username, value, created, modified) 
+            VALUES ($1, $2, $3, $4, $5, $6, $6);
         `;
 
         await client.query(query, values);

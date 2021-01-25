@@ -96,7 +96,7 @@ export type PostWithTags = {
     fullname: string;
     img: string;
     text: string;
-    tags: { id: string, name: string, value: boolean }[];
+    tags: { id: string, name: string, value: boolean, created: string, modified: string }[];
 }
 
 export type Tag = {

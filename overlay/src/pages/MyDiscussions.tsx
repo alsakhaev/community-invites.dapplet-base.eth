@@ -1,8 +1,10 @@
 import React from 'react';
-import { Segment, Comment, Input, InputOnChangeData, Loader } from 'semantic-ui-react';
+import { Segment, Comment, Input, InputOnChangeData, Loader, Dropdown, Button } from 'semantic-ui-react';
 import { Api, PostWithInvitations, PostWithTags, Tag, UserSettings } from '../api';
 import { Post, Profile, Settings } from '../dappletBus';
 import { AggInvitationCard } from '../components/AggInvitationCard';
+import { SortingDropdown } from '../components/SortingDropdown';
+import { DoubleClickButton } from '../components/DoubleClickButton';
 
 interface IProps {
     defaultSearch: string;
@@ -22,13 +24,42 @@ interface IState {
     highlightedId: string | null;
     postsWithTags: PostWithTags[];
     tags: Tag[];
+
+    sortingValue: SortingValues;
+    sortingDirection: SortingDirection;
+    sortingOptions: SortingValues[];
+
+    filterValue: FilterValues;
+    filterOptions: FilterValues[];
+
+    autoupdate: boolean;
+
+    isFilterLoading: boolean;
+    isFilterChanged: boolean;
+}
+
+export enum SortingValues {
+    TimeOfCreation = 'time of creation',
+    TimeOfTagging = 'time of tagging'
+}
+
+export enum FilterValues {
+    All = 'all',
+    Tagged = 'tagged',
+    NotTagged = 'not tagged'
+}
+
+export enum SortingDirection {
+    Desc = 'desc',
+    Asc = 'asc'
 }
 
 export class MyDiscussions extends React.Component<IProps, IState> {
 
     private _api: Api;
+    private _allData: PostWithInvitations[] = [];
 
-    constructor(props: any) {
+    constructor(props: IProps) {
         super(props);
         this._api = new Api(this.props.settings.serverUrl);
         this.state = {
@@ -41,7 +72,15 @@ export class MyDiscussions extends React.Component<IProps, IState> {
             active2: null,
             highlightedId: null,
             tags: [],
-            postsWithTags: []
+            postsWithTags: [],
+            sortingValue: SortingValues.TimeOfCreation,
+            sortingDirection: SortingDirection.Desc,
+            sortingOptions: (props.userSettings?.teamId) ? [SortingValues.TimeOfCreation, SortingValues.TimeOfTagging] : [SortingValues.TimeOfCreation],
+            filterValue: FilterValues.All,
+            filterOptions: (props.userSettings?.teamId) ? [FilterValues.All, FilterValues.Tagged, FilterValues.NotTagged] : [FilterValues.All],
+            autoupdate: false,
+            isFilterLoading: false,
+            isFilterChanged: false
         };
     }
 
@@ -52,6 +91,8 @@ export class MyDiscussions extends React.Component<IProps, IState> {
                 const posts = await this._api.getInvitationPosts(profile.namespace, profile.username);
                 const postsWithTags = await this._api.getAllTopicsWithMyTags(profile.namespace, profile.username, this.props.userSettings?.teamId);
                 this.setState({ posts, postsWithTags });
+                this._allData = posts;
+                this._update();
             }
 
             const tags = await this._api.getTags(this.props.userSettings?.teamId);
@@ -198,25 +239,121 @@ export class MyDiscussions extends React.Component<IProps, IState> {
         this.setState({ postsWithTags });
     }
 
+    private _filterChanged() {
+        if (this.state.autoupdate) {
+            this._update();
+        }
+    }
+
+    private async _update() {
+        this.setState({ isFilterChanged: false, isFilterLoading: true });
+
+        await new Promise((res) => setTimeout(res, 500));
+
+        const s = this.state;
+        let posts = [...this._allData]
+            .filter(x => {
+                if (s.filterValue === FilterValues.All) { // all
+                    return true;
+                } else if (s.filterValue === FilterValues.Tagged) { // tagged
+                    return this._getTagsForPost(x).length !== 0;
+                } else if (s.filterValue === FilterValues.NotTagged) { // not tagged
+                    return this._getTagsForPost(x).length === 0;
+                }
+            })
+            .sort((a, b) => {
+                const result = (() => {
+                    const defaultResult = BigInt(a.post.id) < BigInt(b.post.id) ? -1 : 1;
+
+                    if (s.sortingValue === SortingValues.TimeOfCreation) { // by created
+                        return defaultResult;
+                    }
+
+                    if (s.sortingValue === SortingValues.TimeOfTagging) { // by last tagging
+                        const tagsA = [...this._getTagsForPost(a)];
+                        const tagsB = [...this._getTagsForPost(b)];
+
+                        const lastA = (tagsA.length > 0) ? tagsA.sort((a, b) => (new Date(a.modified) > new Date(b.modified) ? 1 : -1))[tagsA.length - 1].modified : null;
+                        const lastB = (tagsB.length > 0) ? tagsB.sort((a, b) => (new Date(a.modified) > new Date(b.modified) ? 1 : -1))[tagsB.length - 1].modified : null;
+
+                        if (lastA === null && lastB === null) {
+                            return defaultResult;
+                        } else if (lastA === null && lastB !== null) {
+                            return -1;
+                        } else if (lastA !== null && lastB === null) {
+                            return 1;
+                        } else {
+                            return (new Date(lastA as string) > new Date(lastB as string) ? 1 : -1);
+                        }
+                    }
+
+                    return defaultResult;
+                })();
+
+                return (s.sortingDirection === SortingDirection.Desc) ? result * -1 : result;
+            });
+
+        this.setState({ posts, isFilterLoading: false });
+    }
+
     render() {
+        const s = this.state;
         const filteredPosts = this.state.posts.filter(this._postFilter);
 
         return (<div style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
-            <div style={{ marginBottom: '15px' }}>
-                <Input fluid placeholder='Search...' value={this.state.search}
+
+            <div style={{ display: 'flex', marginBottom: '15px' }}>
+                <div style={{ flex: '1' }}>
+                    <span>filter: </span>
+                    <Dropdown
+                        icon={false}
+                        style={{ color: 'rgb(33, 133, 208)' }}
+                        options={s.filterOptions.map((x, i) => ({ text: x, value: x }))}
+                        defaultValue={s.filterValue}
+                        onChange={(_, d) => (this._filterChanged(), this.setState({ filterValue: d.value as FilterValues, isFilterChanged: true }))}
+                    />
+                </div>
+                <div style={{ flex: '1' }}>
+                    <span>sorting: </span>
+                    <SortingDropdown
+                        options={s.sortingOptions}
+                        value={s.sortingValue}
+                        direction={s.sortingDirection}
+                        onDirectionChange={(x) => (this._filterChanged(), this.setState({ sortingDirection: x, isFilterChanged: true }))}
+                        onValueChange={(x) => (this._filterChanged(), this.setState({ sortingValue: x as SortingValues, isFilterChanged: true, sortingDirection: SortingDirection.Desc }))}
+                    />
+                </div>
+            </div>
+
+            <div style={{ marginBottom: '15px', display: 'flex' }}>
+                <Input
+                    style={{ marginRight: '8px', flex: 'auto' }}
+                    placeholder='Search...'
+                    value={this.state.search}
                     icon='search'
                     iconPosition='left'
                     onChange={this.inputChangeHandler}
                 />
+                <DoubleClickButton
+                    icon='filter'
+                    primary
+                    toggle
+                    active={this.state.autoupdate}
+                    onClick={() => this._update()}
+                    onDoubleClick={() => (this.setState({ autoupdate: !this.state.autoupdate }), this._update())}
+                    loading={s.isFilterLoading}
+                    disabled={s.isFilterLoading}
+                />
             </div>
+
             <div style={{ flex: '1', overflow: 'auto', marginRight: '-15px', paddingRight: '15px' }}>
                 {this._getLoading('list') ? <Segment>
                     <Loader active inline='centered'>Loading</Loader>
                 </Segment> : <React.Fragment>
                         {(filteredPosts.length > 0) ? filteredPosts.map((p, i) =>
-                            <AggInvitationCard 
-                                post={p} 
-                                key={p.post.id} 
+                            <AggInvitationCard
+                                post={p}
+                                key={p.post.id}
                                 profile={this.props.profile}
                                 highlight={this.props.highlightedPostId === p.post.id}
                                 tags={this._getTagsForPost(p)}
