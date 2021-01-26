@@ -107,7 +107,8 @@ export class MyDiscussions extends React.Component<IProps, IState> {
     _getTagsForPost(p: PostWithInvitations) {
         const tagged = this.state.postsWithTags;
         const post = tagged.find(x => x.id === p.post.id);
-        return post?.tags || [];
+        const allTags = post?.tags || [];
+        return allTags.filter(x => x.value === true);
     }
 
     async componentWillUnmount() {
