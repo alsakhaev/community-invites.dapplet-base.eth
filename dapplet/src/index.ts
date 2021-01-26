@@ -18,7 +18,7 @@ export default class Feature {
         public viewportAdapter: any
     ) {
         Core.onAction(() => this._openOverlay(this.identityAdapter.getCurrentUser()));
-        Core.onHome(() => window.open('http://gateway.ethswarm.org/bzz/9ce8d56a3aa638f43766ac908342a65e4396c93f32d7d636d5a9f7cd4ce97f64', '_blank'));
+        Core.onHome(() => window.open('https://community-invite-dashboard.herokuapp.com', '_blank'));
  
         const { button, caption } = this.identityAdapter.exports;
 
