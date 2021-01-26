@@ -224,20 +224,20 @@ export class MyDiscussions extends React.Component<IProps, IState> {
 
     async tag(item_id: string, tag_id: string) {
         if (!this.props.profile) throw Error('You are not logged in');
-        this._setLoading(item_id, true);
+        this._setLoading(`${item_id}/tag`, true);
         await this._api.tag(item_id, tag_id, this.props.profile, this.props.userSettings?.teamId);
         const postsWithTags = await this._api.getAllTopicsWithMyTags(this.props.profile.namespace, this.props.profile.username, this.props.userSettings?.teamId);
-        this._setLoading(item_id, false);
+        this._setLoading(`${item_id}/tag`, false);
         this.setState({ postsWithTags });
         this._filterChanged();
     }
 
     async untag(item_id: string, tag_id: string) {
-        this._setLoading(item_id, true);
+        this._setLoading(`${item_id}/untag/${tag_id}`, true);
         if (!this.props.profile) throw Error('You are not logged in');
         await this._api.untag(item_id, tag_id, this.props.profile, this.props.userSettings?.teamId);
         const postsWithTags = await this._api.getAllTopicsWithMyTags(this.props.profile.namespace, this.props.profile.username, this.props.userSettings?.teamId);
-        this._setLoading(item_id, false);
+        this._setLoading(`${item_id}/untag/${tag_id}`, false);
         this.setState({ postsWithTags });
         this._filterChanged();
     }
@@ -370,7 +370,7 @@ export class MyDiscussions extends React.Component<IProps, IState> {
                                 onTag={this.tag.bind(this)}
                                 onUntag={this.untag.bind(this)}
                                 onTagFilter={console.log}
-                                loading={this._getLoading(p.post.id)}
+                                loading={s.loading}
                                 tagging={!!this.props.userSettings?.teamId}
                             />
                         ) : <Segment>No entries found</Segment>}

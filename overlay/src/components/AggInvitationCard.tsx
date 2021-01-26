@@ -38,7 +38,7 @@ interface IProps {
         name: string;
         value: boolean;
     }) => void;
-    loading: boolean;
+    loading: { [key: string]: boolean };
     tagging: boolean;
 }
 
@@ -95,41 +95,54 @@ export class AggInvitationCard extends React.Component<IProps, IState> {
                         })}
                     </div>
 
-                    {(p.tagging) ? <div style={{ marginTop: '4px'}}>
+                    {(p.tagging) ? <div style={{ marginTop: '4px' }}>
 
-                        {p.tags.filter(x => x.value === true).map(x => <Label
-                            onClick={() => this.props.onTagFilter(x)}
-                            style={{ marginTop: '.14285714em' }}
-                            // as={(!this.props.loading) ? 'a' : undefined}
-                            // color={(!this.props.loading) ? 'green' : undefined}
-                            as='a'
-                            color='green'
-                            key={x.id}
-                        >
-                            {x.name}
-                            <Icon
-                                name='delete'
-                                link
-                                onClick={(e: any) => (e.stopPropagation(), this.props.onUntag(p.post.post.id, x.id))}
-                            />
-                        </Label>)}
+                        {p.tags.filter(x => x.value === true)
+                            .map(x => {
+
+                                const isTagLoading = p.loading[`${p.post.post.id}/untag/${x.id}`];
+
+                                return <Label
+                                    onClick={(!isTagLoading) ? () => this.props.onTagFilter(x) : undefined}
+                                    style={{ marginTop: '.14285714em' }}
+                                    as={(!isTagLoading) ? 'a' : undefined}
+                                    color={(!isTagLoading) ? 'green' : undefined}
+                                    key={x.id}
+                                >
+                                    {x.name}
+                                    <Icon
+                                        name='delete'
+                                        disabled={isTagLoading}
+                                        link
+                                        onClick={(e: any) => (e.stopPropagation(), this.props.onUntag(p.post.post.id, x.id))}
+                                    />
+                                </Label>
+                            })}
 
                         {(p.availableTags.filter(x => !p.tags.find(y => y.id === x.id && y.value === true)).length > 0) ? <Dropdown
                             trigger={
                                 <Label
                                     style={{ marginTop: '.14285714em' }}
                                     color='blue'
+                                    disabled={p.loading[`${p.post.post.id}/tag`]}
                                 >
-                                <Icon name='plus' />Add tag</Label>
+                                    <Icon name='plus' />Add tag</Label>
                             }
                             pointing='top right'
                             icon={null}
-                            disabled={this.props.loading}
+                            disabled={p.loading[`${p.post.post.id}/tag`]}
                         >
                             <Dropdown.Menu>
-                                {p.availableTags.filter(x => !p.tags.find(y => y.id === x.id && y.value === true)).map(x => <Dropdown.Item key={x.id} onClick={() => this.props.onTag(p.post.post.id, x.id)}>{x.name}</Dropdown.Item>)}
+                                {p.availableTags.filter(x => !p.tags.find(y => y.id === x.id && y.value === true))
+                                    .map(x =>
+                                        <Dropdown.Item
+                                            key={x.id}
+                                            onClick={() => this.props.onTag(p.post.post.id, x.id)}
+                                        >{x.name}</Dropdown.Item>
+                                    )}
                             </Dropdown.Menu>
                         </Dropdown> : null}
+
                     </div> : null}
                 </Comment>
             </Comment.Group>
