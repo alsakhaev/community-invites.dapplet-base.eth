@@ -1,6 +1,6 @@
 {
   "name": "community-invites.dapplet-base.eth",
-  "version": "0.1.20",
+  "version": "0.1.23",
   "description": "Invite whoever you want to see at events",
   "main": "lib/index.js",
   "scripts": {
@@ -20,6 +20,5 @@
     "rollup-plugin-serve": "^1.0.1",
     "tslib": "^1.11.2",
     "typescript": "^3.8.3"
-  },
-  "dependencies": {}
+  }
 }

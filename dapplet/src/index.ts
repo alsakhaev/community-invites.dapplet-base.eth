@@ -66,8 +66,7 @@ export default class Feature {
 
     private async _openOverlay(profile: any, post?: any) {
         if (!this._overlay) {
-            const url = await Core.storage.get('overlayUrl');
-            this._overlay = Core.overlay({ url, title: 'Community Invite' });
+            this._overlay = Core.overlay({ name: 'community-invite-overlay', title: 'Community Invite' });
         }
 
         const serverUrl = await Core.storage.get('serverUrl');
