@@ -1,6 +1,6 @@
 {
   "name": "community-invites.dapplet-base.eth",
-  "version": "0.1.23",
+  "version": "0.1.25",
   "description": "Invite whoever you want to see at events",
   "main": "lib/index.js",
   "scripts": {
