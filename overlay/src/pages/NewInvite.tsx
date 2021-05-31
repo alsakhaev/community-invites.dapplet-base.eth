@@ -185,7 +185,7 @@ export class NewInvite extends React.Component<IProps, IState> {
 
                 </Segment> : null}
 
-                {!selectedConference!.attendance_from ? <Message warning>
+                {selectedConference && !selectedConference.attendance_from ? <Message warning>
                     Your invite implies your attendance at the conference
                 </Message> : null}
 
@@ -202,7 +202,7 @@ export class NewInvite extends React.Component<IProps, IState> {
                 <div style={{ textAlign: 'end' }}>
                     <Checkbox style={{ margin: '0 20px 0 0' }} label='Private' disabled={s.isInvitingLoading} checked={s.isPrivate} onChange={(e, d) => this.setState({ isPrivate: d.checked as boolean, isModified: true })} />
 
-                    {(!currentInvitation) ? ((!selectedConference!.attendance_from) ?
+                    {(!currentInvitation) ? ((selectedConference && !selectedConference.attendance_from) ?
                         <Button primary onClick={() => this.invite()} loading={s.isInvitingLoading} disabled={s.isInvitingLoading}>{'Attend & Invite'}</Button>
                         : <Button primary onClick={() => this.invite()} loading={s.isInvitingLoading} disabled={s.isInvitingLoading}>Invite</Button>)
                         : <Button primary onClick={() => this.invite()} loading={s.isInvitingLoading} disabled={s.isInvitingLoading || !s.isModified}>Save</Button>}
