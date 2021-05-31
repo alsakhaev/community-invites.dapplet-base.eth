@@ -23,16 +23,14 @@ export default class Feature {
         const { button, caption } = this.identityAdapter.exports;
 
         this.identityAdapter.attachConfig({
-            POST_SOUTH: [
+            POST: () => [
                 button({
                     initial: "DEFAULT",
                     "DEFAULT": {
                         img: ICON,
                         exec: (post) => this._openOverlay(this.identityAdapter.getCurrentUser(), post)
                     }
-                })
-            ],
-            POST_SOCIAL_CONTEXT: [
+                }),
                 caption({
                     initial: "DEFAULT",
                     "DEFAULT": {
@@ -71,9 +69,7 @@ export default class Feature {
 
         const serverUrl = await Core.storage.get('serverUrl');
         if (profile) profile.namespace = 'twitter.com';
-        this._overlay.sendAndListen('data', { profile, post, settings: { serverUrl } }, {
-
-        });
+        this._overlay.send('data', { profile, post, settings: { serverUrl } });
     }
 
     private async _getUserAttendance(namespace: string, username: string): Promise<BadgeInfo[]> {
