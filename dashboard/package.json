@@ -11,6 +11,7 @@
     "@types/node": "^12.12.62",
     "@types/react": "^16.9.49",
     "@types/react-dom": "^16.9.8",
+    "erebos": "^0.3.0",
     "jszip": "^3.5.0",
     "lodash.sortby": "^4.7.0",
     "react": "^16.13.1",
@@ -20,8 +21,7 @@
     "search-string": "^3.1.0",
     "semantic-ui-css": "^2.4.1",
     "semantic-ui-react": "^2.0.0",
-    "typescript": "^3.7.5",
-    "erebos": "^0.3.0"
+    "typescript": "^3.7.5"
   },
   "scripts": {
     "start": "cross-env REACT_APP_API_URL=http://localhost:3003 PORT=3004 BROWSER=none react-scripts start",
