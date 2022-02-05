@@ -1,15 +1,9 @@
 {
     "type": "object",
     "required": [
-        "overlayUrl",
         "serverUrl"
     ],
     "properties": {
-        "overlayUrl": {
-            "type": "string",
-            "title": "Overlay URL",
-            "hidden": true
-        },
         "serverUrl": {
             "type": "string",
             "title": "Server URL"

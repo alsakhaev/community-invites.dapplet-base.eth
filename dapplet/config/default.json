@@ -1,14 +1,11 @@
 {
     "main": {
-        "overlayUrl": "https://community-invite-overlay.herokuapp.com",
-        "serverUrl": "https://community-invite.herokuapp.com"
+        "serverUrl": "https://distributed-parser-dapplet.herokuapp.com"
     },
     "test": {
-        "overlayUrl": "https://community-invite-overlay.herokuapp.com",
-        "serverUrl": "https://community-invite.herokuapp.com"
+        "serverUrl": "https://distributed-parser-dapplet.herokuapp.com"
     },
     "dev": {
-        "overlayUrl": "https://localhost:3002",
         "serverUrl": "http://localhost:3003"
     }
 }
