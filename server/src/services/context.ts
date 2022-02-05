@@ -1,6 +1,6 @@
 import { execute } from '../connection';
 import { Context, ContextVariant } from '../types';
-import keccak256 from 'keccak256';
+import * as ethers from 'ethers';
 
 export async function getContexts(): Promise<Context[]> {
     const query = `
@@ -92,7 +92,7 @@ export async function registerContext(json: string): Promise<void> {
     const contextId = parsedContext.id;
     if (!contextId) throw new Error('No context id.');
 
-    const contextVariantId = keccak256(json).toString('hex');
+    const contextVariantId = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(json)).substring(2);
 
     if (!await getContext(contextId)) {
         await createContext({ id: contextId, views: 1 });
