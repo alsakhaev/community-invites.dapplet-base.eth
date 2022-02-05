@@ -25,6 +25,7 @@
   },
   "homepage": "https://github.com/dapplets/dapplet-registry#readme",
   "dependencies": {
+    "@types/bn.js": "^5.1.0",
     "@types/yesql": "^4.1.0",
     "cors": "^2.8.5",
     "ethers": "^5.0.13",
