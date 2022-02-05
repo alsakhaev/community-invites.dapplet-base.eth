@@ -6,7 +6,7 @@ import cors from "cors";
 
 var app = express();
 app.use(bodyParser.urlencoded());
-app.use(bodyParser.json());
+app.use(bodyParser.text());
 app.use(cors());
 
 app.use('/', routes);
