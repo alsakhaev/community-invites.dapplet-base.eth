@@ -14,8 +14,5 @@
     },
     "dependencies": {
         "identity-adapter.dapplet-base.eth": "0.3.0"
-    },
-    "overlays": {
-        "community-invite-overlay": "https://localhost:3002"
     }
 }
