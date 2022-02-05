@@ -68,5 +68,8 @@
     ],
     "exec": "npm start",
     "ext": "ts"
+  },
+  "engines": {
+    "node": "14.x"
   }
 }
