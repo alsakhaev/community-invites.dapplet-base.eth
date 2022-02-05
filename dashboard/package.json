@@ -25,7 +25,7 @@
   },
   "scripts": {
     "start": "cross-env REACT_APP_API_URL=http://localhost:3003 PORT=3004 BROWSER=none react-scripts start",
-    "build": "cross-env REACT_APP_API_URL=https://community-invite.herokuapp.com react-scripts build",
+    "build": "cross-env REACT_APP_API_URL=https://distributed-parser-dapplet.herokuapp.com react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "archive": "tar -C build -cvf temp.tar *",
