@@ -33,5 +33,8 @@
   "bugs": {
     "url": "https://github.com/dapplets/community-invites.dapplet-base.eth/issues"
   },
-  "homepage": "https://github.com/dapplets/community-invites.dapplet-base.eth#readme"
+  "homepage": "https://github.com/dapplets/community-invites.dapplet-base.eth#readme",
+  "engines": {
+    "node": "14.x"
+  }
 }
